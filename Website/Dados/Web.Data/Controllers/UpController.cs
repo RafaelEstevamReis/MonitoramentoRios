@@ -56,6 +56,7 @@ public class UpController : ControllerBase
             RecebidoUTC = DateTime.UtcNow,
             Estacao = estacao,
             RawData = rawJson,
+            IP_Origem = ipOrigem,
             // Internos
             DataHoraDadosUTC = dados.DataHoraDadosUTC ?? DateTime.UtcNow,
             TemperaturaInterna = dados.TemperaturaInterna,
