@@ -70,6 +70,7 @@ public class UpController : ControllerBase
             RawData = rawJson,
             IP_Origem = ipOrigem,
             // Internos
+            ForcaSinal = dados.ForcaSinal,
             DataHoraDadosUTC = dados.DataHoraDadosUTC ?? DateTime.UtcNow,
             TemperaturaInterna = dados.TemperaturaInterna,
             TensaoBateria = dados.TensaoBateria,
@@ -97,12 +98,13 @@ public class UpController : ControllerBase
     public class UploadData
     {
         // Dados Internos
-        public decimal? TemperaturaInterna { get; set; }
-        public decimal? TensaoBateria { get; set; }
+        public decimal? ForcaSinal { get; set; }
         /// <summary>
         /// Data que os dados foram gerados segundo a placa
         /// </summary>
         public DateTime? DataHoraDadosUTC { get; set; }
+        public decimal? TemperaturaInterna { get; set; }
+        public decimal? TensaoBateria { get; set; }
         // Medições
         public decimal? TemperaturaAr { get; set; }
         public decimal? UmidadeAr { get; set; }

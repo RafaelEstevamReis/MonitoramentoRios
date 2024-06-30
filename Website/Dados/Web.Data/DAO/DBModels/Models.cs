@@ -30,12 +30,13 @@ public class TBDadosEstacoes
     public string Estacao { get; set; } = string.Empty;
 
     // Dados Internos
+    public DateTime DataHoraDadosUTC { get; set; }
+    public decimal? ForcaSinal { get; set; }
     public decimal? TemperaturaInterna { get; set; }
     public decimal? TensaoBateria { get; set; }
     /// <summary>
     /// Data que os dados foram gerados segundo a placa
     /// </summary>
-    public DateTime DataHoraDadosUTC { get; set; }
     // Medições
     public decimal? TemperaturaAr { get; set; }
     public decimal? UmidadeAr { get; set; }

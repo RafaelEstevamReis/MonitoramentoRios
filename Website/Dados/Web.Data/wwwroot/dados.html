@@ -27,21 +27,23 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Recebido UTC</th>
+                <th>Recebido (UTC)</th>
                 <th>Estação</th>
                 <th>Temperatura Interna</th>
                 <th>Tensão da Bateria</th>
-                <th>Data e Hora dos Dados UTC</th>
+                <th>Data e Hora (UTC)</th>
                 <th>Temperatura do Ar</th>
                 <th>Umidade do Ar</th>
                 <th>Pressão do Ar</th>
                 <th>Nível da Água</th>
+                <th>Sinal Conexão</th>
             </tr>
         </thead>
         <tbody>
             <!-- Dados serão preenchidos dinamicamente aqui -->
         </tbody>
     </table>
+    <p>Veja mais em: <a href="https://github.com/RafaelEstevamReis/MonitoramentoRios" target="_blank">gh/MonitoramentoRios</a></p>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -63,6 +65,7 @@
                                         <td>${dado.umidadeAr || '-'}</td>
                                         <td>${dado.pressaoAr || '-'}</td>
                                         <td>${dado.nivelRio || '-'}</td>
+                                        <td>${dado.forcaSinal || '-'}</td>
                                     `;
                         tableBody.appendChild(row);
                     });
