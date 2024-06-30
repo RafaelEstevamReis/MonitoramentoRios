@@ -7,11 +7,11 @@ using Web.Data.DAO;
 
 [ApiController]
 [Route("estacoes")]
-public class Estacoes : ControllerBase
+public class EstacoesController : ControllerBase
 {
     private readonly DB db;
 
-    public Estacoes(DB db)
+    public EstacoesController(DB db)
     {
         this.db = db;
     }

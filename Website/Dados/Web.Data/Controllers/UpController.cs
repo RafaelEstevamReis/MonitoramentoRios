@@ -9,11 +9,11 @@ using Web.Data.DAO;
 
 [ApiController]
 [Route("[controller]")]
-public class Up : ControllerBase
+public class UpController : ControllerBase
 {
     private readonly DB db;
 
-    public Up(DB db)
+    public UpController(DB db)
     {
         this.db = db;
     }
