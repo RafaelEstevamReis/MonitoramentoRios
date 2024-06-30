@@ -6,7 +6,6 @@
     <title>Dados das Estações</title>
     <style>
         table {
-            width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
@@ -45,7 +44,7 @@
     </table>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             // Fazendo o request para o endpoint
             fetch('/estacoes/dados')
                 .then(response => response.json())
@@ -54,17 +53,17 @@
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${dado.id}</td>
-                            <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
-                            <td>${dado.estacao}</td>
-                            <td>${dado.temperaturaInterna || '-'}</td>
-                            <td>${dado.tensaoBateria || '-'}</td>
-                            <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
-                            <td>${dado.temperaturaAr || '-'}</td>
-                            <td>${dado.umidadeAr || '-'}</td>
-                            <td>${dado.pressaoAr || '-'}</td>
-                            <td>${dado.nivelRio || '-'}</td>
-                        `;
+                                        <td>${dado.id}</td>
+                                        <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
+                                        <td>${dado.estacao}</td>
+                                        <td>${dado.temperaturaInterna || '-'}</td>
+                                        <td>${dado.tensaoBateria || '-'}</td>
+                                        <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
+                                        <td>${dado.temperaturaAr || '-'}</td>
+                                        <td>${dado.umidadeAr || '-'}</td>
+                                        <td>${dado.pressaoAr || '-'}</td>
+                                        <td>${dado.nivelRio || '-'}</td>
+                                    `;
                         tableBody.appendChild(row);
                     });
                 })
