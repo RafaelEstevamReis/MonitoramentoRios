@@ -72,4 +72,4 @@ interval:
             root["TemperaturaInterna"] = id(internal_temp).state;
             root["TemperaturaAr"] = id(temp_sensor).state;
             root["UmidadeAr"] = id(hum_sensor).state;
-            root["SinalConexao"] = id(wifi_sig).state;
+            root["ForcaSinal"] = id(wifi_sig).state;
