@@ -19,7 +19,7 @@ public class EstacoesController : ControllerBase
     [HttpGet("dados")]
     public IEnumerable<DAO.DBModels.TBDadosEstacoes> ListarDados(string? estacao = null, int limit = 25)
     {
-        return db.ListarEstacoes(estacao, limit);
+        return db.ListarDados(estacao, limit);
     }
 
     [HttpPost("nova")]

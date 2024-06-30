@@ -26,7 +26,17 @@ public class DB
 
     }
 
-    public IEnumerable<DBModels.TBDadosEstacoes> ListarEstacoes(string? estacao = null, int limit = 50)
+    public IEnumerable<DBModels.TBDadosEstacoes> ListarEstacoes()
+    {
+        using var cnn = db.GetConnection();
+        var estacoes = cnn.GetAll<DBModels.TBEstacoes>();
+        foreach(var e in estacoes)
+        {
+            e.ApiKEY = "";
+        }
+        return estacoes;
+    }
+    public IEnumerable<DBModels.TBDadosEstacoes> ListarDados(string? estacao = null, int limit = 50)
     {
         if (limit > 512) limit = 512;
 
