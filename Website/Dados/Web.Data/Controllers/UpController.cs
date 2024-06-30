@@ -1,7 +1,9 @@
 ﻿namespace Web.Data.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.IO;
 using System.Linq;
@@ -14,10 +16,12 @@ using Web.Data.DAO;
 public class UpController : ControllerBase
 {
     private readonly DB db;
+    private readonly ILogger log;
 
-    public UpController(DB db)
+    public UpController(DB db, ILogger log)
     {
         this.db = db;
+        this.log = log;
     }
 
     [HttpPost("upload")]
@@ -49,7 +53,11 @@ public class UpController : ControllerBase
         if (string.IsNullOrWhiteSpace(apiKey)) return BadRequest("Invalid KEY [0]");
         if (apiKey.Length < 16) return BadRequest("Invalid KEY [1]");
 
-        if (!db.IsValidKey(apiKey)) return Unauthorized("Invalid Key");
+        if (!db.IsValidKey(apiKey))
+        {
+            log.Warning("Invalid KEY: " + apiKey);
+            return Unauthorized("Invalid Key");
+        }
 
         string estacao = Helpers.ApiToEstacao(apiKey);
 
