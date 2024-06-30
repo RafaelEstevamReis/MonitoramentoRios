@@ -1,0 +1,75 @@
+# Implementação ESPHome com placa NodeMCU
+
+esphome:
+  name: estacao
+  friendly_name: estacao
+
+esp32:
+  board: nodemcu-32s
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+wifi:
+  networks:
+  - ssid: !secret wifi_ssid
+    password: !secret wifi_password
+
+captive_portal:
+    
+web_server:
+  
+sensor:
+  - platform: adc
+    id: vp_sen
+    pin: GPIO36
+    name: "AdcVoltage_VP"
+    update_interval: 30s
+
+  - platform: adc
+    id: vn_sen
+    pin: GPIO39
+    name: "AdcVoltage_VN"
+    update_interval: 30s
+    filters:
+      - multiply: 1
+
+  - platform: dht
+    pin: GPIO15
+    model: DHT11
+    temperature:
+      name: "Temperature"
+      id: temp_sensor
+    humidity:
+      name: "Humidity"
+      id: hum_sensor
+    update_interval: 60s
+    
+  - platform: internal_temperature
+    id: internal_temp
+    name: "Internal Temperature"
+  - platform: wifi_signal
+    id: wifi_sig
+    name: "WiFi Signal Sensor"
+    update_interval: 60s
+
+http_request:
+  useragent: esphome/device
+  id: http_request_component  
+  verify_ssl: false
+
+interval:
+  - interval: 5min
+    then:
+      - http_request.post:
+          url: https://monitorarios.xyz/Up/upload
+          headers:
+            "x-key": "xxxxxxxxxxxxxxxxxxxxx"
+          json: |-
+            root["TensaoBateria"] = id(vp_sen).state;
+            root["TemperaturaInterna"] = id(internal_temp).state;
+            root["TemperaturaAr"] = id(temp_sensor).state;
+            root["UmidadeAr"] = id(hum_sensor).state;
+            root["SinalConexao"] = id(wifi_sig).state;
