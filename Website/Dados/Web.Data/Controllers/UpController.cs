@@ -3,8 +3,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Web.Data.DAO;
 
 [ApiController]
@@ -19,13 +21,15 @@ public class UpController : ControllerBase
     }
 
     [HttpPost("upload")]
-    public IActionResult Upload()
+    public async Task<IActionResult> Upload()
     {
         var apiKey = Request.Headers["x-key"].ToString() ?? "";
 
-        var buffer = new byte[1024];
-        int len = Request.Body.Read(buffer, 0, buffer.Length);
-        var json = Encoding.UTF8.GetString(buffer, 0, len);
+        string json;
+        using (var reader = new StreamReader(Request.Body))
+        {
+            json = await reader.ReadToEndAsync();
+        }
         var dados = JsonConvert.DeserializeObject<UploadData>(json);
 
         var ip = getIP(Request);
