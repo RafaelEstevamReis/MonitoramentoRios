@@ -26,7 +26,7 @@ public class DB
 
     }
 
-    public IEnumerable<DBModels.TBDadosEstacoes> ListarEstacoes()
+    public IEnumerable<DBModels.TBEstacoes> ListarEstacoes()
     {
         using var cnn = db.GetConnection();
         var estacoes = cnn.GetAll<DBModels.TBEstacoes>();
