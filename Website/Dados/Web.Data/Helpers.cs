@@ -1,8 +1,8 @@
-﻿using System;
+﻿namespace Web.Data;
+
+using System;
 using System.Security.Cryptography;
 using System.Text;
-
-namespace Web.Data;
 
 public static class Helpers
 {

@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dados das Estações</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h2>Dados das Estações</h2>
+    <table id="dadosEstacoes">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Recebido UTC</th>
+                <th>Estação</th>
+                <th>Temperatura Interna</th>
+                <th>Tensão da Bateria</th>
+                <th>Data e Hora dos Dados UTC</th>
+                <th>Temperatura do Ar</th>
+                <th>Umidade do Ar</th>
+                <th>Pressão do Ar</th>
+                <th>Nível do Rio</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dados serão preenchidos dinamicamente aqui -->
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Fazendo o request para o endpoint
+            fetch('/estacoes/dados')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#dadosEstacoes tbody');
+                    data.forEach(dado => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${dado.id}</td>
+                            <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
+                            <td>${dado.estacao}</td>
+                            <td>${dado.temperaturaInterna || '-'}</td>
+                            <td>${dado.tensaoBateria || '-'}</td>
+                            <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
+                            <td>${dado.temperaturaAr || '-'}</td>
+                            <td>${dado.umidadeAr || '-'}</td>
+                            <td>${dado.pressaoAr || '-'}</td>
+                            <td>${dado.nivelRio || '-'}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados das estações:', error);
+                });
+        });
+    </script>
+</body>
+</html>

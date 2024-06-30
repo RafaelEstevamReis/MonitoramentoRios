@@ -57,7 +57,7 @@ public class Up : ControllerBase
             Estacao = estacao,
             RawData = rawJson,
             // Internos
-            DataHoraDadosUTC = dados.DataHoraDadosUTC,
+            DataHoraDadosUTC = dados.DataHoraDadosUTC ?? DateTime.UtcNow,
             TemperaturaInterna = dados.TemperaturaInterna,
             TensaoBateria = dados.TensaoBateria,
             // Medições
@@ -89,7 +89,7 @@ public class Up : ControllerBase
         /// <summary>
         /// Data que os dados foram gerados segundo a placa
         /// </summary>
-        public DateTime DataHoraDadosUTC { get; set; }
+        public DateTime? DataHoraDadosUTC { get; set; }
         // Medições
         public decimal? TemperaturaAr { get; set; }
         public decimal? UmidadeAr { get; set; }

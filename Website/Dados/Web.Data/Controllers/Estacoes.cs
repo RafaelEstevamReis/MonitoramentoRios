@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Web.Data.DAO;
 
 [ApiController]
-[Route("[controller]")]
+[Route("estacoes")]
 public class Estacoes : ControllerBase
 {
     private readonly DB db;
