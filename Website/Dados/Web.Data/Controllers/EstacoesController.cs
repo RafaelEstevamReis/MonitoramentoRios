@@ -1,14 +1,17 @@
 ﻿namespace Web.Data.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
+using Simple.DatabaseWrapper.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Web.Data.DAO;
 
 [ApiController]
 [Route("estacoes")]
 public class EstacoesController : ControllerBase
 {
+    private static Dictionary<string,string> dicEstacoes = [];
     private readonly DB db;
 
     public EstacoesController(DB db)
@@ -17,9 +20,25 @@ public class EstacoesController : ControllerBase
     }
 
     [HttpGet("dados")]
-    public IEnumerable<DAO.DBModels.TBDadosEstacoes> ListarDados(string? estacao = null, int limit = 25)
+    public IEnumerable<DadosColetados> ListarDados(string? estacao = null, int limit = 25)
     {
-        return db.ListarDados(estacao, limit);
+        var lst = db.ListarDados(estacao, limit)
+                    .Select(o => Simple.DatabaseWrapper.DataClone.CopyWithSerialization<DadosColetados>(o))
+                    .ToArray();
+
+        if (lst.Any(i => !dicEstacoes.ContainsKey(i.Estacao))) atualizaEstacoes(db);
+
+        foreach(var i in  lst)
+        {
+            if (dicEstacoes.TryGetValue(i.Estacao, out string? value)) i.NomeEstacao = value;
+        }
+        return lst;
+    }
+
+    private static void atualizaEstacoes(DB db)
+    {
+        dicEstacoes = db.ListarEstacoes()
+                        .ToDictionary(o => o.Estacao, o => o.NomeEstacao);
     }
 
     [HttpPost("nova")]
@@ -49,6 +68,24 @@ public class EstacoesController : ControllerBase
         });
     }
 
+    public class DadosColetados
+    {
+        public DateTime RecebidoUTC { get; set; }
+        public string Estacao { get; set; } = string.Empty;
+        public string NomeEstacao { get; set; } = string.Empty;
+        // Dados Internos
+        public DateTime DataHoraDadosUTC { get; set; }
+        public decimal? ForcaSinal { get; set; }
+        public decimal? TemperaturaInterna { get; set; }
+        public decimal? TensaoBateria { get; set; }
+        // Medições
+        public decimal? TemperaturaAr { get; set; }
+        public decimal? UmidadeAr { get; set; }
+        public decimal? PressaoAr { get; set; }
+        public decimal? NivelRio { get; set; }
+        public decimal? NivelRio_RAW { get; set; }
+        public string RawData { get; set; } = string.Empty;
+    }
     public class DadosEstacao
     {
         public string NomeResponsavel { get; set; } = string.Empty;

@@ -26,7 +26,6 @@
     <table id="dadosEstacoes">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Recebido (UTC)</th>
                 <th>Estação</th>
                 <th>Temperatura Interna</th>
@@ -55,9 +54,8 @@
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                        <td>${dado.id}</td>
                                         <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
-                                        <td>${dado.estacao}</td>
+                                        <td>${dado.nomeEstacao || dado.estacao}</td>
                                         <td>${dado.temperaturaInterna || '-'}</td>
                                         <td>${dado.tensaoBateria || '-'}</td>
                                         <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
