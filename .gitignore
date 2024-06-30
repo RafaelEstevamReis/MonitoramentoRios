@@ -388,3 +388,4 @@ MigrationBackup/
 
 .vscode
 
+appsettings**.json
