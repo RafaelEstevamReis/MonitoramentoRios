@@ -22,30 +22,10 @@
     </style>
 </head>
 <body>
-    <h2>Últimas Leituras</h2>
-    <table id="ultimasLeituras">
-        <thead>
-            <tr>
-                <th>Recebido (UTC)</th>
-                <th>Estação</th>
-                <th>Temperatura Interna</th>
-                <th>Tensão da Bateria</th>
-                <th>Data e Hora (UTC)</th>
-                <th>Temperatura do Ar</th>
-                <th>Umidade do Ar</th>
-                <th>Pressão do Ar</th>
-                <th>Nível da Água</th>
-                <th>Sinal Conexão</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Dados serão preenchidos dinamicamente aqui -->
-        </tbody>
-    </table>
+    <a href="dados.html">Listar Todos</a>
 
-    <h2>Dados das Estações</h2>
-    <table id="dadosEstacoes">
+    <h2>Dados das Estação</h2>
+    <table id="dadosEstacao">
         <thead>
             <tr>
                 <th>Recebido (UTC)</th>
@@ -69,10 +49,10 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Fazendo o request para o endpoint
-            fetch('/estacoes/dados')
+            fetch('/estacoes/dados?estacao=' + getQueryParam("estacao"))
                 .then(response => response.json())
                 .then(data => {
-                    const tableBody = document.querySelector('#dadosEstacoes tbody');
+                    const tableBody = document.querySelector('#dadosEstacao tbody');
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
@@ -93,34 +73,17 @@
                 .catch(error => {
                     console.error('Erro ao carregar dados das estações:', error);
                 });
-
-            fetch('/estacoes/ultimos')
-                .then(response => response.json())
-                .then(data => {
-                    const tableBody = document.querySelector('#ultimasLeituras tbody');
-                    data.forEach(dado => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                                            <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
-                                            <td>${dado.nomeEstacao || dado.estacao}</td>
-                                            <td>${dado.temperaturaInterna || '-'}</td>
-                                            <td>${dado.tensaoBateria || '-'}</td>
-                                            <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
-                                            <td>${dado.temperaturaAr || '-'}</td>
-                                            <td>${dado.umidadeAr || '-'}</td>
-                                            <td>${dado.pressaoAr || '-'}</td>
-                                            <td>${dado.nivelRio || '-'}</td>
-                                            <td>${dado.forcaSinal || '-'}</td>
-                                            <td><a href="estacao.html?estacao=${dado.estacao}">Detalhar</a></td>
-                                        `;
-                        tableBody.appendChild(row);
-                    });
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar dados das estações:', error);
-                });
-
         });
+        function getQueryParam(name) {
+            // Obtenha a string da query a partir da URL atual
+            const queryString = window.location.search;
+
+            // Crie um objeto URLSearchParams a partir da string da query
+            const urlParams = new URLSearchParams(queryString);
+
+            // Retorne o valor do parâmetro solicitado
+            return urlParams.get(name);
+        }
     </script>
 </body>
 </html>
