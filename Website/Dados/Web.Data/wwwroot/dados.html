@@ -22,6 +22,27 @@
     </style>
 </head>
 <body>
+    <h2>Últimas Leituras</h2>
+    <table id="ultimasLeituras">
+        <thead>
+            <tr>
+                <th>Recebido (UTC)</th>
+                <th>Estação</th>
+                <th>Temperatura Interna</th>
+                <th>Tensão da Bateria</th>
+                <th>Data e Hora (UTC)</th>
+                <th>Temperatura do Ar</th>
+                <th>Umidade do Ar</th>
+                <th>Pressão do Ar</th>
+                <th>Nível da Água</th>
+                <th>Sinal Conexão</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dados serão preenchidos dinamicamente aqui -->
+        </tbody>
+    </table>
+
     <h2>Dados das Estações</h2>
     <table id="dadosEstacoes">
         <thead>
@@ -54,23 +75,49 @@
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                        <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
-                                        <td>${dado.nomeEstacao || dado.estacao}</td>
-                                        <td>${dado.temperaturaInterna || '-'}</td>
-                                        <td>${dado.tensaoBateria || '-'}</td>
-                                        <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
-                                        <td>${dado.temperaturaAr || '-'}</td>
-                                        <td>${dado.umidadeAr || '-'}</td>
-                                        <td>${dado.pressaoAr || '-'}</td>
-                                        <td>${dado.nivelRio || '-'}</td>
-                                        <td>${dado.forcaSinal || '-'}</td>
-                                    `;
+                                            <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
+                                            <td>${dado.nomeEstacao || dado.estacao}</td>
+                                            <td>${dado.temperaturaInterna || '-'}</td>
+                                            <td>${dado.tensaoBateria || '-'}</td>
+                                            <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
+                                            <td>${dado.temperaturaAr || '-'}</td>
+                                            <td>${dado.umidadeAr || '-'}</td>
+                                            <td>${dado.pressaoAr || '-'}</td>
+                                            <td>${dado.nivelRio || '-'}</td>
+                                            <td>${dado.forcaSinal || '-'}</td>
+                                        `;
                         tableBody.appendChild(row);
                     });
                 })
                 .catch(error => {
                     console.error('Erro ao carregar dados das estações:', error);
                 });
+
+            fetch('/estacoes/ultimos')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#ultimasLeituras tbody');
+                    data.forEach(dado => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                                            <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
+                                            <td>${dado.nomeEstacao || dado.estacao}</td>
+                                            <td>${dado.temperaturaInterna || '-'}</td>
+                                            <td>${dado.tensaoBateria || '-'}</td>
+                                            <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
+                                            <td>${dado.temperaturaAr || '-'}</td>
+                                            <td>${dado.umidadeAr || '-'}</td>
+                                            <td>${dado.pressaoAr || '-'}</td>
+                                            <td>${dado.nivelRio || '-'}</td>
+                                            <td>${dado.forcaSinal || '-'}</td>
+                                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados das estações:', error);
+                });
+
         });
     </script>
 </body>

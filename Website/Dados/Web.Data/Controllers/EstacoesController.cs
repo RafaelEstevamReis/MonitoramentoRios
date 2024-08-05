@@ -34,6 +34,24 @@ public class EstacoesController : ControllerBase
         }
         return lst;
     }
+    [HttpGet("ultimos")]
+    public IEnumerable<DadosColetados> ListarRecentes()
+    {
+        var lst = db.ListarDados(estacao: null, limit: 50) // 50 últimas
+                    .Select(Simple.DatabaseWrapper.DataClone.CopyWithSerialization<DadosColetados>)
+                    .GroupBy(o => o.Estacao)
+                    .Select(o => o.OrderBy(k => k.RecebidoUTC).First())
+                    .OrderBy(o => o.NomeEstacao)
+                    .ToArray();
+
+        if (lst.Any(i => !dicEstacoes.ContainsKey(i.Estacao))) atualizaEstacoes(db);
+
+        foreach (var i in lst)
+        {
+            if (dicEstacoes.TryGetValue(i.Estacao, out string? value)) i.NomeEstacao = value;
+        }
+        return lst;
+    }
 
     private static void atualizaEstacoes(DB db)
     {
