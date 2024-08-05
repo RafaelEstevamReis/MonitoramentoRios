@@ -389,3 +389,4 @@ MigrationBackup/
 .vscode
 
 appsettings**.json
+*.db
