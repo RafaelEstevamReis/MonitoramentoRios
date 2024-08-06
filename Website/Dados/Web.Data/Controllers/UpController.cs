@@ -99,6 +99,8 @@ public class UpController : ControllerBase
     {
         // Dados Internos
         public decimal? ForcaSinal { get; set; }
+        public string? SSID { get; set; }
+        public string? BSSID { get; set; }
         /// <summary>
         /// Data que os dados foram gerados segundo a placa
         /// </summary>
