@@ -390,3 +390,4 @@ MigrationBackup/
 
 appsettings**.json
 *.db
+*.FCBak
