@@ -40,7 +40,7 @@ public class EstacoesController : ControllerBase
         var lst = db.ListarDados(estacao: null, limit: 50) // 50 últimas
                     .Select(Simple.DatabaseWrapper.DataClone.CopyWithSerialization<DadosColetados>)
                     .GroupBy(o => o.Estacao)
-                    .Select(o => o.OrderBy(k => k.RecebidoUTC).First())
+                    .Select(o => o.OrderByDescending(k => k.RecebidoUTC).First())
                     .OrderBy(o => o.NomeEstacao)
                     .ToArray();
 
