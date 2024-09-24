@@ -26,15 +26,39 @@ sensor:
     id: vp_sen
     pin: GPIO36
     name: "AdcVoltage_VP"
-    update_interval: 30s
-
-  - platform: adc
-    id: vn_sen
-    pin: GPIO39
-    name: "AdcVoltage_VN"
-    update_interval: 30s
+    update_interval: 10s
     filters:
-      - multiply: 1
+      - lambda: return (x - 0.07f) * 20.000f; # calibrado individualmente
+  - platform: template
+    id: vp_senPerc
+    name: "AdcVoltage_VP_PERC"
+    unit_of_measurement: "%"
+    lambda: return id(vp_sen).state;
+    filters:
+#      - calibrate_linear: # AGM
+#        - 13.00 -> 100
+#        - 12.75 -> 90
+#        - 12.50 -> 80
+#        - 12.30 -> 70
+#        - 12.15 -> 60
+#        - 12.05 -> 50
+#        - 11.95 -> 40
+#        - 11.81 -> 30
+#        - 11.66 -> 20
+#        - 11.51 -> 10
+#        - 11.00 -> 0
+      - calibrate_linear: # Sealed Lead Acid
+        - 12.90 -> 100
+        - 12.78 -> 90
+        - 12.65 -> 80
+        - 12.51 -> 70
+        - 12.41 -> 60
+        - 12.23 -> 50
+        - 12.11 -> 40
+        - 11.96 -> 30
+        - 11.81 -> 20
+        - 11.70 -> 10
+        - 11.63 -> 0
 
   - platform: dht
     pin: GPIO15
@@ -55,6 +79,23 @@ sensor:
     name: "WiFi Signal Sensor"
     update_interval: 60s
 
+  - platform: pulse_counter
+    pin: GPIO25
+    id: precipitacao_mm_min
+    unit_of_measurement: 'mm/min'
+    name: 'Precipitacao'
+    filters:
+      - multiply: 0.10  # pulses x 0.1mm for default 60s
+
+text_sensor: # Debug
+  - platform: wifi_info
+    ssid:
+      name: "WiFi SSID Sensor"
+      id: wifi_ssid
+    bssid:
+      name: "WiFi BSSID Sensor"
+      id: wifi_bssid
+
 http_request:
   useragent: esphome/device
   id: http_request_component  
@@ -69,7 +110,10 @@ interval:
             "x-key": "xxxxxxxxxxxxxxxxxxxxx"
           json: |-
             root["TensaoBateria"] = id(vp_sen).state;
+            root["PercentBateria"] = id(vp_senPerc).state;
             root["TemperaturaInterna"] = id(internal_temp).state;
             root["TemperaturaAr"] = id(temp_sensor).state;
             root["UmidadeAr"] = id(hum_sensor).state;
             root["ForcaSinal"] = id(wifi_sig).state;
+            root["ssid"] = id(wifi_ssid).state;
+            root["bssid"] = id(wifi_bssid).state;
