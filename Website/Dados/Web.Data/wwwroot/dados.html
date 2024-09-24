@@ -35,6 +35,7 @@
                 <th>Temperatura do Ar</th>
                 <th>Umidade do Ar</th>
                 <th>Pressão do Ar</th>
+                <th>Precipitação</th>
                 <th>Nível da Água</th>
                 <th>Sinal Conexão</th>
                 <th></th>
@@ -45,7 +46,7 @@
         </tbody>
     </table>
 
-    <h2>Dados das Estações</h2>
+    <h2>Dados Históricos</h2>
     <table id="dadosEstacoes">
         <thead>
             <tr>
@@ -57,6 +58,7 @@
                 <th>Temperatura do Ar</th>
                 <th>Umidade do Ar</th>
                 <th>Pressão do Ar</th>
+                <th>Precipitação</th>
                 <th>Nível da Água</th>
                 <th>Sinal Conexão</th>
             </tr>
@@ -85,6 +87,7 @@
                                             <td>${dado.temperaturaAr || '-'}</td>
                                             <td>${dado.umidadeAr || '-'}</td>
                                             <td>${dado.pressaoAr || '-'}</td>
+                                            <td>${dado.precipitacao || '-'}</td>
                                             <td>${dado.nivelRio || '-'}</td>
                                             <td>${dado.forcaSinal || '-'}</td>
                                         `;
@@ -110,6 +113,7 @@
                                             <td>${dado.temperaturaAr || '-'}</td>
                                             <td>${dado.umidadeAr || '-'}</td>
                                             <td>${dado.pressaoAr || '-'}</td>
+                                            <td>${dado.precipitacao || '-'}</td>
                                             <td>${dado.nivelRio || '-'}</td>
                                             <td>${dado.forcaSinal || '-'}</td>
                                             <td><a href="estacao.html?estacao=${dado.estacao}">Detalhar</a></td>
