@@ -20,12 +20,23 @@
         th {
             background-color: #f2f2f2;
         }
+
+        #chart_div {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
     </style>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
     <a href="dados.html">Listar Todos</a>
 
-    <h2>Dados das Estação</h2>
+    <h2>Dados da Estação</h2>
+
+    <!-- Gráfico -->
+    <div id="chart_div"></div>
+
     <table id="dadosEstacao">
         <thead>
             <tr>
@@ -36,7 +47,6 @@
                 <th>Data e Hora (UTC)</th>
                 <th>Temperatura do Ar</th>
                 <th>Umidade do Ar</th>
-                <th>Pressão do Ar</th>
                 <th>Precipitação</th>
                 <th>Nível da Água</th>
                 <th>Sinal Conexão</th>
@@ -50,42 +60,78 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Fazendo o request para o endpoint
+            // Carregar gráfico após carregar os dados
             fetch('/estacoes/dados?estacao=' + getQueryParam("estacao"))
+                //fetch('https://monitorarios.xyz/estacoes/dados?estacao=' + getQueryParam("estacao"), { mode: 'no-cors' })
                 .then(response => response.json())
                 .then(data => {
                     const tableBody = document.querySelector('#dadosEstacao tbody');
+                    const chartData = [['Data/Hora', 'Temperatura do Ar', 'Umidade do Ar']];
+
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                            <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
-                                            <td>${dado.nomeEstacao || dado.estacao}</td>
-                                            <td>${dado.temperaturaInterna || '-'}</td>
-                                            <td>${dado.tensaoBateria || '-'}</td>
-                                            <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
-                                            <td>${dado.temperaturaAr || '-'}</td>
-                                            <td>${dado.umidadeAr || '-'}</td>
-                                            <td>${dado.pressaoAr || '-'}</td>
-                                            <td>${dado.precipitacao || '-'}</td>
-                                            <td>${dado.nivelRio || '-'}</td>
-                                            <td>${dado.forcaSinal || '-'}</td>
-                                        `;
+                                    <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
+                                    <td>${dado.nomeEstacao || dado.estacao}</td>
+                                    <td>${dado.temperaturaInterna || '-'}</td>
+                                    <td>${dado.tensaoBateria || '-'}</td>
+                                    <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
+                                    <td>${dado.temperaturaAr || '-'}</td>
+                                    <td>${dado.umidadeAr || '-'}</td>
+                                    <td>${dado.precipitacao || '-'}</td>
+                                    <td>${dado.nivelRio || '-'}</td>
+                                    <td>${dado.forcaSinal || '-'}</td>
+                                `;
                         tableBody.appendChild(row);
+
+                        // Adicionar dados ao gráfico, se existirem valores
+                        const hora = new Date(dado.dataHoraDadosUTC).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                        if (dado.temperaturaAr && dado.umidadeAr) {
+                            chartData.push([hora, parseFloat(dado.temperaturaAr), parseFloat(dado.umidadeAr)]);
+                        }
                     });
+
+                    const reversedData = [chartData[0]].concat(chartData.slice(1).reverse());
+                    // Desenhar o gráfico
+                    google.charts.load('current', { 'packages': ['corechart'] });
+                    google.charts.setOnLoadCallback(() => drawChart(reversedData));
                 })
                 .catch(error => {
                     console.error('Erro ao carregar dados das estações:', error);
                 });
         });
+
         function getQueryParam(name) {
-            // Obtenha a string da query a partir da URL atual
             const queryString = window.location.search;
-
-            // Crie um objeto URLSearchParams a partir da string da query
             const urlParams = new URLSearchParams(queryString);
-
-            // Retorne o valor do parâmetro solicitado
             return urlParams.get(name);
+        }
+
+        function drawChart(chartData) {
+            const data = google.visualization.arrayToDataTable(chartData);
+
+            const options = {
+                title: 'Temperatura do Ar e Umidade',
+                curveType: 'function',
+                legend: { position: 'bottom' },
+                hAxis: {
+                    title: 'Horário',
+                    format: 'HH:mm',  // Formato para exibir apenas as horas
+                    gridlines: { count: 15 }  // Ajuste para quantidade de gridlines (opcional)
+                },
+                vAxes: {
+                    0: { title: 'Temperatura (°C)' },  // Eixo Y esquerdo (Temperatura)
+                    1: { title: 'Umidade (%)' }        // Eixo Y direito (Umidade)
+                },
+                series: {
+                    0: { targetAxisIndex: 0 },  // Temperatura no eixo esquerdo
+                    1: { targetAxisIndex: 1 }   // Umidade no eixo direito
+                }
+            };
+
+            const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
         }
     </script>
 </body>

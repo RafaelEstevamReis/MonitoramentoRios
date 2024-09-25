@@ -32,6 +32,7 @@ public class EstacoesController : ControllerBase
         {
             if (dicEstacoes.TryGetValue(i.Estacao, out string? value)) i.NomeEstacao = value;
             if(i.TemperaturaInterna.HasValue) i.TemperaturaInterna = Math.Round(i.TemperaturaInterna ?? 0, 1);
+            i.RawData = string.Empty;
         }
         return lst;
     }
