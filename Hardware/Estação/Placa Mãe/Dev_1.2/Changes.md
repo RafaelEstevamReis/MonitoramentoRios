@@ -9,17 +9,18 @@
 ## Melhorias
 
 * Adicionadas 2 Leds de Status e uma Led no 3v3
+* Alterado footprint do PC817 (precisa validar)
+* Adicionar conector para USS
+* Mudar footprint do diodo
+* Mudar footprint dos botões
 
 ## Notas
 
 
 ## ToDo
 
-* Corrigir footprint do PC817
 * Mudar footprint do USB
 * Mudar footprint do CP2102N
-* Mudar footprint dos botões
-* Mudar footprint do diodo
-* Adicionar conector para USS
-* Aumentar furos da PCB para compabilidade com suportes de placa mãe
+* Alterar furos da PCB para compabilidade com suportes de placa mãe
 * Separar conector do vBat
+* Separar LED externa

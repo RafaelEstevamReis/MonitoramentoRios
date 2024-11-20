@@ -102,6 +102,7 @@ public class EstacoesController : ControllerBase
         public decimal? TemperaturaAr { get; set; }
         public decimal? UmidadeAr { get; set; }
         public decimal? PressaoAr { get; set; }
+        public decimal? Precipitacao { get; set; }
         public decimal? NivelRio { get; set; }
         public decimal? NivelRio_RAW { get; set; }
         public string RawData { get; set; } = string.Empty;
