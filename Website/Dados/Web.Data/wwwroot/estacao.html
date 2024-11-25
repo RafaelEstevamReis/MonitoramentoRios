@@ -36,6 +36,7 @@
 
     <!-- Gráfico -->
     <div id="chart_div"></div>
+    <div id="chartLevel_div"></div>
 
     <table id="dadosEstacao">
         <thead>
@@ -67,21 +68,22 @@
                 .then(data => {
                     const tableBody = document.querySelector('#dadosEstacao tbody');
                     const chartData = [['Data/Hora', 'Temperatura do Ar', 'Umidade do Ar']];
+                    const chartLevelData = [['Data/Hora', 'Nível']];
 
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                    <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
-                                    <td>${dado.nomeEstacao || dado.estacao}</td>
-                                    <td>${dado.temperaturaInterna || '-'}</td>
-                                    <td>${dado.tensaoBateria || '-'}</td>
-                                    <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
-                                    <td>${dado.temperaturaAr || '-'}</td>
-                                    <td>${dado.umidadeAr || '-'}</td>
-                                    <td>${dado.precipitacao || '-'}</td>
-                                    <td>${dado.nivelRio || '-'}</td>
-                                    <td>${dado.forcaSinal || '-'}</td>
-                                `;
+                                            <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
+                                            <td>${dado.nomeEstacao || dado.estacao}</td>
+                                            <td>${dado.temperaturaInterna || '-'}</td>
+                                            <td>${dado.tensaoBateria || '-'}</td>
+                                            <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
+                                            <td>${dado.temperaturaAr || '-'}</td>
+                                            <td>${dado.umidadeAr || '-'}</td>
+                                            <td>${dado.precipitacao || '-'}</td>
+                                            <td>${dado.nivelRio || '-'}</td>
+                                            <td>${dado.forcaSinal || '-'}</td>
+                                        `;
                         tableBody.appendChild(row);
 
                         // Adicionar dados ao gráfico, se existirem valores
@@ -90,12 +92,19 @@
                         if (dado.temperaturaAr && dado.umidadeAr) {
                             chartData.push([hora, parseFloat(dado.temperaturaAr), parseFloat(dado.umidadeAr)]);
                         }
+                        if (dado.nivelRio) {
+                            chartLevelData.push([hora, parseFloat(dado.nivelRio)]);
+                        }
                     });
 
                     const reversedData = [chartData[0]].concat(chartData.slice(1).reverse());
+                    const reversedLevelData = [chartLevelData[0]].concat(chartLevelData.slice(1).reverse());
                     // Desenhar o gráfico
                     google.charts.load('current', { 'packages': ['corechart'] });
-                    google.charts.setOnLoadCallback(() => drawChart(reversedData));
+                    google.charts.setOnLoadCallback(() => {
+                        drawChart(reversedData);
+                        if (reversedLevelData.length > 2) drawChartSimples(reversedLevelData, 'Nível', 'chartLevel_div');
+                    });
                 })
                 .catch(error => {
                     console.error('Erro ao carregar dados das estações:', error);
@@ -131,6 +140,29 @@
             };
 
             const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+        function drawChartSimples(chartData, title, id) {
+            const data = google.visualization.arrayToDataTable(chartData);
+
+            const options = {
+                title: title,
+                curveType: 'function',
+                legend: { position: 'bottom' },
+                hAxis: {
+                    title: 'Horário',
+                    format: 'HH:mm',  // Formato para exibir apenas as horas
+                    gridlines: { count: 15 }  // Ajuste para quantidade de gridlines (opcional)
+                },
+                vAxes: {
+                    0: { title: title },  // Eixo Y esquerdo
+                },
+                series: {
+                    0: { targetAxisIndex: 0 },  // Temperatura no eixo esquerdo
+                }
+            };
+
+            const chart = new google.visualization.LineChart(document.getElementById(id));
             chart.draw(data, options);
         }
     </script>

@@ -20,7 +20,7 @@ public class EstacoesController : ControllerBase
     }
 
     [HttpGet("dados")]
-    public IEnumerable<DadosColetados> ListarDados(string? estacao = null, int limit = 25)
+    public IEnumerable<DadosColetados> ListarDados(string? estacao = null, int limit = 64)
     {
         var lst = db.ListarDados(estacao, limit)
                     .Select(o => Simple.DatabaseWrapper.DataClone.CopyWithSerialization<DadosColetados>(o))
@@ -39,7 +39,7 @@ public class EstacoesController : ControllerBase
     [HttpGet("ultimos")]
     public IEnumerable<DadosColetados> ListarRecentes()
     {
-        var lst = db.ListarDados(estacao: null, limit: 50) // 50 últimas
+        var lst = db.ListarDados(estacao: null, limit: 64) // 50 últimas
                     .Select(Simple.DatabaseWrapper.DataClone.CopyWithSerialization<DadosColetados>)
                     .GroupBy(o => o.Estacao)
                     .Select(o => o.OrderByDescending(k => k.RecebidoUTC).First())
