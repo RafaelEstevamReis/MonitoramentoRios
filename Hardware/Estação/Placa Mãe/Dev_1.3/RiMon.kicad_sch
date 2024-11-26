@@ -10904,7 +10904,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Generic connector, double row, 02x05, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" "Generic connector, single row, 01x04, script generated"
 			(at 128.27 116.84 0)
 			(effects
 				(font
@@ -13503,7 +13503,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "http://www.advanced-monolithic.com/pdf/ds1117.pdf"
+		(property "Datasheet" "https://www.monolithicpower.com/en/documentview/productdocument/index/version/2/document_type/Datasheet/lang/en/sku/MP2338GTL/"
 			(at 178.308 64.516 0)
 			(effects
 				(font
@@ -13512,7 +13512,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223"
+		(property "Description" "Synchronous Rectified 3A, 28V, 450kHz Step-Down Converter, SOT583"
 			(at 180.34 55.88 0)
 			(effects
 				(font
@@ -15196,7 +15196,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "http://www.soselectronic.cz/a_info/resource/d/pc817.pdf"
+		(property "Datasheet" "http://www.advanced-monolithic.com/pdf/ds1117.pdf"
 			(at 60.96 36.83 0)
 			(effects
 				(font
@@ -15205,7 +15205,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "DC Optocoupler, Vce 35V, CTR 50-300%, DIP-4"
+		(property "Description" "1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223"
 			(at 58.42 30.48 0)
 			(effects
 				(font
@@ -15349,7 +15349,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x04, script generated"
+		(property "Description" "Generic connector, double row, 02x05, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"
 			(at 104.14 73.66 0)
 			(effects
 				(font
@@ -16039,7 +16039,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.monolithicpower.com/en/documentview/productdocument/index/version/2/document_type/Datasheet/lang/en/sku/MP2338GTL/"
+		(property "Datasheet" "http://www.soselectronic.cz/a_info/resource/d/pc817.pdf"
 			(at 118.11 166.37 0)
 			(effects
 				(font
@@ -16049,7 +16049,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Synchronous Rectified 3A, 28V, 450kHz Step-Down Converter, SOT583"
+		(property "Description" "DC Optocoupler, Vce 35V, CTR 50-300%, DIP-4"
 			(at 118.11 166.37 0)
 			(effects
 				(font
