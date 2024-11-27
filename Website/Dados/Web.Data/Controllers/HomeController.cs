@@ -10,4 +10,11 @@ public class HomeController : ControllerBase
     {
         return Redirect("/dados.html");
     }
+
+    [NonAction]
+    [HttpGet("robots.txt")]
+    public IActionResult RobotsTxt()
+    {
+        return Ok("");
+    }
 }
