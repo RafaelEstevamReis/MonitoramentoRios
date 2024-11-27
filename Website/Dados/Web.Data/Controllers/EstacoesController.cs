@@ -24,20 +24,23 @@ public class EstacoesController : ControllerBase
     {
         if (estacao != null && estacao.Length == 9 && estacao[4] == '-')
         {
-            if (dicEstacoesNomesId.TryGetValue(estacao, out string? value))
+            if (dicEstacoesNomesId.TryGetValue(estacao, out string? value) && value != null)
             {
                 estacao = value;
             }
             else
             {
-                var lstEstacoes = db.ListarEstacoes()
-                                    .Where(e => e.NomeEstacao == estacao)
+                var estacaoBusca = db.ListarEstacoes()
+                                    .Where(e => e.NomeEstacao.Equals(estacao, StringComparison.InvariantCultureIgnoreCase))
                                     .OrderByDescending(o => o.Id)
                                     //.FirstOrDefault()
                                     ;
                 // Não mudar ordem
-                dicEstacoesNomesId[estacao] = lstEstacoes.FirstOrDefault()?.Estacao ?? "";
-                estacao = lstEstacoes.FirstOrDefault()?.Estacao;
+                if (estacaoBusca != null)
+                {
+                    dicEstacoesNomesId[estacao] = estacaoBusca.FirstOrDefault()?.Estacao ?? "";
+                    estacao = estacaoBusca.FirstOrDefault()?.Estacao;
+                }
             }
         }
 
