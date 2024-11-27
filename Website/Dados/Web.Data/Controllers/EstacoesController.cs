@@ -1,7 +1,6 @@
 ﻿namespace Web.Data.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
-using Simple.DatabaseWrapper.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +10,8 @@ using Web.Data.DAO;
 [Route("estacoes")]
 public class EstacoesController : ControllerBase
 {
-    private static Dictionary<string,string> dicEstacoes = [];
+    private static Dictionary<string, string> dicEstacoesNomesId = [];
+    private static Dictionary<string, string> dicEstacoes = [];
     private readonly DB db;
 
     public EstacoesController(DB db)
@@ -22,16 +22,35 @@ public class EstacoesController : ControllerBase
     [HttpGet("dados")]
     public IEnumerable<DadosColetados> ListarDados(string? estacao = null, int limit = 64)
     {
+        if (estacao != null && estacao.Length == 9 && estacao[4] == '-')
+        {
+            if (dicEstacoesNomesId.TryGetValue(estacao, out string? value))
+            {
+                estacao = value;
+            }
+            else
+            {
+                var lstEstacoes = db.ListarEstacoes()
+                                    .Where(e => e.NomeEstacao == estacao)
+                                    .OrderByDescending(o => o.Id)
+                                    //.FirstOrDefault()
+                                    ;
+                // Não mudar ordem
+                dicEstacoesNomesId[estacao] = lstEstacoes.FirstOrDefault()?.Estacao ?? "";
+                estacao = lstEstacoes.FirstOrDefault()?.Estacao;
+            }
+        }
+
         var lst = db.ListarDados(estacao, limit)
                     .Select(o => Simple.DatabaseWrapper.DataClone.CopyWithSerialization<DadosColetados>(o))
                     .ToArray();
 
         if (lst.Any(i => !dicEstacoes.ContainsKey(i.Estacao))) atualizaEstacoes(db);
 
-        foreach(var i in  lst)
+        foreach (var i in lst)
         {
             if (dicEstacoes.TryGetValue(i.Estacao, out string? value)) i.NomeEstacao = value;
-            if(i.TemperaturaInterna.HasValue) i.TemperaturaInterna = Math.Round(i.TemperaturaInterna ?? 0, 1);
+            if (i.TemperaturaInterna.HasValue) i.TemperaturaInterna = Math.Round(i.TemperaturaInterna ?? 0, 1);
             i.RawData = string.Empty;
         }
         return lst;
