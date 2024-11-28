@@ -7,12 +7,12 @@
 
 ## Melhorias
 
+* Separar LED externa
+* Separar conector do vBat
 
 ## Notas
 
 
 ## ToDo
 
-* Alterar furos da PCB para compabilidade com suportes de placa mãe
-* Separar conector do vBat
-* Separar LED externa
+
