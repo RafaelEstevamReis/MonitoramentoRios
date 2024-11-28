@@ -7933,6 +7933,17 @@
 		)
 		(uuid "c875ef00-eb98-4b64-bce0-850a5ba3837e")
 	)
+	(label "tmpGND"
+		(at 147.32 138.43 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "cf1ac191-1fbe-4317-babd-4d4b07d0d04c")
+	)
 	(label "S_DHT"
 		(at 87.63 161.29 0)
 		(fields_autoplaced yes)
