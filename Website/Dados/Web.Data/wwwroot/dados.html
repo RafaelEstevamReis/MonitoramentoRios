@@ -89,6 +89,7 @@
                                             <td>${dado.forcaSinal || '-'}</td>
                                         `;
                         tableBody.appendChild(row);
+                        setColor(row, dado.nomeEstacao);
                     });
                 })
                 .catch(error => {
@@ -115,6 +116,7 @@
                                             <td><a href="estacao.html?estacao=${dado.estacao}">Detalhar</a></td>
                                         `;
                         tableBody.appendChild(row);
+                        setColor(row, dado.nomeEstacao);
                     });
                 })
                 .catch(error => {
@@ -122,6 +124,26 @@
                 });
 
         });
+
+        const colorList = ['lightblue', 'lightgreen', 'lightgoldenrodyellow', 'antiquewhite', 'aliceblue', 'lightpink', 'aquamarine', 'azure', 'beige', 'yellowgreen', 'skyblue'];
+        function setColor(element, idEstacao) {
+            const hsh = getHash(idEstacao);
+            // Gera um índice determinístico baseado no idEstacao
+            const index = hsh % colorList.length;
+            // Define a cor de fundo do elemento com base no índice
+            element.style.backgroundColor = colorList[index];
+            //console.log(`Hash para '${idEstacao}': ${hsh} IX: ${index} Color: ${colorList[index]}`);
+        }
+        function getHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = (hash << 5) - hash + str.charCodeAt(i);
+                hash |= 0; // Converte para um inteiro de 32 bits
+            }
+
+            return Math.abs(hash); // Garantimos que o valor seja positivo
+        }
+
     </script>
 </body>
 </html>
