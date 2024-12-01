@@ -125,8 +125,17 @@
 
         });
 
-        const colorList = ['lightblue', 'lightgreen', 'lightgoldenrodyellow', 'antiquewhite', 'aliceblue', 'lightpink', 'aquamarine', 'azure', 'beige', 'yellowgreen', 'skyblue'];
+        const colorList = ['lightblue', 'lightgreen', 'lightgoldenrodyellow', 'antiquewhite', 'aliceblue', 'lightpink', 'aquamarine', 'beige', 'yellowgreen', 'skyblue'];
         function setColor(element, idEstacao) {
+            if (idEstacao === 'RSRL-RB01') {
+                element.style.backgroundColor = 'azure';
+                return;
+            }
+            if (idEstacao === 'RSRL-BE01') {
+                element.style.backgroundColor = 'darkseagreen';
+                return;
+            }
+
             const hsh = getHash(idEstacao);
             // Gera um índice determinístico baseado no idEstacao
             const index = hsh % colorList.length;
