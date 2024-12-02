@@ -78,8 +78,8 @@
                         row.innerHTML = `
                                             <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
                                             <td>${dado.nomeEstacao || dado.estacao}</td>
-                                            <td>${dado.temperaturaInterna || '-'}</td>
-                                            <td>${dado.tensaoBateria || '-'} (${dado.percentBateria || '-'}%)</td>
+                                            <td>${formatValue(dado.temperaturaInterna, 1)}</td>
+                                            <td>${formatValue(dado.tensaoBateria, 1)} (${formatValue(dado.percentBateria, 0)}%)</td>
                                             <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
                                             <td>${dado.temperaturaAr || '-'}</td>
                                             <td>${dado.umidadeAr || '-'}</td>
@@ -113,6 +113,10 @@
                     console.error('Erro ao carregar dados das estações:', error);
                 });
         });
+        function formatValue(value, decimals = 0) {
+            if (value == null) return '-'; // Verifica null ou undefined
+            return decimals === 0 ? Math.round(value) : value.toFixed(decimals);
+        }
 
         function getQueryParam(name) {
             const queryString = window.location.search;
