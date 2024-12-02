@@ -74,6 +74,7 @@ public class UpController : ControllerBase
             DataHoraDadosUTC = dados.DataHoraDadosUTC ?? DateTime.UtcNow,
             TemperaturaInterna = dados.TemperaturaInterna,
             TensaoBateria = dados.TensaoBateria,
+            PercentBateria = dados.PercentBateria,
             // Medições
             TemperaturaAr = dados.TemperaturaAr,
             UmidadeAr = dados.UmidadeAr,
@@ -107,6 +108,7 @@ public class UpController : ControllerBase
         public DateTime? DataHoraDadosUTC { get; set; }
         public decimal? TemperaturaInterna { get; set; }
         public decimal? TensaoBateria { get; set; }
+        public decimal? PercentBateria { get; set; }
         // Medições
         public decimal? TemperaturaAr { get; set; }
         public decimal? UmidadeAr { get; set; }

@@ -34,6 +34,7 @@ public class TBDadosEstacoes
     public decimal? ForcaSinal { get; set; }
     public decimal? TemperaturaInterna { get; set; }
     public decimal? TensaoBateria { get; set; }
+    public decimal? PercentBateria { get; set; }
     /// <summary>
     /// Data que os dados foram gerados segundo a placa
     /// </summary>
