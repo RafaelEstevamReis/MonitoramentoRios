@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="60">
-    <title>Dados das Estações</title>
+    <title>Dados da Estação</title>
     <style>
         table {
             border-collapse: collapse;
@@ -46,11 +46,11 @@
         <thead>
             <tr>
                 <th>Recebido (UTC)</th>
-                <th>Temperatura Interna</th>
+                <th width="100px">Temperatura Interna</th>
                 <th>Tensão da Bateria</th>
-                <th>Data e Hora (UTC)</th>
-                <th>Temperatura do Ar</th>
-                <th>Umidade do Ar</th>
+                <th>Reportado (UTC)</th>
+                <th width="100px">Temperatura do Ar</th>
+                <th width="100px">Umidade do Ar</th>
                 <th>Precipitação</th>
                 <th>Nível da Água</th>
                 <th>Sinal Conexão</th>
@@ -79,15 +79,15 @@
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                            <td>${new Date(dado.recebidoUTC).toLocaleString()} (${timeSince(dado.recebidoUTC)})</td>
-                                            <td>${formatValue(dado.temperaturaInterna, 1)}</td>
-                                            <td>${formatValue(dado.tensaoBateria, 1)} (${formatValue(dado.percentBateria, 0)}%)</td>
+                                            <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
+                                            <td>${formatValue(dado.temperaturaInterna, 1)}ºC</td>
+                                            <td>${formatValue(dado.tensaoBateria, 2)}v (${formatValue(dado.percentBateria, 0)}%)</td>
                                             <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
-                                            <td>${dado.temperaturaAr || '-'}</td>
-                                            <td>${dado.umidadeAr || '-'}</td>
+                                            <td>${dado.temperaturaAr || '-'}ºC</td>
+                                            <td>${dado.umidadeAr || '-'}%</td>
                                             <td>${dado.precipitacao || '-'}</td>
-                                            <td>${dado.nivelRio || '-'}</td>
-                                            <td>${dado.forcaSinal || '-'}</td>
+                                            <td>${dado.nivelRio || '-'}m</td>
+                                            <td>${wifiSignalToPercent(dado.forcaSinal)} (${dado.forcaSinal || '-'}dBm)</td>
                                         `;
                         tableBody.appendChild(row);
 

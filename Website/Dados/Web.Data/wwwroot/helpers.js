@@ -24,6 +24,19 @@ function timeSince(date) {
     }
     return 'agora';
 }
+function wifiSignalToPercent(signal) {
+    if (signal == null || isNaN(signal)) return '-'; // Retorna '-' para valores inválidos
+
+    const MIN_SIGNAL = -100; // Nível mínimo típico
+    const MAX_SIGNAL = -50;  // Nível máximo típico
+
+    // Garante que o nível esteja dentro do intervalo esperado
+    const clampedSignal = Math.min(Math.max(signal, MIN_SIGNAL), MAX_SIGNAL);
+
+    // Converte o nível para percentual
+    const percent = ((clampedSignal - MIN_SIGNAL) / (MAX_SIGNAL - MIN_SIGNAL)) * 100;
+    return Math.round(percent) + '%';
+}
 
 function getQueryParam(name) {
     const queryString = window.location.search;
