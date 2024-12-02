@@ -120,6 +120,7 @@ public class EstacoesController : ControllerBase
         public decimal? ForcaSinal { get; set; }
         public decimal? TemperaturaInterna { get; set; }
         public decimal? TensaoBateria { get; set; }
+        public decimal? PercentBateria { get; set; }
         // Medições
         public decimal? TemperaturaAr { get; set; }
         public decimal? UmidadeAr { get; set; }
