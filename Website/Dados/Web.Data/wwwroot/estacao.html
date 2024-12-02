@@ -86,7 +86,7 @@
                                             <td>${dado.temperaturaAr || '-'}ºC</td>
                                             <td>${dado.umidadeAr || '-'}%</td>
                                             <td>${dado.precipitacao || '-'}</td>
-                                            <td>${dado.nivelRio || '-'}m</td>
+                                            <td>${formatValue(dado.nivelRio, 3) || '-'}m</td>
                                             <td>${wifiSignalToPercent(dado.forcaSinal)} (${dado.forcaSinal || '-'}dBm)</td>
                                         `;
                         tableBody.appendChild(row);
