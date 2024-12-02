@@ -21,6 +21,7 @@
             background-color: #f2f2f2;
         }
     </style>
+    <script type="text/javascript" src="helpers.js"></script>
 </head>
 <body>
     <h2>Últimas Leituras</h2>
@@ -103,7 +104,7 @@
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                            <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
+                                            <td>${new Date(dado.recebidoUTC).toLocaleString()} (${timeSince(dado.recebidoUTC)})</td>
                                             <td>${dado.nomeEstacao || dado.estacao}</td>
                                             <td>${formatValue(dado.temperaturaInterna, 1)}</td>
                                             <td>${formatValue(dado.tensaoBateria, 1)} (${formatValue(dado.percentBateria, 0)}%)</td>
@@ -124,10 +125,6 @@
                 });
 
         });
-        function formatValue(value, decimals = 0) {
-            if (value == null) return '-'; // Verifica null ou undefined
-            return decimals === 0 ? Math.round(value) : value.toFixed(decimals);
-        }
 
         const colorList = ['lightblue', 'lightgreen', 'lightgoldenrodyellow', 'antiquewhite', 'aliceblue', 'lightpink', 'aquamarine', 'beige', 'yellowgreen', 'skyblue'];
         function setColor(element, idEstacao) {

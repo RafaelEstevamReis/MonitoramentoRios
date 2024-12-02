@@ -31,11 +31,12 @@
 
     </style>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="helpers.js"></script>
 </head>
 <body>
     <a href="dados.html">Listar Todos</a>
 
-    <h2>Dados da Estação</h2>
+    <h2>Dados da Estação <span id="nomeEstacao"></span></h2>
 
     <!-- Gráfico -->
     <div id="chart_div"></div>
@@ -45,7 +46,6 @@
         <thead>
             <tr>
                 <th>Recebido (UTC)</th>
-                <th>Estação</th>
                 <th>Temperatura Interna</th>
                 <th>Tensão da Bateria</th>
                 <th>Data e Hora (UTC)</th>
@@ -73,11 +73,13 @@
                     const chartData = [['Data/Hora', 'Temperatura do Ar', 'Umidade do Ar']];
                     const chartLevelData = [['Data/Hora', 'Nível']];
 
+                    const spnNome = document.getElementById('nomeEstacao');
+                    spnNome.textContent = data[0].nomeEstacao;
+
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                            <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
-                                            <td>${dado.nomeEstacao || dado.estacao}</td>
+                                            <td>${new Date(dado.recebidoUTC).toLocaleString()} (${timeSince(dado.recebidoUTC)})</td>
                                             <td>${formatValue(dado.temperaturaInterna, 1)}</td>
                                             <td>${formatValue(dado.tensaoBateria, 1)} (${formatValue(dado.percentBateria, 0)}%)</td>
                                             <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
@@ -113,16 +115,6 @@
                     console.error('Erro ao carregar dados das estações:', error);
                 });
         });
-        function formatValue(value, decimals = 0) {
-            if (value == null) return '-'; // Verifica null ou undefined
-            return decimals === 0 ? Math.round(value) : value.toFixed(decimals);
-        }
-
-        function getQueryParam(name) {
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            return urlParams.get(name);
-        }
 
         function drawChart(chartData) {
             const data = google.visualization.arrayToDataTable(chartData);
