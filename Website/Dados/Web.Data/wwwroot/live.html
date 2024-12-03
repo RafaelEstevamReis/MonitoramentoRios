@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Dados da Estação</title>
+    <script type="text/javascript" src="helpers.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", updateContent);
+        setInterval(updateContent, 60000);
+
+        function updateContent() {
+
+            fetch('/estacoes/dados?limit=1&estacao=' + getQueryParam("estacao"))
+                .then(response => response.json())
+                .then(data => {
+                    const dado = data[0];
+                    // Header
+                    setValue('nomeEstacao', dado.nomeEstacao);
+                    setValue('dtDados', new Date(dado.dataHoraDadosUTC).toLocaleString());
+                    // Dados Estação
+                    setValue('clNomeEstacao', dado.nomeEstacao);
+                    setValue('clBat', `${formatValue(dado.tensaoBateria, 2)}v (${formatValue(dado.percentBateria, 0)}%)`);
+                    setValue('clIntTemp', `${formatValue(dado.temperaturaInterna, 1)}ºC`);
+                    setValue('clSigStr', `${wifiSignalToPercent(dado.forcaSinal)} (${dado.forcaSinal || '-'}dBm)`);
+                    // Ar
+                    setValue('clTemp', `${dado.temperaturaAr || '-'}ºC`);
+                    setValue('clHumd', `${dado.umidadeAr || '-'}%`);
+                    setValue('clPres', '-');
+                    // Medição
+                    setValue('clLevel', `${formatValue(dado.nivelRio, 3) || '-'}m`);
+                    setValue('clRain', `${dado.precipitacao || '-'}`);
+
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados das estações:', error);
+                });
+
+
+            fetch('/estacoes/agregado?estacao=' + getQueryParam("estacao"))
+                .then(response => response.json())
+                .then(data => {
+                    const min = data.min;
+                    // Dados Estação
+                    setValue('clMinBat', `${formatValue(min.tensaoBateria, 2)}v (${formatValue(min.percentBateria, 0)}%)`);
+                    setValue('clMinIntTemp', `${formatValue(min.temperaturaInterna, 1)}ºC`);
+                    setValue('clMinSigStr', `${wifiSignalToPercent(min.forcaSinal)} (${min.forcaSinal || '-'}dBm)`);
+                    // Ar
+                    setValue('clMinTemp', `${min.temperaturaAr || '-'}ºC`);
+                    setValue('clMinHumd', `${min.umidadeAr || '-'}%`);
+                    setValue('clMinPres', '-');
+                    // Medição
+                    setValue('clMinLevel', `${formatValue(min.nivelRio, 3) || '-'}m`);
+                    setValue('clMinRain', `${min.precipitacao || '-'}`);
+
+                    const max = data.max;
+                    // Dados Estação
+                    setValue('clMaxBat', `${formatValue(max.tensaoBateria, 2)}v (${formatValue(max.percentBateria, 0)}%)`);
+                    setValue('clMaxIntTemp', `${formatValue(max.temperaturaInterna, 1)}ºC`);
+                    setValue('clMaxSigStr', `${wifiSignalToPercent(max.forcaSinal)} (${max.forcaSinal || '-'}dBm)`);
+                    // Ar
+                    setValue('clMaxTemp', `${max.temperaturaAr || '-'}ºC`);
+                    setValue('clMaxHumd', `${max.umidadeAr || '-'}%`);
+                    setValue('clMaxPres', '-');
+                    // Medição
+                    setValue('clMaxLevel', `${formatValue(max.nivelRio, 3) || '-'}m`);
+                    setValue('clMaxRain', `${max.precipitacao || '-'}`);
+
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados das estações:', error);
+                });
+        }
+        function setValue(id, value) {
+            const element = document.getElementById(id);
+            if (element === null || element === undefined) return;
+
+            element.textContent = value || '-';
+        }
+    </script>
+    <style>
+        table {
+            border-collapse: collapse
+        }
+
+        tr:nth-child(even):not(.blockHeader) {
+            background-color: #f2f2f2;
+        }
+
+        h2 {
+            width: 500px;
+        }
+
+        .blockHeader {
+            font-weight: bold;
+            background-color: lightslategrey;
+            color: white;
+            padding: 5px;
+        }
+
+        .cellHeader {
+            font-weight: bold;
+            width: 200px;
+        }
+
+        .cellValue {
+            width: 140px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Dados da Estação <span id="nomeEstacao">[NOME ESTACAO]</span></h2>
+    <div>Atualizado em <span id="dtDados">[HH]</span></div>
+
+    <table>
+        <tbody>
+            <tr class="blockHeader">
+                <td>AR</td>
+                <td>Leitura</td>
+                <td>-</td>
+                <td>Mínimas</td>
+                <td>Máximas</td>
+            </tr>
+            <tr>
+                <td class="cellHeader">Temperatura</td>
+                <td class="cellValue" id="clTemp">-</td>
+                <td class="cellValue"></td>
+                <td class="cellValue" id="clMinTemp"></td>
+                <td class="cellValue" id="clMaxTemp"></td>
+            </tr>
+            <tr>
+                <td class="cellHeader">Umidade</td>
+                <td class="cellValue" id="clHumd">-</td>
+                <td class="cellValue"></td>
+                <td class="cellValue" id="clMinHumd"></td>
+                <td class="cellValue" id="clMaxHumd"></td>
+            </tr>
+            <tr>
+                <td class="cellHeader">Barômetro</td>
+                <td class="cellValue" id="clPres">-</td>
+                <td class="cellValue"></td>
+                <td class="cellValue" id="clMinPres"></td>
+                <td class="cellValue" id="clMaxPres"></td>
+            </tr>
+
+            <tr class="blockHeader">
+                <td colspan="5">MEDIÇÃO</td>
+            </tr>
+            <tr>
+                <td class="cellHeader">Nível Água</td>
+                <td class="cellValue" id="clLevel">-</td>
+                <td class="cellValue"></td>
+                <td class="cellValue" id="clMinLevel"></td>
+                <td class="cellValue" id="clMaxLevel"></td>
+            </tr>
+            <tr>
+                <td class="cellHeader">Precipitação</td>
+                <td class="cellValue" id="clRain">-</td>
+                <td class="cellValue"></td>
+                <td class="cellValue" id="clMinRain"></td>
+                <td class="cellValue" id="clMaxRain"></td>
+            </tr>
+
+            <tr class="blockHeader">
+                <td colspan="5">ESTAÇÃO</td>
+            </tr>
+
+            <tr>
+                <td class="cellHeader">Nome</td>
+                <td class="cellValue" id="clNomeEstacao">-</td>
+                <td class="cellValue"></td>
+                <td class="cellValue"></td>
+                <td class="cellValue"></td>
+            </tr>
+            <tr>
+                <td class="cellHeader">Bateria</td>
+                <td class="cellValue" id="clBat">-</td>
+                <td class="cellValue"></td>
+                <td class="cellValue" id="clMinBat"></td>
+                <td class="cellValue" id="clMaxBat"></td>
+            </tr>
+            <tr>
+                <td class="cellHeader">Temp. Interna</td>
+                <td class="cellValue" id="clIntTemp">-</td>
+                <td class="cellValue"></td>
+                <td class="cellValue" id="clMinIntTemp"></td>
+                <td class="cellValue" id="clMaxIntTemp"></td>
+            </tr>
+            <tr>
+                <td class="cellHeader">Força Sinal</td>
+                <td class="cellValue" id="clSigStr">-</td>
+                <td class="cellValue"></td>
+                <td class="cellValue" id="clMinSigStr"></td>
+                <td class="cellValue" id="clMaxSigStr"></td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

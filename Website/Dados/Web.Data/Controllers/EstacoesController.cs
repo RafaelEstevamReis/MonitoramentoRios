@@ -77,6 +77,54 @@ public class EstacoesController : ControllerBase
         return lst;
     }
 
+    [HttpGet("agregado")]
+    public DadosAgregados AgregarDados(string estacao, int hour)
+    {
+        var lst = db.ListarDados(estacao, hour * 60)
+                    .Where(o => (DateTime.UtcNow - o.DataHoraDadosUTC).TotalHours <= hour)
+                    .ToArray();
+
+        return new DadosAgregados
+        {
+            Avg = new DadosColetados
+            {
+                ForcaSinal = lst.Average(o=> o.ForcaSinal),
+                NivelRio = lst.Average(o => o.NivelRio),
+                PercentBateria = lst.Average(o => o.PercentBateria),
+                Precipitacao = lst.Average(o => o.Precipitacao),
+                PressaoAr = lst.Average(o => o.PressaoAr),
+                TemperaturaAr = lst.Average(o => o.TemperaturaAr),
+                UmidadeAr = lst.Average(o => o.UmidadeAr),
+                TemperaturaInterna = lst.Average(o => o.TemperaturaInterna),
+                TensaoBateria = lst.Average(o => o.TensaoBateria),
+            },
+            Max = new DadosColetados
+            {
+                ForcaSinal = lst.Max(o => o.ForcaSinal),
+                NivelRio = lst.Max(o => o.NivelRio),
+                PercentBateria = lst.Max(o => o.PercentBateria),
+                Precipitacao = lst.Max(o => o.Precipitacao),
+                PressaoAr = lst.Max(o => o.PressaoAr),
+                TemperaturaAr = lst.Max(o => o.TemperaturaAr),
+                UmidadeAr = lst.Max(o => o.UmidadeAr),
+                TemperaturaInterna = lst.Max(o => o.TemperaturaInterna),
+                TensaoBateria = lst.Max(o => o.TensaoBateria),
+            },
+            Min = new DadosColetados
+            {
+                ForcaSinal = lst.Min(o => o.ForcaSinal),
+                NivelRio = lst.Min(o => o.NivelRio),
+                PercentBateria = lst.Min(o => o.PercentBateria),
+                Precipitacao = lst.Min(o => o.Precipitacao),
+                PressaoAr = lst.Min(o => o.PressaoAr),
+                TemperaturaAr = lst.Min(o => o.TemperaturaAr),
+                UmidadeAr = lst.Min(o => o.UmidadeAr),
+                TemperaturaInterna = lst.Min(o => o.TemperaturaInterna),
+                TensaoBateria = lst.Min(o => o.TensaoBateria),
+            },
+        };
+    }
+
     private static void atualizaEstacoes(DB db)
     {
         dicEstacoes = db.ListarEstacoes()
@@ -134,5 +182,12 @@ public class EstacoesController : ControllerBase
     {
         public string NomeResponsavel { get; set; } = string.Empty;
         public string NomeEstacao { get; set; } = string.Empty;
+    }
+    public class DadosAgregados
+    {
+        public DadosColetados Min { get; set; }
+        public DadosColetados Max { get; set; }
+        public DadosColetados Avg { get; set; }
+
     }
 }
