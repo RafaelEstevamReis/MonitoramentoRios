@@ -78,7 +78,7 @@ public class EstacoesController : ControllerBase
     }
 
     [HttpGet("agregado")]
-    public DadosAgregados AgregarDados(string estacao, int hour)
+    public DadosAgregados AgregarDados(string estacao, int hour = 8)
     {
         var lst = db.ListarDados(estacao, hour * 60)
                     .Where(o => (DateTime.UtcNow - o.DataHoraDadosUTC).TotalHours <= hour)

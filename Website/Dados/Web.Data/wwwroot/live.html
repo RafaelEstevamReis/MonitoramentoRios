@@ -36,7 +36,7 @@
                 });
 
 
-            fetch('/estacoes/agregado?estacao=' + getQueryParam("estacao"))
+            fetch('/estacoes/agregado?hour=24&estacao=' + getQueryParam("estacao"))
                 .then(response => response.json())
                 .then(data => {
                     const min = data.min;
