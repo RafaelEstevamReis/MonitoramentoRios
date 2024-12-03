@@ -5,37 +5,13 @@
     <title>Dados da Estação</title>
     <script type="text/javascript" src="helpers.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", updateContent);
+        document.addEventListener("DOMContentLoaded", function () {
+            updateContent();
+            carregaAgregado();
+        });
         setInterval(updateContent, 60000);
 
-        function updateContent() {
-
-            fetch('/estacoes/dados?limit=1&estacao=' + getQueryParam("estacao"))
-                .then(response => response.json())
-                .then(data => {
-                    const dado = data[0];
-                    // Header
-                    setValue('nomeEstacao', dado.nomeEstacao);
-                    setValue('dtDados', new Date(dado.dataHoraDadosUTC).toLocaleString());
-                    // Dados Estação
-                    setValue('clNomeEstacao', dado.nomeEstacao);
-                    setValue('clBat', `${formatValue(dado.tensaoBateria, 2)}v (${formatValue(dado.percentBateria, 0)}%)`);
-                    setValue('clIntTemp', `${formatValue(dado.temperaturaInterna, 1)}ºC`);
-                    setValue('clSigStr', `${wifiSignalToPercent(dado.forcaSinal)} (${dado.forcaSinal || '-'}dBm)`);
-                    // Ar
-                    setValue('clTemp', `${dado.temperaturaAr || '-'}ºC`);
-                    setValue('clHumd', `${dado.umidadeAr || '-'}%`);
-                    setValue('clPres', '-');
-                    // Medição
-                    setValue('clLevel', `${formatValue(dado.nivelRio, 3) || '-'}m`);
-                    setValue('clRain', `${dado.precipitacao || '-'}`);
-
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar dados das estações:', error);
-                });
-
-
+        function carregaAgregado() {
             fetch('/estacoes/agregado?hour=24&estacao=' + getQueryParam("estacao"))
                 .then(response => response.json())
                 .then(data => {
@@ -64,6 +40,32 @@
                     // Medição
                     setValue('clMaxLevel', `${formatValue(max.nivelRio, 3) || '-'}m`);
                     setValue('clMaxRain', `${max.precipitacao || '-'}`);
+
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados das estações:', error);
+                });
+        }
+        function updateContent() {
+            fetch('/estacoes/dados?limit=1&estacao=' + getQueryParam("estacao"))
+                .then(response => response.json())
+                .then(data => {
+                    const dado = data[0];
+                    // Header
+                    setValue('nomeEstacao', dado.nomeEstacao);
+                    setValue('dtDados', new Date(dado.dataHoraDadosUTC).toLocaleString());
+                    // Dados Estação
+                    setValue('clNomeEstacao', dado.nomeEstacao);
+                    setValue('clBat', `${formatValue(dado.tensaoBateria, 2)}v (${formatValue(dado.percentBateria, 0)}%)`);
+                    setValue('clIntTemp', `${formatValue(dado.temperaturaInterna, 1)}ºC`);
+                    setValue('clSigStr', `${wifiSignalToPercent(dado.forcaSinal)} (${dado.forcaSinal || '-'}dBm)`);
+                    // Ar
+                    setValue('clTemp', `${dado.temperaturaAr || '-'}ºC`);
+                    setValue('clHumd', `${dado.umidadeAr || '-'}%`);
+                    setValue('clPres', '-');
+                    // Medição
+                    setValue('clLevel', `${formatValue(dado.nivelRio, 3) || '-'}m`);
+                    setValue('clRain', `${dado.precipitacao || '-'}`);
 
                 })
                 .catch(error => {
