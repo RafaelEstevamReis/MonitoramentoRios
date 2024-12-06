@@ -22,7 +22,7 @@
             background-color: #f2f2f2;
         }
 
-        #chart_div, chartLevel_div {
+        #chart_div, #chartLevel_div {
             width: 100%;
             height: 400px;
             margin-top: 20px;
@@ -34,7 +34,7 @@
     <script type="text/javascript" src="helpers.js"></script>
 </head>
 <body>
-    <a href="dados.html">Listar Todos</a>
+    <a href="dados.html">Listar Todas</a>
 
     <h2>Dados da Estação <span id="nomeEstacao"></span></h2>
 
@@ -86,7 +86,7 @@
                                             <td>${dado.temperaturaAr || '-'}ºC</td>
                                             <td>${dado.umidadeAr || '-'}%</td>
                                             <td>${dado.precipitacao || '-'}</td>
-                                            <td>${formatValue(dado.nivelRio, 3) || '-'}m</td>
+                                            <td>${formatValue(dado.nivelRio, 2) || '-'}m</td>
                                             <td>${wifiSignalToPercent(dado.forcaSinal)} (${dado.forcaSinal || '-'}dBm)</td>
                                         `;
                         tableBody.appendChild(row);
@@ -98,7 +98,7 @@
                             chartData.push([hora, parseFloat(dado.temperaturaAr), parseFloat(dado.umidadeAr)]);
                         }
                         if (dado.nivelRio) {
-                            chartLevelData.push([hora, parseFloat(dado.nivelRio)]);
+                            chartLevelData.push([hora, parseFloat(dado.nivelRio.toFixed(2))]);
                         }
                     });
 
