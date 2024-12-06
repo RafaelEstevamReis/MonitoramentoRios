@@ -106,7 +106,7 @@
                                             <td>${dado.precipitacao || '-'}</td>
                                             <td>${formatValue(dado.nivelRio, 1)}m</td>
                                             <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
-                                            <td><a href="estacao.html?estacao=${dado.estacao}">Detalhar</a></td>
+                                            <td><a href="live.html?estacao=${dado.estacao}">Resumo</a> | <a href="estacao.html?estacao=${dado.estacao}">Detalhar</a> </td>
                                         `;
                         tableBody.appendChild(row);
                         setColor(row, dado.nomeEstacao);
