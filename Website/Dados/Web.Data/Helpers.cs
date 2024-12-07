@@ -27,4 +27,10 @@ public static class Helpers
         var hex = ToHex(hash);
         return hex.Substring(0, 16);
     }
+
+    public static decimal? Round(this decimal? value, int decimals)
+    {
+        if (value == null) return null;
+        return Math.Round(value.Value, decimals);
+    }
 }
