@@ -88,7 +88,7 @@ public class EstacoesController : ControllerBase
         {
             Avg = new DadosColetados
             {
-                ForcaSinal = lst.Average(o=> o.ForcaSinal),
+                ForcaSinal = lst.Average(o => o.ForcaSinal),
                 NivelRio = lst.Average(o => o.NivelRio),
                 PercentBateria = lst.Average(o => o.PercentBateria),
                 Precipitacao = lst.Average(o => o.Precipitacao),
@@ -125,11 +125,29 @@ public class EstacoesController : ControllerBase
         };
     }
 
+    [HttpGet("hourly")]
+    public IActionResult AgregarHora(string estacao, int hourSpan)
+    {
+        var agr = db.AgregadoHora(estacao, hourSpan);
+        if (agr == null) return NoContent();
+        return Ok(agr);
+    }
+
+    [HttpGet("lastHourly")]
+    public IActionResult FaixaHora(string estacao, int lastHours = 8)
+    {
+        var horaAgora = (int)(DateTime.UtcNow - DateTime.UnixEpoch).TotalHours;
+
+        var range = Enumerable.Range(horaAgora - lastHours, lastHours);
+        return Ok( range.Select(h => db.AgregadoHora(estacao, h)));
+    }
+
     private static void atualizaEstacoes(DB db)
     {
         dicEstacoes = db.ListarEstacoes()
                         .ToDictionary(o => o.Estacao, o => o.NomeEstacao);
     }
+
 
     [HttpPost("nova")]
     public IActionResult NovaEstacao(DadosEstacao dados)

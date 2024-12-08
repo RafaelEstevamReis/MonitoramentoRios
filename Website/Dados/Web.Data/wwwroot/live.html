@@ -8,6 +8,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             updateContent();
             carregaAgregado();
+            carregaHistorico();
         });
         setInterval(updateContent, 60000);
 
@@ -78,6 +79,32 @@
 
             element.textContent = value || '-';
         }
+
+        function carregaHistorico() {
+            fetch('/estacoes/lastHourly?lastHours=24&estacao=' + getQueryParam("estacao"))
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#dadosEstacao tbody');
+                    data.forEach(dado => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                                <td>${new Date(dado.dataHoraDadosUTC).toISOString().slice(0, 13).replace('T', ' ')}h</td>
+                                <td>${dado.dataCount}</td>
+                                <td>${formatValue(dado.temperaturaInterna_AVG, 1)}ºC</td>
+                                <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
+                                <td>${formatValue(dado.temperaturaAr_AVG,1) || '-'}ºC</td>
+                                <td>${formatValue(dado.umidadeAr_AVG,1) || '-'}%</td>
+                                <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
+                                <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG,0) || '-'}dBm)</td>
+                            `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados das estações:', error);
+                });
+        }
+
     </script>
     <style>
         table {
@@ -199,5 +226,25 @@
     </table>
 
     <div>Atualizado em <span id="dtDados">[HH]</span></div>
+    <br /> <hr /> <br />
+
+    <table id="dadosEstacao">
+        <thead>
+            <tr>
+                <th>Recebido (UTC)</th>
+                <th>Registros</th>
+                <th width="100px">Temperatura Interna</th>
+                <th>Tensão da Bateria</th>
+                <th width="100px">Temperatura do Ar</th>
+                <th width="100px">Umidade do Ar</th>
+                <th>Nível da Água</th>
+                <th>Sinal Conexão</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dados serão preenchidos dinamicamente aqui -->
+        </tbody>
+    </table>
+
 </body>
 </html>
