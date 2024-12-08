@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa OpenStreetMap</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script type="text/javascript" src="helpers.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        #screen {
+            background-color: aquamarine;
+            height: 100%;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .circle-label {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 123, 255, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: center;
+            border: 2px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div id="screen">
+        <div id="map"></div>
+    </div>
+
+    <script>
+        var map = L.map('map', {
+            maxZoom: 13,
+            minZoom: 11,
+        }).setView([-29.61, -50.53], 13); // Posição inicial [latitude, longitude] e zoom
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Todas as coordenadas devem ter apenas 2.5 casas decimais (terceira casa múltiplo de 5)
+
+        // RSRL-CE01
+        addCircleLabel(-29.650, -50.575, `-ºC`, "/live.html?estacao=BB45660B199C5677");
+
+        fetch('/estacoes/ultimos')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(dado => {
+                    // RSRL-BE01
+                    if (dado.estacao == "04109F675953A131") {
+                        addCircleLabel(-29.565, -50.535, `${dado.temperaturaAr}ºC<br>${formatValue(dado.nivelRio, 1)}m`, "/live.html?estacao=04109F675953A131");
+                    }
+                    // RSRL-GLLS
+                    if (dado.estacao == "9A6EE7B45495BB7F") {
+                        addCircleLabel(-29.590, -50.565, `${dado.temperaturaAr}ºC<br>${formatValue(dado.nivelRio, 1)}m`, "/live.html?estacao=9A6EE7B45495BB7F");
+                    }
+                    // RSRL-RB01
+                    if (dado.estacao == "BB45660B199C5677") {
+                        addCircleLabel(-29.640, -50.540, `${dado.temperaturaAr}ºC`, "/live.html?estacao=BB45660B199C5677");
+                    }
+
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar dados das estações:', error);
+            });
+
+
+        function addCircleLabel(lat, lng, label, url) {
+            // Adiciona o texto dentro do círculo
+            var circle = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: 'circle-label',
+                    html: label,
+                    iconSize: [50, 50],
+                    iconAnchor: [20, 20] // Centralizar o texto no ponto
+                })
+            }).addTo(map);
+
+            circle.on('click', function () {
+                window.location.href = url;
+            });
+        }
+    </script>
+</body>
+</html>
