@@ -3,7 +3,6 @@
 using Simple.Sqlite;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 public class DB
@@ -82,15 +81,16 @@ public class DB
 
         if (qData.Length == 0) return null; // Salvar que não tem? Dá full table scan
 
-        var forcaSinal = DataAggregator.Aggregate(qData, o => o.ForcaSinal);
-        var temperaturaInterna = DataAggregator.Aggregate(qData, o => o.TemperaturaInterna);
-        var tensaoBateria = DataAggregator.Aggregate(qData, o => o.TensaoBateria);
-        var percentBateria = DataAggregator.Aggregate(qData, o => o.PercentBateria);
-        var temperaturaAr = DataAggregator.Aggregate(qData, o => o.TemperaturaAr);
-        var umidadeAr = DataAggregator.Aggregate(qData, o => o.UmidadeAr);
-        var pressaoAr = DataAggregator.Aggregate(qData, o => o.PressaoAr);
-        var precipitacao = DataAggregator.Aggregate(qData, o => o.Precipitacao);
-        var nivelRio = DataAggregator.Aggregate(qData, o => o.NivelRio);
+        var forcaSinal = agregadorPadrao(qData, o => o.ForcaSinal);
+        var temperaturaInterna = agregadorPadrao(qData, o => o.TemperaturaInterna);
+        var tensaoBateria = agregadorPadrao(qData, o => o.TensaoBateria);
+        var percentBateria = agregadorPadrao(qData, o => o.PercentBateria);
+        var temperaturaAr = agregadorPadrao(qData, o => o.TemperaturaAr);
+        var umidadeAr = agregadorPadrao(qData, o => o.UmidadeAr);
+        var pressaoAr = agregadorPadrao(qData, o => o.PressaoAr);
+        var precipitacao = agregadorPadrao(qData, o => o.Precipitacao);
+        var nivelRio = agregadorPadrao(qData, o => o.NivelRio ?? o.NivelRio_RAW);
+
 
         hora = new DBModels.TBDadosEstacoesHora
         {
@@ -169,6 +169,19 @@ public class DB
         if (horaAgora != hourSpan) cnn.Insert(hora, OnConflict.Replace);
 
         return hora;
+    }
+
+    private DataAggregator.Result agregadorPadrao(DBModels.TBDadosEstacoes[] qData, Func<DBModels.TBDadosEstacoes, decimal?> selector)
+    {
+        // retira o pior menor e pior maior
+        var valores = DataAggregator.TruncarValores(qData.Select(selector), trimSize: 1).ToList();
+        // Calcula o desvio
+        var agr1 = DataAggregator.Aggregate(valores);
+        // Corta todos 1 desvio fora
+        valores = valores.Where(o => Math.Abs(o - agr1.Avg ?? 0) < agr1.StdDev).ToList();
+        var agr2 = DataAggregator.Aggregate(valores);
+
+        return agr2;
     }
 
     public bool IsValidKey(string key) => apiKeys.Contains(key);

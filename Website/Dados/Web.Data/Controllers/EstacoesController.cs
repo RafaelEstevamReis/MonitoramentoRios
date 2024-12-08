@@ -139,7 +139,7 @@ public class EstacoesController : ControllerBase
         var horaAgora = (int)(DateTime.UtcNow - DateTime.UnixEpoch).TotalHours;
 
         var range = Enumerable.Range(horaAgora - lastHours, lastHours);
-        return Ok( range.Select(h => db.AgregadoHora(estacao, h)));
+        return Ok(range.Select(h => db.AgregadoHora(estacao, h)));
     }
 
     private static void atualizaEstacoes(DB db)

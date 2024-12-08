@@ -84,12 +84,14 @@
             fetch('/estacoes/lastHourly?lastHours=24&estacao=' + getQueryParam("estacao"))
                 .then(response => response.json())
                 .then(data => {
+                    data.sort((a, b) => new Date(b.dataHoraDadosUTC) - new Date(a.dataHoraDadosUTC));
+
                     const tableBody = document.querySelector('#dadosEstacao tbody');
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
                                 <td>${new Date(dado.dataHoraDadosUTC).toISOString().slice(0, 13).replace('T', ' ')}h</td>
-                                <td>${dado.dataCount}</td>
+                                <td style="text-align: center;">${dado.dataCount}</td>
                                 <td>${formatValue(dado.temperaturaInterna_AVG, 1)}ºC</td>
                                 <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
                                 <td>${formatValue(dado.temperaturaAr_AVG,1) || '-'}ºC</td>
@@ -231,7 +233,7 @@
     <table id="dadosEstacao">
         <thead>
             <tr>
-                <th>Recebido (UTC)</th>
+                <th>Recebido<br>(UTC)</th>
                 <th>Registros</th>
                 <th width="100px">Temperatura Interna</th>
                 <th>Tensão da Bateria</th>

@@ -12,7 +12,12 @@ public class DataAggregator
     /// </summary>
     public static Result Aggregate<T>(IEnumerable<T> data, Func<T, decimal?> fieldSelector)
     {
-        var values = data.Select(fieldSelector).ToList();
+        var values = data.Select(fieldSelector);
+        return Aggregate(values);
+    }
+    public static Result Aggregate(IEnumerable<decimal?> data)
+    {
+        var values = data.ToList();
 
         if (values.Count == 0) return new Result
         {
@@ -57,29 +62,30 @@ public class DataAggregator
             Avg = avg.Round(3),
             StdDev = stdDev.Round(3),
             Trend = trend.Round(3),
+            Values = values.ToArray(),
         };
     }
 
-    public static Result AgretgateWithFilter<T>(IEnumerable<T> data, Func<T, decimal?> fieldSelector,
+    public static Result AgregateWithFilter<T>(IEnumerable<T> data, Func<T, decimal?> fieldSelector,
         Func<IEnumerable<T>, Func<T, decimal?>, decimal, IEnumerable<T>> filterFunction, decimal filterScore)
     {
         var filteredData = filterFunction(data, fieldSelector, filterScore);
         return Aggregate(filteredData, fieldSelector);
     }
 
-    public static IEnumerable<T> FilterUsingNormalDistribution<T>(IEnumerable<T> data, Func<T, decimal?> fieldSelector, decimal zScore = 1.96M) // Padrão: 95% de confiança
+    public static IEnumerable<T> FilterUsingNormalDistribution<T>(IEnumerable<T> data, Func<T, decimal?> fieldSelector, decimal zScore)
     {
         var values = data.Select(fieldSelector).Where(o => o is not null).Cast<decimal>().ToList();
 
         if (values.Count == 0) return data; // Retorna os dados sem alterações se estiverem vazios.
 
-        var mean = values.Average();
-        var variance = values.Sum(x => (x - mean) * (x - mean)) / values.Count;
+        var avg = values.Average();
+        var variance = values.Sum(x => (x - avg) * (x - avg)) / values.Count;
         var stdDev = (decimal)Math.Sqrt((double)variance);
 
         // Define os limites com base no nível de confiança
-        var lowerBound = mean - zScore * stdDev;
-        var upperBound = mean + zScore * stdDev;
+        var lowerBound = avg - zScore * stdDev;
+        var upperBound = avg + zScore * stdDev;
 
         // Filtra valores dentro do intervalo
         return data.Where(item =>
@@ -88,7 +94,7 @@ public class DataAggregator
             return value is not null && value >= lowerBound && value <= upperBound;
         });
     }
-    public static IEnumerable<T> FilterUsingStdDev<T>(IEnumerable<T> data, Func<T, decimal?> fieldSelector, decimal numStdDev = 3)
+    public static IEnumerable<T> FilterUsingStdDev<T>(IEnumerable<T> data, Func<T, decimal?> fieldSelector, decimal numStdDev)
     {
         var values = data.Select(fieldSelector).Where(o => o is not null).Cast<decimal>().ToList();
 
@@ -109,6 +115,15 @@ public class DataAggregator
         });
     }
 
+    public static IEnumerable<decimal?> TruncarValores(IEnumerable<decimal?> data, int trimSize)
+    {
+        return data.Where(o => o is not null)
+                   .OrderBy(x => x)
+                   .Skip(trimSize)
+                   .Take(data.Count() - 2 * trimSize)
+                   ;
+    }
+
     public class Result
     {
         public int Count { get; set; }
@@ -123,6 +138,7 @@ public class DataAggregator
         /// +1: Steeply upwards
         /// </summary>
         public decimal? Trend { get; set; }
+        public decimal?[] Values { get; set; } = [];
     }
 
 
