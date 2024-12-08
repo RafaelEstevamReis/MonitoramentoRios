@@ -24,7 +24,7 @@ public class DB
            .Add<DBModels.TBDadosEstacoesHora>()
            .Commit();
 
-        //cnn.Execute($"DELETE FROM {nameof(DBModels.TBDadosEstacoesHora)} "); 
+        cnn.Execute($"DELETE FROM {nameof(DBModels.TBDadosEstacoesHora)} "); 
 
         var allKeys = cnn.Query<string>($"SELECT {nameof(DBModels.TBEstacoes.ApiKEY)} FROM {nameof(DBModels.TBEstacoes)}");
         foreach (var k in allKeys) apiKeys.Add(k);
@@ -72,7 +72,7 @@ public class DB
 
         // Coletar a hora manualmente 
         var inicio = DateTime.UnixEpoch.AddHours(hourSpan);
-        var fim = DateTime.UnixEpoch.AddHours(hourSpan + 1);
+        var fim = DateTime.UnixEpoch.AddHours(hourSpan + 1).AddMilliseconds(-1);
         var qData = cnn.Query<DBModels.TBDadosEstacoes>($"SELECT * FROM {nameof(DBModels.TBDadosEstacoes)} WHERE Estacao = @estacao AND DataHoraDadosUTC BETWEEN @inicio AND @fim ", new
         {
             estacao,

@@ -5,6 +5,7 @@
     <title>Dados da Estação</title>
     <script type="text/javascript" src="helpers.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             updateContent();
@@ -98,15 +99,15 @@
                         // Tabela
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                        <td>${new Date(dado.dataHoraDadosUTC).toISOString().slice(0, 13).replace('T', ' ')}h</td>
-                                        <td style="text-align: center;">${dado.dataCount}</td>
-                                        <td>${formatValue(dado.temperaturaInterna_AVG, 1)}ºC</td>
-                                        <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
-                                        <td>${formatValue(dado.temperaturaAr_AVG, 1) || '-'}ºC</td>
-                                        <td>${formatValue(dado.umidadeAr_AVG, 1) || '-'}%</td>
-                                        <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
-                                        <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG, 0) || '-'}dBm)</td>
-                                        `;
+                                            <td>${dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ')}h</td>
+                                            <td style="text-align: center;">${dado.dataCount}</td>
+                                            <td>${formatValue(dado.temperaturaInterna_AVG, 1)}ºC</td>
+                                            <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
+                                            <td>${formatValue(dado.temperaturaAr_AVG, 1) || '-'}ºC</td>
+                                            <td>${formatValue(dado.umidadeAr_AVG, 1) || '-'}%</td>
+                                            <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
+                                            <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG, 0) || '-'}dBm)</td>
+                                            `;
                         tableBody.appendChild(row);
                     });
 
@@ -117,7 +118,7 @@
                     data.forEach(dado => {
                         if (dado === undefined || dado === null) return;
 
-                        const label = new Date(dado.dataHoraDadosUTC).toISOString().slice(0, 13).replace('T', ' ') + 'h';
+                        const label = dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ') + 'h';
                         labels.push(label);
                         nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null); // Adicionar null se não houver dados
                     });
