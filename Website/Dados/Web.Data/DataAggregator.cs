@@ -1,8 +1,8 @@
-﻿using System;
+﻿namespace Web.Data;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-
-namespace Web.Data;
 
 public class DataAggregator
 {
@@ -60,6 +60,55 @@ public class DataAggregator
         };
     }
 
+    public static Result AgretgateWithFilter<T>(IEnumerable<T> data, Func<T, decimal?> fieldSelector,
+        Func<IEnumerable<T>, Func<T, decimal?>, decimal, IEnumerable<T>> filterFunction, decimal filterScore)
+    {
+        var filteredData = filterFunction(data, fieldSelector, filterScore);
+        return Aggregate(filteredData, fieldSelector);
+    }
+
+    public static IEnumerable<T> FilterUsingNormalDistribution<T>(IEnumerable<T> data, Func<T, decimal?> fieldSelector, decimal zScore = 1.96M) // Padrão: 95% de confiança
+    {
+        var values = data.Select(fieldSelector).Where(o => o is not null).Cast<decimal>().ToList();
+
+        if (values.Count == 0) return data; // Retorna os dados sem alterações se estiverem vazios.
+
+        var mean = values.Average();
+        var variance = values.Sum(x => (x - mean) * (x - mean)) / values.Count;
+        var stdDev = (decimal)Math.Sqrt((double)variance);
+
+        // Define os limites com base no nível de confiança
+        var lowerBound = mean - zScore * stdDev;
+        var upperBound = mean + zScore * stdDev;
+
+        // Filtra valores dentro do intervalo
+        return data.Where(item =>
+        {
+            var value = fieldSelector(item);
+            return value is not null && value >= lowerBound && value <= upperBound;
+        });
+    }
+    public static IEnumerable<T> FilterUsingStdDev<T>(IEnumerable<T> data, Func<T, decimal?> fieldSelector, decimal numStdDev = 3)
+    {
+        var values = data.Select(fieldSelector).Where(o => o is not null).Cast<decimal>().ToList();
+
+        if (values.Count == 0) return data; // Retorna os dados sem alterações se estiverem vazios.
+
+        var avg = values.Average();
+        var stdDev = (decimal)Math.Sqrt((double)(values.Sum(x => (x - avg) * (x - avg)) / values.Count));
+
+        // Define os limites de exclusão
+        decimal lowerBound = avg - numStdDev * stdDev;
+        decimal upperBound = avg + numStdDev * stdDev;
+
+        // Filtra valores dentro dos limites
+        return data.Where(item =>
+        {
+            var value = fieldSelector(item);
+            return value is not null && value >= lowerBound && value <= upperBound;
+        });
+    }
+
     public class Result
     {
         public int Count { get; set; }
@@ -75,4 +124,6 @@ public class DataAggregator
         /// </summary>
         public decimal? Trend { get; set; }
     }
+
+
 }
