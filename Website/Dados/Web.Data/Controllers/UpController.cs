@@ -1,13 +1,11 @@
 ﻿namespace Web.Data.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Web.Data.DAO;
 
@@ -24,6 +22,7 @@ public class UpController : ControllerBase
         this.log = log;
     }
 
+    [NonAction]
     [HttpPost("upload")]
     public async Task<IActionResult> Upload()
     {
