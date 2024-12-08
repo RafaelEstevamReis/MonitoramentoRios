@@ -10,7 +10,15 @@ Log.Logger = new LoggerConfiguration()
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSerilog();
 builder.Services.AddSingleton(Log.Logger);
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowGetMethod", policy =>
+    {
+        policy.WithMethods("GET")    // Permite apenas o método GET
+              .AllowAnyOrigin()      // Permite qualquer origem
+              .AllowAnyHeader();     // Permite qualquer cabeçalho
+    });
+});
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -27,6 +35,9 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 //}
+
+// Habilita o CORS para todas as rotas com a política "AllowGetMethod"
+app.UseCors("AllowGetMethod");
 
 app.UseStaticFiles();
 app.UseAuthorization();
