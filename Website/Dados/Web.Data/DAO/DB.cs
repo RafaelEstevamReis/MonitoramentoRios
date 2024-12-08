@@ -1,7 +1,10 @@
 ﻿namespace Web.Data.DAO;
 
 using Simple.Sqlite;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 public class DB
 {
@@ -19,6 +22,7 @@ public class DB
         cnn.CreateTables()
            .Add<DBModels.TBEstacoes>()
            .Add<DBModels.TBDadosEstacoes>()
+           .Add<DBModels.TBDadosEstacoesHora>()
            .Commit();
 
         var allKeys = cnn.Query<string>($"SELECT {nameof(DBModels.TBEstacoes.ApiKEY)} FROM {nameof(DBModels.TBEstacoes)}");
@@ -30,7 +34,7 @@ public class DB
     {
         using var cnn = db.GetConnection();
         var estacoes = cnn.GetAll<DBModels.TBEstacoes>();
-        foreach(var e in estacoes)
+        foreach (var e in estacoes)
         {
             e.ApiKEY = "";
         }
@@ -50,6 +54,121 @@ public class DB
         {
             return cnn.Query<DBModels.TBDadosEstacoes>($"SELECT * FROM {nameof(DBModels.TBDadosEstacoes)} WHERE Estacao = @estacao ORDER BY Id DESC LIMIT 0,{limit} ", new { estacao });
         }
+    }
+
+    public DBModels.TBDadosEstacoesHora? AgregadoHora(string estacao, int hourSpan)
+    {
+        if (string.IsNullOrEmpty(estacao)) return null;
+
+        using var cnn = db.GetConnection();
+        var qhora = cnn.Query<DBModels.TBDadosEstacoesHora>($"SELECT * FROM {nameof(DBModels.TBDadosEstacoesHora)} WHERE Estacao = @estacao AND HourKey = @hourSpan ", new
+        {
+            estacao,
+            hourSpan,
+        });
+
+        var hora = qhora.FirstOrDefault();
+        if (hora != null) return hora;
+
+        // Coletar a hora manualmente 
+        var inicio = DateTime.UnixEpoch.AddHours(hourSpan);
+        var fim = DateTime.UnixEpoch.AddHours(hourSpan + 1);
+        var qData = cnn.Query<DBModels.TBDadosEstacoes>($"SELECT * FROM {nameof(DBModels.TBDadosEstacoes)} WHERE Estacao = @estacao AND DataHoraDadosUTC BETWEEN @inicio AND @fim ", new
+        {
+            estacao,
+            inicio,
+            fim,
+        }).ToArray();
+
+        if (qData.Length == 0) return null; // Salvar que não tem? Dá full table scan
+
+        var forcaSinal = DataAggregator.Aggregate(qData, o => o.ForcaSinal);
+        var temperaturaInterna = DataAggregator.Aggregate(qData, o => o.TemperaturaInterna);
+        var tensaoBateria = DataAggregator.Aggregate(qData, o => o.TensaoBateria);
+        var percentBateria = DataAggregator.Aggregate(qData, o => o.PercentBateria);
+        var temperaturaAr = DataAggregator.Aggregate(qData, o => o.TemperaturaAr);
+        var umidadeAr = DataAggregator.Aggregate(qData, o => o.UmidadeAr);
+        var pressaoAr = DataAggregator.Aggregate(qData, o => o.PressaoAr);
+        var precipitacao = DataAggregator.Aggregate(qData, o => o.Precipitacao);
+        var nivelRio = DataAggregator.Aggregate(qData, o => o.NivelRio);
+
+        hora = new DBModels.TBDadosEstacoesHora
+        {
+            Id = 0,
+            Estacao = estacao,
+            HourKey = hourSpan,
+            DataHoraDadosUTC = inicio,
+            DataCount = qData.Length,
+            FirstDataRow = qData.Min(o => o.Id),
+            LastDataRow = qData.Max(o => o.Id),
+
+            // Dados de Força do Sinal
+            ForcaSinal_MAX = forcaSinal.Max,
+            ForcaSinal_MIN = forcaSinal.Min,
+            ForcaSinal_AVG = forcaSinal.Avg,
+            ForcaSinal_StdDev = forcaSinal.StdDev,
+
+            // Dados de Temperatura Interna
+            TemperaturaInterna_MAX = temperaturaInterna.Max,
+            TemperaturaInterna_MIN = temperaturaInterna.Min,
+            TemperaturaInterna_AVG = temperaturaInterna.Avg,
+            TemperaturaInterna_StdDev = temperaturaInterna.StdDev,
+
+            // Dados de Tensão da Bateria
+            TensaoBateria_MAX = tensaoBateria.Max,
+            TensaoBateria_MIN = tensaoBateria.Min,
+            TensaoBateria_AVG = tensaoBateria.Avg,
+            TensaoBateria_StdDev = tensaoBateria.StdDev,
+            TensaoBateria_Trend = tensaoBateria.Trend,
+
+            // Dados de Percentual da Bateria
+            PercentBateria_MAX = percentBateria.Max,
+            PercentBateria_MIN = percentBateria.Min,
+            PercentBateria_AVG = percentBateria.Avg,
+            PercentBateria_StdDev = percentBateria.StdDev,
+            PercentBateria_Trend = percentBateria.Trend,
+
+            // Dados de Temperatura do Ar
+            TemperaturaAr_MAX = temperaturaAr.Max,
+            TemperaturaAr_MIN = temperaturaAr.Min,
+            TemperaturaAr_AVG = temperaturaAr.Avg,
+            TemperaturaAr_StdDev = temperaturaAr.StdDev,
+            TemperaturaAr_Trend = temperaturaAr.Trend,
+
+            // Dados de Umidade do Ar
+            UmidadeAr_MAX = umidadeAr.Max,
+            UmidadeAr_MIN = umidadeAr.Min,
+            UmidadeAr_AVG = umidadeAr.Avg,
+            UmidadeAr_StdDev = umidadeAr.StdDev,
+            UmidadeAr_Trend = umidadeAr.Trend,
+
+            // Dados de Pressão do Ar
+            PressaoAr_MAX = pressaoAr.Max,
+            PressaoAr_MIN = pressaoAr.Min,
+            PressaoAr_AVG = pressaoAr.Avg,
+            PressaoAr_StdDev = pressaoAr.StdDev,
+            PressaoAr_Trend = pressaoAr.Trend,
+
+            // Dados de Precipitação
+            Precipitacao_MAX = precipitacao.Max,
+            Precipitacao_MIN = precipitacao.Min,
+            Precipitacao_AVG = precipitacao.Avg,
+            Precipitacao_StdDev = precipitacao.StdDev,
+            Precipitacao_Trend = precipitacao.Trend,
+
+            // Dados do Nível do Rio
+            NivelRio_MAX = nivelRio.Max,
+            NivelRio_MIN = nivelRio.Min,
+            NivelRio_AVG = nivelRio.Avg,
+            NivelRio_StdDev = nivelRio.StdDev,
+            NivelRio_Trend = nivelRio.Trend,
+        };
+
+        // Salva db, exceto se for hora corrente
+        var horaAgora = (int)(DateTime.UtcNow - DateTime.UnixEpoch).TotalHours;
+        if (horaAgora != hourSpan) cnn.Insert(hora, OnConflict.Replace);
+
+        return hora;
     }
 
     public bool IsValidKey(string key) => apiKeys.Contains(key);
