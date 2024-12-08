@@ -24,9 +24,10 @@ public class DB
            .Add<DBModels.TBDadosEstacoesHora>()
            .Commit();
 
+        cnn.Execute($"DELETE FROM {nameof(DBModels.TBDadosEstacoesHora)} "); 
+
         var allKeys = cnn.Query<string>($"SELECT {nameof(DBModels.TBEstacoes.ApiKEY)} FROM {nameof(DBModels.TBEstacoes)}");
         foreach (var k in allKeys) apiKeys.Add(k);
-
     }
 
     public IEnumerable<DBModels.TBEstacoes> ListarEstacoes()
@@ -81,16 +82,15 @@ public class DB
 
         if (qData.Length == 0) return null; // Salvar que não tem? Dá full table scan
 
-        var forcaSinal = agregadorPadrao(qData, o => o.ForcaSinal);
-        var temperaturaInterna = agregadorPadrao(qData, o => o.TemperaturaInterna);
-        var tensaoBateria = agregadorPadrao(qData, o => o.TensaoBateria);
-        var percentBateria = agregadorPadrao(qData, o => o.PercentBateria);
-        var temperaturaAr = agregadorPadrao(qData, o => o.TemperaturaAr);
-        var umidadeAr = agregadorPadrao(qData, o => o.UmidadeAr);
-        var pressaoAr = agregadorPadrao(qData, o => o.PressaoAr);
-        var precipitacao = agregadorPadrao(qData, o => o.Precipitacao);
-        var nivelRio = agregadorPadrao(qData, o => o.NivelRio ?? o.NivelRio_RAW);
-
+        var forcaSinal = DataAggregator.Aggregate(qData, o => o.ForcaSinal);
+        var temperaturaInterna = DataAggregator.Aggregate(qData, o => o.TemperaturaInterna);
+        var tensaoBateria = DataAggregator.Aggregate(qData, o => o.TensaoBateria);
+        var percentBateria = DataAggregator.Aggregate(qData, o => o.PercentBateria);
+        var temperaturaAr = DataAggregator.Aggregate(qData, o => o.TemperaturaAr);
+        var umidadeAr = DataAggregator.Aggregate(qData, o => o.UmidadeAr);
+        var pressaoAr = DataAggregator.Aggregate(qData, o => o.PressaoAr);
+        var precipitacao = DataAggregator.Aggregate(qData, o => o.Precipitacao);
+        var nivelRio = agregadorFiltrado(qData, o => o.NivelRio ?? o.NivelRio_RAW);
 
         hora = new DBModels.TBDadosEstacoesHora
         {
@@ -171,7 +171,7 @@ public class DB
         return hora;
     }
 
-    private DataAggregator.Result agregadorPadrao(DBModels.TBDadosEstacoes[] qData, Func<DBModels.TBDadosEstacoes, decimal?> selector)
+    private DataAggregator.Result agregadorFiltrado(DBModels.TBDadosEstacoes[] qData, Func<DBModels.TBDadosEstacoes, decimal?> selector)
     {
         // retira o pior menor e pior maior
         var valores = DataAggregator.TruncarValores(qData.Select(selector), trimSize: 1).ToList();
