@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <title>Dados da Estação</title>
     <script type="text/javascript" src="helpers.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             updateContent();
@@ -84,23 +85,89 @@
             fetch('/estacoes/lastHourly?lastHours=24&estacao=' + getQueryParam("estacao"))
                 .then(response => response.json())
                 .then(data => {
-                    data.sort((a, b) => new Date(b.dataHoraDadosUTC) - new Date(a.dataHoraDadosUTC));
+                    const sortedData = data.slice().sort((a, b) => {
+                        if (!a?.dataHoraDadosUTC) return 1; // Coloca `a` no final se `a` for null ou dataHoraDadosUTC estiver ausente
+                        if (!b?.dataHoraDadosUTC) return -1; // Coloca `b` no final se `b` for null ou dataHoraDadosUTC estiver ausente
+                        return new Date(b.dataHoraDadosUTC) - new Date(a.dataHoraDadosUTC);
+                    });
 
                     const tableBody = document.querySelector('#dadosEstacao tbody');
-                    data.forEach(dado => {
+
+                    sortedData.forEach(dado => {
+                        if (dado === undefined || dado === null) return;
+                        // Tabela
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                <td>${new Date(dado.dataHoraDadosUTC).toISOString().slice(0, 13).replace('T', ' ')}h</td>
-                                <td style="text-align: center;">${dado.dataCount}</td>
-                                <td>${formatValue(dado.temperaturaInterna_AVG, 1)}ºC</td>
-                                <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
-                                <td>${formatValue(dado.temperaturaAr_AVG,1) || '-'}ºC</td>
-                                <td>${formatValue(dado.umidadeAr_AVG,1) || '-'}%</td>
-                                <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
-                                <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG,0) || '-'}dBm)</td>
-                            `;
+                                        <td>${new Date(dado.dataHoraDadosUTC).toISOString().slice(0, 13).replace('T', ' ')}h</td>
+                                        <td style="text-align: center;">${dado.dataCount}</td>
+                                        <td>${formatValue(dado.temperaturaInterna_AVG, 1)}ºC</td>
+                                        <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
+                                        <td>${formatValue(dado.temperaturaAr_AVG, 1) || '-'}ºC</td>
+                                        <td>${formatValue(dado.umidadeAr_AVG, 1) || '-'}%</td>
+                                        <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
+                                        <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG, 0) || '-'}dBm)</td>
+                                        `;
                         tableBody.appendChild(row);
                     });
+
+                    // Criar o gráfico
+                    const labels = []; // Para os rótulos do gráfico
+                    const nivelRioData = []; // Para os valores do nível do rio
+
+                    data.forEach(dado => {
+                        if (dado === undefined || dado === null) return;
+
+                        const label = new Date(dado.dataHoraDadosUTC).toISOString().slice(0, 13).replace('T', ' ') + 'h';
+                        labels.push(label);
+                        nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null); // Adicionar null se não houver dados
+                    });
+
+                    const ctx = document.getElementById('nivelRioChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels, // Usar os rótulos preparados
+                            datasets: [{
+                                label: 'Nível do Rio (m)',
+                                data: nivelRioData, // Usar os dados preparados
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderWidth: 2,
+                                pointRadius: 3,
+                                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                                pointBorderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                },
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Hora'
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'Nível do Rio (m)'
+                                    },
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+
                 })
                 .catch(error => {
                     console.error('Erro ao carregar dados das estações:', error);
@@ -143,91 +210,99 @@
 
     <h2>Dados da Estação <span id="nomeEstacao">[NOME ESTACAO]</span></h2>
 
-    <table>
-        <tbody>
-            <tr class="blockHeader">
-                <td>AR</td>
-                <td>Leitura</td>
-                <td>-</td>
-                <td>Mínimas</td>
-                <td>Máximas</td>
-            </tr>
-            <tr>
-                <td class="cellHeader">Temperatura</td>
-                <td class="cellValue" id="clTemp">-</td>
-                <td class="cellValue"></td>
-                <td class="cellValue" id="clMinTemp"></td>
-                <td class="cellValue" id="clMaxTemp"></td>
-            </tr>
-            <tr>
-                <td class="cellHeader">Umidade</td>
-                <td class="cellValue" id="clHumd">-</td>
-                <td class="cellValue"></td>
-                <td class="cellValue" id="clMinHumd"></td>
-                <td class="cellValue" id="clMaxHumd"></td>
-            </tr>
-            <tr>
-                <td class="cellHeader">Barômetro</td>
-                <td class="cellValue" id="clPres">-</td>
-                <td class="cellValue"></td>
-                <td class="cellValue" id="clMinPres"></td>
-                <td class="cellValue" id="clMaxPres"></td>
-            </tr>
+    <div id="topo" style="display: flex; flex-wrap: wrap;">
+        <div id="dvTable" style="width: 550px;">
+            <table>
+                <tbody>
+                    <tr class="blockHeader">
+                        <td>AR</td>
+                        <td>Leitura</td>
+                        <td>-</td>
+                        <td>Mínimas</td>
+                        <td>Máximas</td>
+                    </tr>
+                    <tr>
+                        <td class="cellHeader">Temperatura</td>
+                        <td class="cellValue" id="clTemp">-</td>
+                        <td class="cellValue"></td>
+                        <td class="cellValue" id="clMinTemp"></td>
+                        <td class="cellValue" id="clMaxTemp"></td>
+                    </tr>
+                    <tr>
+                        <td class="cellHeader">Umidade</td>
+                        <td class="cellValue" id="clHumd">-</td>
+                        <td class="cellValue"></td>
+                        <td class="cellValue" id="clMinHumd"></td>
+                        <td class="cellValue" id="clMaxHumd"></td>
+                    </tr>
+                    <tr>
+                        <td class="cellHeader">Barômetro</td>
+                        <td class="cellValue" id="clPres">-</td>
+                        <td class="cellValue"></td>
+                        <td class="cellValue" id="clMinPres"></td>
+                        <td class="cellValue" id="clMaxPres"></td>
+                    </tr>
 
-            <tr class="blockHeader">
-                <td colspan="5">MEDIÇÃO</td>
-            </tr>
-            <tr>
-                <td class="cellHeader">Nível Água</td>
-                <td class="cellValue" id="clLevel">-</td>
-                <td class="cellValue"></td>
-                <td class="cellValue" id="clMinLevel"></td>
-                <td class="cellValue" id="clMaxLevel"></td>
-            </tr>
-            <tr>
-                <td class="cellHeader">Precipitação</td>
-                <td class="cellValue" id="clRain">-</td>
-                <td class="cellValue"></td>
-                <td class="cellValue" id="clMinRain"></td>
-                <td class="cellValue" id="clMaxRain"></td>
-            </tr>
+                    <tr class="blockHeader">
+                        <td colspan="5">MEDIÇÃO</td>
+                    </tr>
+                    <tr>
+                        <td class="cellHeader">Nível Água</td>
+                        <td class="cellValue" id="clLevel">-</td>
+                        <td class="cellValue"></td>
+                        <td class="cellValue" id="clMinLevel"></td>
+                        <td class="cellValue" id="clMaxLevel"></td>
+                    </tr>
+                    <tr>
+                        <td class="cellHeader">Precipitação</td>
+                        <td class="cellValue" id="clRain">-</td>
+                        <td class="cellValue"></td>
+                        <td class="cellValue" id="clMinRain"></td>
+                        <td class="cellValue" id="clMaxRain"></td>
+                    </tr>
 
-            <tr class="blockHeader">
-                <td colspan="5">ESTAÇÃO</td>
-            </tr>
+                    <tr class="blockHeader">
+                        <td colspan="5">ESTAÇÃO</td>
+                    </tr>
 
-            <tr>
-                <td class="cellHeader">Nome</td>
-                <td class="cellValue" id="clNomeEstacao">-</td>
-                <td class="cellValue"></td>
-                <td class="cellValue"></td>
-                <td class="cellValue"></td>
-            </tr>
-            <tr>
-                <td class="cellHeader">Bateria</td>
-                <td class="cellValue" id="clBat">-</td>
-                <td class="cellValue"></td>
-                <td class="cellValue" id="clMinBat"></td>
-                <td class="cellValue" id="clMaxBat"></td>
-            </tr>
-            <tr>
-                <td class="cellHeader">Temp. Interna</td>
-                <td class="cellValue" id="clIntTemp">-</td>
-                <td class="cellValue"></td>
-                <td class="cellValue" id="clMinIntTemp"></td>
-                <td class="cellValue" id="clMaxIntTemp"></td>
-            </tr>
-            <tr>
-                <td class="cellHeader">Força Sinal</td>
-                <td class="cellValue" id="clSigStr">-</td>
-                <td class="cellValue"></td>
-                <td class="cellValue" id="clMinSigStr"></td>
-                <td class="cellValue" id="clMaxSigStr"></td>
-            </tr>
-        </tbody>
-    </table>
+                    <tr>
+                        <td class="cellHeader">Nome</td>
+                        <td class="cellValue" id="clNomeEstacao">-</td>
+                        <td class="cellValue"></td>
+                        <td class="cellValue"></td>
+                        <td class="cellValue"></td>
+                    </tr>
+                    <tr>
+                        <td class="cellHeader">Bateria</td>
+                        <td class="cellValue" id="clBat">-</td>
+                        <td class="cellValue"></td>
+                        <td class="cellValue" id="clMinBat"></td>
+                        <td class="cellValue" id="clMaxBat"></td>
+                    </tr>
+                    <tr>
+                        <td class="cellHeader">Temp. Interna</td>
+                        <td class="cellValue" id="clIntTemp">-</td>
+                        <td class="cellValue"></td>
+                        <td class="cellValue" id="clMinIntTemp"></td>
+                        <td class="cellValue" id="clMaxIntTemp"></td>
+                    </tr>
+                    <tr>
+                        <td class="cellHeader">Força Sinal</td>
+                        <td class="cellValue" id="clSigStr">-</td>
+                        <td class="cellValue"></td>
+                        <td class="cellValue" id="clMinSigStr"></td>
+                        <td class="cellValue" id="clMaxSigStr"></td>
+                    </tr>
+                </tbody>
+            </table>
 
-    <div>Atualizado em <span id="dtDados">[HH]</span></div>
+            <div>Atualizado em <span id="dtDados">[HH]</span></div>
+        </div>
+        <div id="dvGrafico" style="max-height: 300px; width: 600px">
+            <canvas id="nivelRioChart"></canvas>
+        </div>
+    </div>
+
     <br /> <hr /> <br />
 
     <table id="dadosEstacao">
