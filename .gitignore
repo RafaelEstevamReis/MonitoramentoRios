@@ -391,3 +391,4 @@ MigrationBackup/
 appsettings**.json
 *.db
 *.FCBak
+**/launchSettings.json
