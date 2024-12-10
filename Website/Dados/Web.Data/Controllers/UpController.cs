@@ -22,7 +22,6 @@ public class UpController : ControllerBase
         this.log = log;
     }
 
-    [NonAction]
     [HttpPost("upload")]
     public async Task<IActionResult> Upload()
     {
