@@ -179,6 +179,7 @@ public class DB
         var agr1 = DataAggregator.Aggregate(valores);
         // Corta todos 1 desvio fora
         valores = valores.Where(o => Math.Abs(o - agr1.Avg ?? 0) < agr1.StdDev).ToList();
+
         var agr2 = DataAggregator.Aggregate(valores);
 
         return agr2;

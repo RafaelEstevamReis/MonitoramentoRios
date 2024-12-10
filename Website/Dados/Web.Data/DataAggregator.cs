@@ -22,11 +22,11 @@ public class DataAggregator
         if (values.Count == 0) return new Result
         {
             Count = 0,
-            Min = 0,
-            Max = 0,
-            Avg = 0,
-            StdDev = 0,
-            Trend = 0
+            Min = null,
+            Max = null,
+            Avg = null,
+            StdDev = null,
+            Trend = null
         };
 
         int count = values.Count;
