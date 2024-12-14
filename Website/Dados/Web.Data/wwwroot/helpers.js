@@ -2,6 +2,10 @@ function formatValue(value, decimals = 0) {
     if (value == null) return '-'; // Verifica null ou undefined
     return decimals === 0 ? Math.round(value) : value.toFixed(decimals);
 }
+function formatValueUnit(value, decimals, unit) {
+    if (value == null) return '-'; // Verifica null ou undefined
+    return (decimals === 0 ? Math.round(value) : value.toFixed(decimals)) +""+ unit;
+}
 function timeSince(date) {
     const now = new Date();
     const seconds = Math.round((now - new Date(date)) / 1000);

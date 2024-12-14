@@ -104,7 +104,7 @@
                                             <td>${dado.temperaturaAr || '-'}ºC</td>
                                             <td>${dado.umidadeAr || '-'}%</td>
                                             <td>${dado.precipitacao || '-'}</td>
-                                            <td>${formatValue(dado.nivelRio, 1)}m</td>
+                                            <td>${formatValue(dado.nivelRio, 1, 'm')}</td>
                                             <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
                                             <td><a href="live.html?estacao=${dado.estacao}">Resumo</a> | <a href="estacao.html?estacao=${dado.estacao}">Detalhar</a> </td>
                                         `;

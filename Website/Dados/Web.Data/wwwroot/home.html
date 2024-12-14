@@ -1,0 +1,307 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa das Estações</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="chart.js"></script>
+    <script type="text/javascript" src="helpers.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            color: white;
+        }
+
+        #screen {
+            display: flex;
+            flex-direction: row;
+            background-color: darkslategray;
+            height: 100%;
+        }
+
+        #map {
+            height: 100%;
+            width: 30%;
+            min-width: 350px;
+        }
+
+        #content {
+            flex: 1;
+            overflow: auto; /* Permite o scroll */
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        h2 {
+            padding: 5px;
+        }
+
+        td {
+            text-align: center;
+        }
+        .cdvChart {
+            max-height: 300px;
+        }
+
+        .btn, .btn:visited {
+            color: white;
+            text-decoration: none;
+            background-color: lightslategrey;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            padding: 8px 32px;
+            text-align: center;
+            display: inline-block;
+            font-size: 16px;
+        }
+
+        .circle-label {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 123, 255, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: center;
+            border: 2px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div id="screen">
+        <div id="content">
+            <h1>Projeto de Monitoramento de Rios</h1>
+            <h1>Rolante-RS</h1>
+
+            <h2>Estações</h2>
+
+            <table id="ultimasLeituras">
+                <thead>
+                    <tr>
+                        <th>Estação</th>
+                        <th>Bateria</th>
+                        <th width="100px">Temperatura</th>
+                        <th width="100px">Umidade</th>
+                        <th>Nível da Água</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dados serão preenchidos dinamicamente aqui -->
+                </tbody>
+            </table>
+
+
+            <h2>Nìveis</h2>
+
+            <div id="dvTodas">
+
+                <div class="cdvChart">
+                    <h3>Boa Esperança - Arrio Boa Esperança, Rolante-RS</h3>
+                    <canvas id="chtBE01"></canvas>
+                </div>
+                <div class="cdvChart">
+                    <h3>Alto Areia - Areia, Rolante-RS</h3>
+                    <canvas id="chtGLLS"></canvas>
+                </div>
+
+            </div>
+
+        </div>
+        <div id="map"></div>
+    </div>
+
+    <script>
+        /* Dados */
+        fetch('/estacoes/ultimos')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.querySelector('#ultimasLeituras tbody');
+                data.forEach(dado => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                                            <td>${dado.nomeEstacao || dado.estacao}</td>
+                                            <td>${formatValue(dado.percentBateria, 0)}%</td>
+                                            <td>${dado.temperaturaAr || '-'}ºC</td>
+                                            <td>${dado.umidadeAr || '-'}%</td>
+                                            <td>${formatValueUnit(dado.nivelRio, 1, 'm')}</td>
+                                            <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
+                                        `;
+                    tableBody.appendChild(row);
+                    //setColor(row, dado.nomeEstacao);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar dados das estações:', error);
+            });
+
+        /* Gráficos */
+
+        carregaHistoricoGrafico('04109F675953A131', 'chtBE01');
+        carregaHistoricoGrafico('9A6EE7B45495BB7F', 'chtGLLS');
+
+        function carregaHistoricoGrafico(idEstacao, canvasId) {
+            fetch('/estacoes/lastHourly?lastHours=24&estacao=' + idEstacao)
+                .then(response => response.json())
+                .then(data => {
+                    // Criar o gráfico
+                    const labels = []; // Para os rótulos do gráfico
+                    const nivelRioData = []; // Para os valores do nível do rio
+
+                    data.forEach(dado => {
+                        if (dado === undefined || dado === null) return;
+
+                        const label = dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ') + 'h';
+                        labels.push(label);
+                        nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null); // Adicionar null se não houver dados
+                    });
+
+                    const ctx = document.getElementById(canvasId).getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels, // Usar os rótulos preparados
+                            datasets: [{
+                                label: 'Nível do Rio (m)',
+                                data: nivelRioData, // Usar os dados preparados
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderWidth: 2,
+                                pointRadius: 3,
+                                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                                pointBorderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: 'white' // Cor dos nomes das séries na legenda
+                                    },
+                                    display: true,
+                                    position: 'top'
+                                },
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Hora',
+                                        color: 'white'
+                                    },
+                                    ticks: {
+                                        color: 'white' // Cor dos textos do eixo X
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'Nível do Rio (m)',
+                                        color: 'white'
+                                    },
+                                    ticks: {
+                                        color: 'white' // Cor dos textos do eixo X
+                                    },
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados das estações:', error);
+                });
+        }
+
+        /* Mapa */
+        let lst = [];
+        var map = L.map('map', {
+            maxZoom: 13,
+            minZoom: 11,
+        }).setView([-29.61, -50.55], 12); // Posição inicial [latitude, longitude] e zoom
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        let noSigSvg = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M790-56 414-434q-47 11-87.5 33T254-346l-84-86q32-32 69-56t79-42l-90-90q-41 21-76.5 46.5T84-516L0-602q32-32 66.5-57.5T140-708l-84-84 56-56 736 736-58 56Zm-310-64q-42 0-71-29.5T380-220q0-42 29-71t71-29q42 0 71 29t29 71q0 41-29 70.5T480-120Zm236-238-29-29-29-29-144-144q81 8 151.5 41T790-432l-74 74Zm160-158q-77-77-178.5-120.5T480-680q-21 0-40.5 1.5T400-674L298-776q44-12 89.5-18t92.5-6q142 0 265 53t215 145l-84 86Z"/></svg>';
+
+        // Todas as coordenadas devem ter apenas 2.5 casas decimais (terceira casa múltiplo de 5)
+        addCircleLabel(-29.650, -50.575, noSigSvg, null); // RSRL-CE01
+        addCircleLabel(-29.645, -50.511, noSigSvg, null); // RSRL-AR01
+
+        adicionaEstacao(-29.565, -50.535, noSigSvg, "04109F675953A131"); // BE01
+        adicionaEstacao(-29.590, -50.565, noSigSvg, "9A6EE7B45495BB7F"); // GLLS
+        adicionaEstacao(-29.640, -50.540, noSigSvg, "BB45660B199C5677"); // RB01
+
+        fetch('/estacoes/ultimos')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(dado => {
+                    let text = `-`;
+                    if (dado.nivelRio === null || dado.nivelRio === undefined) {
+                        text = `${dado.temperaturaAr}ºC`;
+                    } else {
+                        text = `${dado.temperaturaAr}ºC<br>${formatValue(dado.nivelRio, 1)}m`;
+                    }
+                    atualizaEstacao(text, dado.estacao);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar dados das estações:', error);
+            });
+
+        function adicionaEstacao(lat, lng, label, id) {
+            let e = addCircleLabel(lat, lng, label, `/live.html?estacao=${id}`);
+            e.id = `mcE_${id}`;
+            lst.push(e);
+        }
+        function atualizaEstacao(label, id) {
+            // procurar o id na lst e setar o valor com label
+            let e = lst.find(el => el.id === `mcE_${id}`);
+
+            if (e === null || e === undefined) return;
+
+            e._icon.innerHTML = label;
+        }
+
+        function addCircleLabel(lat, lng, label, url) {
+            // Adiciona o texto dentro do círculo
+            var circle = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: 'circle-label',
+                    html: label,
+                    iconSize: [50, 50],
+                    iconAnchor: [20, 20] // Centralizar o texto no ponto
+                })
+            }).addTo(map);
+
+            if (url !== null) {
+                circle.on('click', function () {
+                    window.location.href = url;
+                });
+            }
+
+            return circle;
+        }
+    </script>
+</body>
+</html>
