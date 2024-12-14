@@ -52,25 +52,21 @@ public class UpController : ControllerBase
     [Consumes("application/octet-stream")]
     public async Task<IActionResult> OnPostUploadAsync()
     {
+        var filePath = Path.Combine("data", "img", Path.GetRandomFileName() + ".jpg");
+        await Task.Delay(100); // terminar de chegar
+
         byte[] fileContent;
         using (var memoryStream = new MemoryStream())
         {
-            await Task.Delay(50); // terminar de chegar
             await Request.Body.CopyToAsync(memoryStream);
             fileContent = memoryStream.ToArray();
         }
 
-        // Define o caminho onde a imagem será salva
-        var filePath = Path.Combine("data", "img", Path.GetRandomFileName() + ".jpg");
-
         // Salva a imagem no caminho definido
         await System.IO.File.WriteAllBytesAsync(filePath, fileContent);
 
-        log.Information("Image saved at " + new FileInfo(filePath).FullName);
-
-        // Retorna uma resposta de sucesso
+        log.Information("Image saved at " + new FileInfo(filePath).FullName + $" Size: {fileContent.Length}");
         return Ok();
-
     }
 
     private IActionResult registraDados(UploadData dados, string apiKey, string rawJson, string ipOrigem)
