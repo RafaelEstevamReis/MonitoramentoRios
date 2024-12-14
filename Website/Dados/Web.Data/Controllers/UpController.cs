@@ -1,9 +1,11 @@
 ﻿namespace Web.Data.Controllers;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -44,6 +46,31 @@ public class UpController : ControllerBase
         var stringObject = JsonConvert.SerializeObject(dados);
         var ip = getIP(Request);
         return registraDados(dados, apiKey, stringObject, ip);
+    }
+
+    [HttpPost("img")]
+    public async Task<IActionResult> OnPostUploadAsync(List<IFormFile> files)
+    {
+        long size = files.Sum(f => f.Length);
+
+        foreach (var formFile in files)
+        {
+            if (formFile.Length > 0)
+            {
+                //var filePath = Path.GetTempFileName();
+                var filePath = Path.Combine("data", "img", Path.GetTempFileName());
+
+                using (var stream = System.IO.File.Create(filePath))
+                {
+                    await formFile.CopyToAsync(stream);
+                }
+            }
+        }
+
+        // Process uploaded files
+        // Don't rely on or trust the FileName property without validation.
+
+        return Ok(new { count = files.Count, size });
     }
 
     private IActionResult registraDados(UploadData dados, string apiKey, string rawJson, string ipOrigem)
