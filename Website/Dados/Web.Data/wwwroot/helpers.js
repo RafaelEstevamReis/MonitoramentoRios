@@ -29,8 +29,8 @@ function wifiSignalToPercent(signal) {
     if (signal === undefined) return '-';
     if (signal === 0) return '-';
 
-    const MIN_SIGNAL = -95; // Nível mínimo típico
-    const MAX_SIGNAL = -50;  // Nível máximo típico
+    const MIN_SIGNAL = -90; // Nível mínimo
+    const MAX_SIGNAL = -50;  // Nível máximo
 
     // Garante que o nível esteja dentro do intervalo esperado
     const clampedSignal = Math.min(Math.max(signal, MIN_SIGNAL), MAX_SIGNAL);

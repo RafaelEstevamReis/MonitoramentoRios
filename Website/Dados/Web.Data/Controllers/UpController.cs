@@ -74,7 +74,8 @@ public class UpController : ControllerBase
         string? imgPath = null;
         if (dados.pic_b64 != null)
         {
-            imgPath = salvaImagem(estacao, Convert.FromBase64String(dados.pic_b64), ipOrigem);
+            var imgBytes = Convert.FromBase64String(dados.pic_b64);
+            imgPath = salvaImagem(estacao, imgBytes, ipOrigem);
             rawJson = rawJson.Replace(dados.pic_b64, "[PIC]");
         }
 
@@ -109,7 +110,7 @@ public class UpController : ControllerBase
         var dir = Path.Combine("data", "img", estacao);
         if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
-        var filePath = Path.Combine(dir, $"{estacao}-{DateTime.Now:yyyyMMddHHmmss}.jpg");
+        var filePath = Path.Combine(dir, $"{estacao}-{DateTime.UtcNow:yyyyMMddHHmmss}.jpg");
 
         log.Information($"Image from {estacao} saved at {new FileInfo(filePath).FullName} Size: {rawData.Length} ");
         // Salva a imagem no caminho definido
