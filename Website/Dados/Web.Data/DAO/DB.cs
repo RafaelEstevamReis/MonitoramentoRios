@@ -173,14 +173,25 @@ public class DB
 
     private DataAggregator.Result agregadorFiltrado(DBModels.TBDadosEstacoes[] qData, Func<DBModels.TBDadosEstacoes, decimal?> selector)
     {
+        List<decimal?> valores;
         // retira o pior menor e pior maior
-        var valores = DataAggregator.TruncarValores(qData.Select(selector), trimSize: 1).ToList();
+        if (qData.Length > 3)
+        {
+            valores = DataAggregator.TruncarValores(qData.Select(selector), trimSize: 1).ToList();
+        }
+        else
+        {
+            valores = qData.Select(selector).ToList();
+        }
+
         // Calcula o desvio
         var agr1 = DataAggregator.Aggregate(valores);
-        // Corta todos 1 desvio fora
-        valores = valores.Where(o => Math.Abs(o - agr1.Avg ?? 0) < agr1.StdDev).ToList();
+        if (agr1.Count == 1) return agr1;
 
-        var agr2 = DataAggregator.Aggregate(valores);
+        // Corta todos 1 desvio fora
+        var valores2 = agr1.Values.Where(o => Math.Abs(o - agr1.Avg ?? 0) <= agr1.StdDev).ToList();
+
+        var agr2 = DataAggregator.Aggregate(valores2);
 
         return agr2;
     }

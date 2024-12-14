@@ -17,7 +17,7 @@ public class DataAggregator
     }
     public static Result Aggregate(IEnumerable<decimal?> data)
     {
-        var values = data.ToList();
+        var values = data.Where(o => o.HasValue).ToList();
 
         if (values.Count == 0) return new Result
         {
@@ -62,7 +62,7 @@ public class DataAggregator
             Avg = avg.Round(3),
             StdDev = stdDev.Round(3),
             Trend = trend.Round(3),
-            Values = values.ToArray(),
+            Values = values.Select(o => o.Round(3)).ToArray(),
         };
     }
 
