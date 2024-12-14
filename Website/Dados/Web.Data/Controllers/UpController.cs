@@ -66,6 +66,7 @@ public class UpController : ControllerBase
                 {
                     await formFile.CopyToAsync(stream);
                 }
+                log.Information("Image saved at " + new FileInfo(filePath).FullName);
             }
         }
 
