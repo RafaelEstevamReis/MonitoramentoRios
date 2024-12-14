@@ -55,10 +55,9 @@ public class UpController : ControllerBase
         byte[] fileContent;
         using (var memoryStream = new MemoryStream())
         {
+            await Task.Delay(50); // terminar de chegar
             await Request.Body.CopyToAsync(memoryStream);
             fileContent = memoryStream.ToArray();
-
-            // Lógica para processar os bytes
         }
 
         // Define o caminho onde a imagem será salva
@@ -116,7 +115,7 @@ public class UpController : ControllerBase
 
         return Ok();
     }
-    private static string getIP(Microsoft.AspNetCore.Http.HttpRequest request)
+    private static string getIP(HttpRequest request)
     {
         var ip = request.Headers["X-Forwarded-For"].FirstOrDefault();
         if (string.IsNullOrEmpty(ip))
