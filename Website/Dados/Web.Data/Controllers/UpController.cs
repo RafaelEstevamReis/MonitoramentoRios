@@ -59,7 +59,8 @@ public class UpController : ControllerBase
             if (formFile.Length > 0)
             {
                 //var filePath = Path.GetTempFileName();
-                var filePath = Path.Combine("data", "img", Path.GetTempFileName());
+                //var filePath = Path.Combine("data", "img", Path.GetTempFileName());
+                var filePath = "data/img/" + Path.GetTempFileName();
 
                 using (var stream = System.IO.File.Create(filePath))
                 {
