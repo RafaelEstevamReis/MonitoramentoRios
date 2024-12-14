@@ -30,6 +30,7 @@
         }
 
         #content {
+            padding: 5px;
             flex: 1;
             overflow: auto; /* Permite o scroll */
         }
@@ -91,6 +92,7 @@
                     <tr>
                         <th>Estação</th>
                         <th>Bateria</th>
+                        <th>Sinal</th>
                         <th width="100px">Temperatura</th>
                         <th width="100px">Umidade</th>
                         <th>Nível da Água</th>
@@ -133,6 +135,7 @@
                     row.innerHTML = `
                                             <td>${dado.nomeEstacao || dado.estacao}</td>
                                             <td>${formatValue(dado.percentBateria, 0)}%</td>
+                                            <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
                                             <td>${dado.temperaturaAr || '-'}ºC</td>
                                             <td>${dado.umidadeAr || '-'}%</td>
                                             <td>${formatValueUnit(dado.nivelRio, 1, 'm')}</td>
