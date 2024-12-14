@@ -61,6 +61,68 @@ public class EstacoesController : ControllerBase
     [HttpGet("ultimos")]
     public IEnumerable<DadosColetados> ListarRecentes()
     {
+        // Obtenha os dados da base de dados
+        var dados = db.ListarDados(estacao: null, limit: 64) // Carrega as últimas entradas
+                      .Select(Simple.DatabaseWrapper.DataClone.CopyWithSerialization<DadosColetados>)
+                      .ToList();
+
+        // Atualiza os nomes das estações, se necessário
+        if (dados.Any(i => !dicEstacoes.ContainsKey(i.Estacao)))
+        {
+            atualizaEstacoes(db);
+        }
+
+        // Cria um dicionário para armazenar os dados mais recentes por estação
+        var dadosCompletosPorEstacao = dados
+            .GroupBy(o => o.Estacao)
+            .Select(grupo => {
+                // Ordena os registros do grupo por data (mais recente primeiro)
+                var registrosOrdenados = grupo.OrderByDescending(o => o.RecebidoUTC).ToList();
+
+                // Seleciona o registro mais recente
+                var registroMaisRecente = registrosOrdenados.First();
+
+                // Preenche as propriedades com os valores mais recentes não nulos
+                var dadosCompletos = new DadosColetados
+                {
+                    RecebidoUTC = registroMaisRecente.RecebidoUTC,
+                    Estacao = registroMaisRecente.Estacao,
+                    NomeEstacao = registroMaisRecente.NomeEstacao,
+                    DataHoraDadosUTC = registroMaisRecente.DataHoraDadosUTC,
+
+                    // Dados internos
+                    ForcaSinal = registrosOrdenados.FirstOrDefault(r => r.ForcaSinal.HasValue)?.ForcaSinal,
+                    TemperaturaInterna = registrosOrdenados.FirstOrDefault(r => r.TemperaturaInterna.HasValue)?.TemperaturaInterna,
+                    TensaoBateria = registrosOrdenados.FirstOrDefault(r => r.TensaoBateria.HasValue)?.TensaoBateria,
+                    PercentBateria = registrosOrdenados.FirstOrDefault(r => r.PercentBateria.HasValue)?.PercentBateria,
+
+                    // Medições
+                    TemperaturaAr = registrosOrdenados.FirstOrDefault(r => r.TemperaturaAr.HasValue)?.TemperaturaAr,
+                    UmidadeAr = registrosOrdenados.FirstOrDefault(r => r.UmidadeAr.HasValue)?.UmidadeAr,
+                    PressaoAr = registrosOrdenados.FirstOrDefault(r => r.PressaoAr.HasValue)?.PressaoAr,
+                    Precipitacao = registrosOrdenados.FirstOrDefault(r => r.Precipitacao.HasValue)?.Precipitacao,
+                    NivelRio = registrosOrdenados.FirstOrDefault(r => r.NivelRio.HasValue)?.NivelRio,
+                    NivelRio_RAW = registrosOrdenados.FirstOrDefault(r => r.NivelRio_RAW.HasValue)?.NivelRio_RAW,
+
+                    // Dados brutos
+                    RawData = registroMaisRecente.RawData
+                };
+
+                // Atualiza o nome da estação, se disponível
+                if (dicEstacoes.TryGetValue(dadosCompletos.Estacao, out string? nomeEstacao))
+                {
+                    dadosCompletos.NomeEstacao = nomeEstacao;
+                }
+
+                return dadosCompletos;
+            })
+            .OrderBy(o => o.NomeEstacao) // Ordena pelo nome da estação
+            .ToArray();
+
+        return dadosCompletosPorEstacao;
+    }
+    public IEnumerable<DadosColetados> ListarRecentes_OLD()
+    {
         var lst = db.ListarDados(estacao: null, limit: 64) // 50 últimas
                     .Select(Simple.DatabaseWrapper.DataClone.CopyWithSerialization<DadosColetados>)
                     .GroupBy(o => o.Estacao)
