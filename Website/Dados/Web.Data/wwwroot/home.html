@@ -46,6 +46,7 @@
         td {
             text-align: center;
         }
+
         .cdvChart {
             max-height: 300px;
         }
@@ -133,14 +134,14 @@
                 data.forEach(dado => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                                            <td>${dado.nomeEstacao || dado.estacao}</td>
-                                            <td>${formatValue(dado.percentBateria, 0)}%</td>
-                                            <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
-                                            <td>${dado.temperaturaAr || '-'}ºC</td>
-                                            <td>${dado.umidadeAr || '-'}%</td>
-                                            <td>${formatValueUnit(dado.nivelRio, 1, 'm')}</td>
-                                            <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
-                                        `;
+                                                            <td>${dado.nomeEstacao || dado.estacao}</td>
+                                                            <td>${formatValue(dado.percentBateria, 0)}%</td>
+                                                            <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
+                                                            <td>${dado.temperaturaAr || '-'}ºC</td>
+                                                            <td>${dado.umidadeAr || '-'}%</td>
+                                                            <td>${formatValueUnit(dado.nivelRio, 1, 'm')}</td>
+                                                            <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
+                                                        `;
                     tableBody.appendChild(row);
                     //setColor(row, dado.nomeEstacao);
                 });
@@ -151,23 +152,27 @@
 
         /* Gráficos */
 
-        carregaHistoricoGrafico('04109F675953A131', 'chtBE01');
+        carregaHistoricoGrafico('04109F675953A131', 'chtBE01', null, 0.7);
         carregaHistoricoGrafico('9A6EE7B45495BB7F', 'chtGLLS');
 
-        function carregaHistoricoGrafico(idEstacao, canvasId) {
+        function carregaHistoricoGrafico(idEstacao, canvasId, nivelNormal, nivelAlerta) {
             fetch('/estacoes/lastHourly?lastHours=24&estacao=' + idEstacao)
                 .then(response => response.json())
                 .then(data => {
                     // Criar o gráfico
                     const labels = []; // Para os rótulos do gráfico
                     const nivelRioData = []; // Para os valores do nível do rio
+                    const nivelRioDataNormal = []; // Para os valores do nível do rio
+                    const nivelRioDataAlerta = []; // Para os valores do nível do rio
 
                     data.forEach(dado => {
                         if (dado === undefined || dado === null) return;
 
                         const label = dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ') + 'h';
                         labels.push(label);
-                        nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null); // Adicionar null se não houver dados
+                        nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null);
+                        nivelRioDataNormal.push(formatValue(nivelNormal, 2) || null);
+                        nivelRioDataAlerta.push(formatValue(nivelAlerta, 2) || null);
                     });
 
                     const ctx = document.getElementById(canvasId).getContext('2d');
@@ -184,7 +189,28 @@
                                 pointRadius: 3,
                                 pointBackgroundColor: 'rgba(75, 192, 192, 1)',
                                 pointBorderColor: '#fff'
-                            }]
+                            },
+                            //{
+                            //    label: 'Normal',
+                            //    data: nivelRioDataNormal, // Usar os dados preparados
+                            //    borderColor: 'green',
+                            //    backgroundColor: 'green',
+                            //    borderWidth: 2,
+                            //    pointRadius: 3,
+                            //    pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                            //    pointBorderColor: '#fff'
+                            //},
+                            {
+                                label: 'Alerta',
+                                data: nivelRioDataAlerta, // Usar os dados preparados
+                                borderColor: 'yellow',
+                                backgroundColor: 'yellow',
+                                borderWidth: 2,
+                                pointRadius: 3,
+                                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                                pointBorderColor: '#fff'
+                            }
+                            ]
                         },
                         options: {
                             responsive: true,
