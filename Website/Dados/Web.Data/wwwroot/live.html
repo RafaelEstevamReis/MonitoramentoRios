@@ -118,7 +118,8 @@
                     data.forEach(dado => {
                         if (dado === undefined || dado === null) return;
 
-                        const label = dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ') + 'h';
+                        const label = dado.dataHoraDadosUTC.slice(8, 10) + '/' + dado.dataHoraDadosUTC.slice(5, 7) + ' ' + dado.dataHoraDadosUTC.slice(11, 13) + 'h';
+
                         labels.push(label);
                         nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null); // Adicionar null se não houver dados
                     });
@@ -297,7 +298,7 @@
                 </tbody>
             </table>
 
-            <div>Atualizado em <span id="dtDados">[HH]</span></div>
+            <div>Atualizado em <span id="dtDados">[HH]</span> (UTC)</div>
         </div>
         <div id="dvGrafico" style="max-height: 300px; width: 600px">
             <canvas id="nivelRioChart"></canvas>
