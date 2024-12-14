@@ -46,6 +46,7 @@
     </div>
 
     <script>
+        let lst = [];
         var map = L.map('map', {
             maxZoom: 13,
             minZoom: 11,
@@ -59,6 +60,9 @@
 
         // RSRL-CE01
         //addCircleLabel(-29.650, -50.575, `-ºC`, "/live.html?estacao=BB45660B199C5677");
+        adicionaEstacao(-29.565, -50.535, "-", "04109F675953A131"); // BE01
+        adicionaEstacao(-29.590, -50.565, '-', "9A6EE7B45495BB7F"); // GLLS
+        adicionaEstacao(-29.640, -50.540, '-', "BB45660B199C5677"); // RB01
 
         fetch('/estacoes/ultimos')
             .then(response => response.json())
@@ -66,15 +70,18 @@
                 data.forEach(dado => {
                     // RSRL-BE01
                     if (dado.estacao == "04109F675953A131") {
-                        addCircleLabel(-29.565, -50.535, `${dado.temperaturaAr}ºC<br>${formatValue(dado.nivelRio, 1)}m`, "/live.html?estacao=04109F675953A131");
+                        //addCircleLabel(-29.565, -50.535, `${dado.temperaturaAr}ºC<br>${formatValue(dado.nivelRio, 1)}m`, "/live.html?estacao=04109F675953A131");
+                        atualizaEstacao(`${dado.temperaturaAr}ºC<br>${formatValue(dado.nivelRio, 1)}m`, "04109F675953A131");
                     }
                     // RSRL-GLLS
                     if (dado.estacao == "9A6EE7B45495BB7F") {
-                        addCircleLabel(-29.590, -50.565, `${dado.temperaturaAr}ºC<br>${formatValue(dado.nivelRio, 1)}m`, "/live.html?estacao=9A6EE7B45495BB7F");
+                        //addCircleLabel(-29.590, -50.565, `${dado.temperaturaAr}ºC<br>${formatValue(dado.nivelRio, 1)}m`, "/live.html?estacao=9A6EE7B45495BB7F");
+                        atualizaEstacao(`${dado.temperaturaAr}ºC<br>${formatValue(dado.nivelRio, 1)}m`, "9A6EE7B45495BB7F");
                     }
                     // RSRL-RB01
                     if (dado.estacao == "BB45660B199C5677") {
-                        addCircleLabel(-29.640, -50.540, `${dado.temperaturaAr}ºC`, "/live.html?estacao=BB45660B199C5677");
+                        //addCircleLabel(-29.640, -50.540, `${dado.temperaturaAr}ºC`, "/live.html?estacao=BB45660B199C5677");
+                        atualizaEstacao(`${dado.temperaturaAr}ºC`, "BB45660B199C5677");
                     }
 
                 });
@@ -83,6 +90,19 @@
                 console.error('Erro ao carregar dados das estações:', error);
             });
 
+        function adicionaEstacao(lat, lng, label, id) {
+            let e = addCircleLabel(lat, lng, label, `/live.html?estacao=${id}`);
+            e.id = `mcE_${id}`;
+            lst.push(e);
+        }
+        function atualizaEstacao(label, id) {
+            // procurar o id na lst e setar o valor com label
+            let e = lst.find(el => el.id === `mcE_${id}`);
+
+            if (e === null || e === undefined) return;
+
+            e._icon.innerHTML = label;
+        }
 
         function addCircleLabel(lat, lng, label, url) {
             // Adiciona o texto dentro do círculo
@@ -98,6 +118,8 @@
             circle.on('click', function () {
                 window.location.href = url;
             });
+
+            return circle;
         }
     </script>
 </body>
