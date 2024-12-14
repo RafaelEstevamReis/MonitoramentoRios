@@ -392,3 +392,4 @@ appsettings**.json
 *.db
 *.FCBak
 **/launchSettings.json
+data/

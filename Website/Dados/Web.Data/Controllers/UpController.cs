@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -47,28 +46,7 @@ public class UpController : ControllerBase
         var ip = getIP(Request);
         return registraDados(dados, apiKey, stringObject, ip);
     }
-
-    [HttpPost("img")]
-    [Consumes("application/octet-stream")]
-    public async Task<IActionResult> OnPostUploadAsync()
-    {
-        var filePath = Path.Combine("data", "img", Path.GetRandomFileName() + ".jpg");
-        await Task.Delay(100); // terminar de chegar
-
-        byte[] fileContent;
-        using (var memoryStream = new MemoryStream())
-        {
-            await Request.Body.CopyToAsync(memoryStream);
-            fileContent = memoryStream.ToArray();
-        }
-
-        // Salva a imagem no caminho definido
-        await System.IO.File.WriteAllBytesAsync(filePath, fileContent);
-
-        log.Information("Image saved at " + new FileInfo(filePath).FullName + $" Size: {fileContent.Length}");
-        return Ok();
-    }
-
+    
     private IActionResult registraDados(UploadData dados, string apiKey, string rawJson, string ipOrigem)
     {
         if (string.IsNullOrWhiteSpace(apiKey)) return BadRequest("Invalid KEY [0]");
@@ -86,12 +64,20 @@ public class UpController : ControllerBase
         if (dados.ForcaSinal == 0) dados.ForcaSinal = null;
         if (dados.PercentBateria > 100) dados.PercentBateria = 100;
 
+        string? imgPath = null;
+        if (dados.pic_b64 != null)
+        {
+            imgPath = salvaImagem(estacao, Convert.FromBase64String(dados.pic_b64), ipOrigem);
+            rawJson = rawJson.Replace(dados.pic_b64, "[PIC]");
+        }
+
         var d = new DAO.DBModels.TBDadosEstacoes
         {
             // Base
             Id = 0,
             RecebidoUTC = DateTime.UtcNow,
             Estacao = estacao,
+            type = dados.type,
             RawData = rawJson,
             IP_Origem = ipOrigem,
             // Internos
@@ -106,10 +92,24 @@ public class UpController : ControllerBase
             PressaoAr = dados.PressaoAr,
             NivelRio = dados.NivelRio,
             NivelRio_RAW = dados.NivelRio_RAW,
+            ImgPath = imgPath,
         };
         db.Registra(d);
 
         return Ok();
+    }
+    private string salvaImagem(string estacao, byte[] rawData, string ipOrigem)
+    {
+        var dir = Path.Combine("data", "img", estacao);
+        if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+        var filePath = Path.Combine(dir, $"{estacao}-{DateTime.Now:yyyyMMddHHmmss}.jpg");
+
+        log.Information($"Image from {estacao} saved at {new FileInfo(filePath).FullName} Size: {rawData.Length} ");
+        // Salva a imagem no caminho definido
+        System.IO.File.WriteAllBytes(filePath, rawData);
+
+        return filePath;
     }
     private static string getIP(HttpRequest request)
     {
@@ -127,6 +127,10 @@ public class UpController : ControllerBase
         public decimal? ForcaSinal { get; set; }
         public string? SSID { get; set; }
         public string? BSSID { get; set; }
+        /// <summary>
+        /// Tipo de dispositivo
+        /// </summary>
+        public string? type { get; set; }
         /// <summary>
         /// Data que os dados foram gerados segundo a placa
         /// </summary>
@@ -146,5 +150,9 @@ public class UpController : ControllerBase
         ///  Medição direta sem calibração ou ajuste
         /// </summary>
         public decimal? NivelRio_RAW { get; set; }
+        /// <summary>
+        /// Imagem capturada por câmera
+        /// </summary>
+        public string? pic_b64 { get; set; }
     }
 }

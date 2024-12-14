@@ -28,6 +28,7 @@ public class TBDadosEstacoes
     /// PubKey ou Hash da ApiKEY da estação
     /// </summary>
     public string Estacao { get; set; } = string.Empty;
+    public string? type { get; set; }
 
     // Dados Internos
     public DateTime DataHoraDadosUTC { get; set; }
@@ -51,6 +52,7 @@ public class TBDadosEstacoes
     ///  Medição direta sem calibração ou ajuste
     /// </summary>
     public decimal? NivelRio_RAW { get; set; }
+    public string? ImgPath { get; set; } = string.Empty;
 
     public string RawData { get; set; } = string.Empty;
     public string IP_Origem { get; set; } = string.Empty;
