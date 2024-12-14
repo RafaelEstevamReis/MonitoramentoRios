@@ -49,15 +49,18 @@ public class UpController : ControllerBase
     }
 
     [HttpPost("img")]
-    public async Task<IActionResult> OnPostUploadAsync([FromBody] byte[] imageData)
+    public async Task<IActionResult> OnPostUploadAsync(IFormFile image)
     {
         try
         {
             // Define o caminho onde a imagem será salva
             var filePath = Path.Combine("data", "img", Path.GetRandomFileName() + ".jpg");
 
-            // Salva a imagem no caminho definido
-            await System.IO.File.WriteAllBytesAsync(filePath, imageData);
+            // Salva o arquivo
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(stream);
+            }
 
             log.Information("Image saved at " + new FileInfo(filePath).FullName);
 
