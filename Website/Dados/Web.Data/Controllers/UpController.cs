@@ -59,6 +59,10 @@ public class UpController : ControllerBase
 
         string estacao = Helpers.ApiToEstacao(apiKey);
 
+        // Corrige valores
+        if (dados.ForcaSinal == 0) dados.ForcaSinal = null;
+        if (dados.PercentBateria > 100) dados.PercentBateria = 100;
+
         var d = new DAO.DBModels.TBDadosEstacoes
         {
             // Base

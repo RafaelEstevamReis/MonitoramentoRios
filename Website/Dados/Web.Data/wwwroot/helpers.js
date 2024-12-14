@@ -27,6 +27,7 @@ function timeSince(date) {
 function wifiSignalToPercent(signal) {
     if (signal == null || isNaN(signal)) return '-'; // Retorna '-' para valores inválidos
     if (signal === undefined) return '-';
+    if (signal === 0) return '-';
 
     const MIN_SIGNAL = -95; // Nível mínimo típico
     const MAX_SIGNAL = -50;  // Nível máximo típico
