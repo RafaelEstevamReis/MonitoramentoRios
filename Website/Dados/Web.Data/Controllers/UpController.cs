@@ -50,30 +50,26 @@ public class UpController : ControllerBase
 
     [HttpPost("img")]
     [Consumes("image/jpeg")]
-    public async Task<IActionResult> OnPostUploadAsync(List<IFormFile> files)
+    public async Task<IActionResult> OnPostUploadAsync([FromBody] byte[] imageData)
     {
-        long size = files.Sum(f => f.Length);
-
-        foreach (var formFile in files)
+        try
         {
-            if (formFile.Length > 0)
-            {
-                //var filePath = Path.GetTempFileName();
-                //var filePath = Path.Combine("data", "img", Path.GetTempFileName());
-                var filePath = "/data/img/" + Path.GetTempFileName();
+            // Define o caminho onde a imagem será salva
+            var filePath = Path.Combine("data", "img", Path.GetRandomFileName() + ".jpg");
 
-                using (var stream = System.IO.File.Create(filePath))
-                {
-                    await formFile.CopyToAsync(stream);
-                }
-                log.Information("Image saved at " + new FileInfo(filePath).FullName);
-            }
+            // Salva a imagem no caminho definido
+            await System.IO.File.WriteAllBytesAsync(filePath, imageData);
+
+            log.Information("Image saved at " + new FileInfo(filePath).FullName);
+
+            // Retorna uma resposta de sucesso
+            return Ok();
         }
-
-        // Process uploaded files
-        // Don't rely on or trust the FileName property without validation.
-
-        return Ok(new { count = files.Count, size });
+        catch (Exception ex)
+        {
+            // Em caso de erro, retorna uma resposta de erro
+            return BadRequest(new { message = "Erro ao salvar a imagem", error = ex.Message });
+        }
     }
 
     private IActionResult registraDados(UploadData dados, string apiKey, string rawJson, string ipOrigem)
