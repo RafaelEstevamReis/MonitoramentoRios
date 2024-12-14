@@ -49,7 +49,6 @@ public class UpController : ControllerBase
     }
 
     [HttpPost("img")]
-    [Consumes("image/jpeg")]
     public async Task<IActionResult> OnPostUploadAsync([FromBody] byte[] imageData)
     {
         try
