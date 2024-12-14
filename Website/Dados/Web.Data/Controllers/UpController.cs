@@ -49,6 +49,7 @@ public class UpController : ControllerBase
     }
 
     [HttpPost("img")]
+    [Consumes("image/jpeg")]
     public async Task<IActionResult> OnPostUploadAsync(List<IFormFile> files)
     {
         long size = files.Sum(f => f.Length);
