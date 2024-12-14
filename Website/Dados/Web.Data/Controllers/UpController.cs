@@ -46,7 +46,7 @@ public class UpController : ControllerBase
         var ip = getIP(Request);
         return registraDados(dados, apiKey, stringObject, ip);
     }
-    
+
     private IActionResult registraDados(UploadData dados, string apiKey, string rawJson, string ipOrigem)
     {
         if (string.IsNullOrWhiteSpace(apiKey)) return BadRequest("Invalid KEY [0]");
@@ -59,7 +59,14 @@ public class UpController : ControllerBase
         }
 
         string estacao = Helpers.ApiToEstacao(apiKey);
+        // Faz por baixo
+        _ = Task.Run(() => finalizaGravacaoDados(dados, rawJson, ipOrigem, estacao));
+        // Retorna resposta rápido
+        return Ok();
+    }
 
+    private void finalizaGravacaoDados(UploadData dados, string rawJson, string ipOrigem, string estacao)
+    {
         // Corrige valores
         if (dados.ForcaSinal == 0) dados.ForcaSinal = null;
         if (dados.PercentBateria > 100) dados.PercentBateria = 100;
@@ -95,9 +102,8 @@ public class UpController : ControllerBase
             ImgPath = imgPath,
         };
         db.Registra(d);
-
-        return Ok();
     }
+
     private string salvaImagem(string estacao, byte[] rawData, string ipOrigem)
     {
         var dir = Path.Combine("data", "img", estacao);
