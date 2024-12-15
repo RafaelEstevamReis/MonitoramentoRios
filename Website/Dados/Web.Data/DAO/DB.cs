@@ -24,7 +24,7 @@ public class DB
            .Add<DBModels.TBDadosEstacoesHora>()
            .Commit();
 
-        cnn.Execute($"DELETE FROM {nameof(DBModels.TBDadosEstacoesHora)} WHERE NivelRio_AVG is NULL");
+        //cnn.Execute($"DELETE FROM {nameof(DBModels.TBDadosEstacoesHora)} WHERE NivelRio_AVG is NULL");
 
         var allKeys = cnn.Query<string>($"SELECT {nameof(DBModels.TBEstacoes.ApiKEY)} FROM {nameof(DBModels.TBEstacoes)}");
         foreach (var k in allKeys) apiKeys.Add(k);
