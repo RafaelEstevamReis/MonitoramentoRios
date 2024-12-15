@@ -24,7 +24,7 @@ public class DB
            .Add<DBModels.TBDadosEstacoesHora>()
            .Commit();
 
-        //cnn.Execute($"DELETE FROM {nameof(DBModels.TBDadosEstacoesHora)} ");
+        cnn.Execute($"DELETE FROM {nameof(DBModels.TBDadosEstacoesHora)} ");
 
         var allKeys = cnn.Query<string>($"SELECT {nameof(DBModels.TBEstacoes.ApiKEY)} FROM {nameof(DBModels.TBEstacoes)}");
         foreach (var k in allKeys) apiKeys.Add(k);
@@ -173,15 +173,11 @@ public class DB
 
     private DataAggregator.Result agregadorFiltrado(DBModels.TBDadosEstacoes[] qData, Func<DBModels.TBDadosEstacoes, decimal?> selector)
     {
-        List<decimal?> valores;
+        List<decimal?> valores = qData.Select(selector).Where(o => o.HasValue).ToList();
         // retira o pior menor e pior maior
         if (qData.Length > 3)
         {
-            valores = DataAggregator.TruncarValores(qData.Select(selector), trimSize: 1).ToList();
-        }
-        else
-        {
-            valores = qData.Select(selector).ToList();
+            valores = DataAggregator.TruncarValores(valores, trimSize: 1).ToList();
         }
 
         // Calcula o desvio
