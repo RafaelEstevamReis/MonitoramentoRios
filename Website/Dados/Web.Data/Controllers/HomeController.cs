@@ -8,7 +8,7 @@ public class HomeController : ControllerBase
     [HttpGet("/")]
     public IActionResult Home()
     {
-        return Redirect("/dados.html");
+        return Redirect("/home.html");
     }
 
     [NonAction]
