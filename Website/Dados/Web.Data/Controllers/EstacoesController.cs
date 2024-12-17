@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Web.Data.DAO;
+using Web.Data.DAO.DBModels;
 
 [ApiController]
 [Route("estacoes")]
@@ -75,7 +76,8 @@ public class EstacoesController : ControllerBase
         // Cria um dicionário para armazenar os dados mais recentes por estação
         var dadosCompletosPorEstacao = dados
             .GroupBy(o => o.Estacao)
-            .Select(grupo => {
+            .Select(grupo =>
+            {
                 // Ordena os registros do grupo por data (mais recente primeiro)
                 var registrosOrdenados = grupo.OrderByDescending(o => o.RecebidoUTC).ToList();
 
@@ -120,23 +122,6 @@ public class EstacoesController : ControllerBase
             .ToArray();
 
         return dadosCompletosPorEstacao;
-    }
-    public IEnumerable<DadosColetados> ListarRecentes_OLD()
-    {
-        var lst = db.ListarDados(estacao: null, limit: 64) // 50 últimas
-                    .Select(Simple.DatabaseWrapper.DataClone.CopyWithSerialization<DadosColetados>)
-                    .GroupBy(o => o.Estacao)
-                    .Select(o => o.OrderByDescending(k => k.RecebidoUTC).First())
-                    .OrderBy(o => o.NomeEstacao)
-                    .ToArray();
-
-        if (lst.Any(i => !dicEstacoes.ContainsKey(i.Estacao))) atualizaEstacoes(db);
-
-        foreach (var i in lst)
-        {
-            if (dicEstacoes.TryGetValue(i.Estacao, out string? value)) i.NomeEstacao = value;
-        }
-        return lst;
     }
 
     [HttpGet("agregado")]
@@ -212,7 +197,7 @@ public class EstacoesController : ControllerBase
 
     [NonAction]
     [HttpPost("nova")]
-    public IActionResult NovaEstacao(DadosEstacao dados)
+    public IActionResult NovaEstacao(DadosNovaEstacao dados)
     {
         if (dados is null)
         {
@@ -238,6 +223,25 @@ public class EstacoesController : ControllerBase
         });
     }
 
+    [HttpGet("")]
+    public IActionResult ListarEstacoes()
+    {
+        var todas = db.ListarEstacoes();
+
+        return Ok(todas.Select(e => new DadosEstacao
+        {
+            Estacao = e.Estacao,
+            NomeEstacao = e.NomeEstacao,
+            NomeResponsavel = e.NomeResponsavel,
+            UltimoEnvio = converteDados(db.ObterRegistroEstacao(e.UltimoEnvio)),
+        }));
+    }
+    private DadosColetados? converteDados(TBDadosEstacoes? dados)
+    {
+        if (dados == null) return null;
+        return Simple.DatabaseWrapper.DataClone.MapModel<TBDadosEstacoes, DadosColetados>(dados);
+    }
+
     public class DadosColetados
     {
         public DateTime RecebidoUTC { get; set; }
@@ -258,16 +262,22 @@ public class EstacoesController : ControllerBase
         public decimal? NivelRio_RAW { get; set; }
         public string RawData { get; set; } = string.Empty;
     }
-    public class DadosEstacao
+    public class DadosNovaEstacao
     {
         public string NomeResponsavel { get; set; } = string.Empty;
         public string NomeEstacao { get; set; } = string.Empty;
+    }
+    public class DadosEstacao
+    {
+        public string Estacao { get; set; } = string.Empty;
+        public string NomeResponsavel { get; set; } = string.Empty;
+        public string NomeEstacao { get; set; } = string.Empty;
+        public DadosColetados? UltimoEnvio { get; set; }
     }
     public class DadosAgregados
     {
         public DadosColetados Min { get; set; }
         public DadosColetados Max { get; set; }
         public DadosColetados Avg { get; set; }
-
     }
 }
