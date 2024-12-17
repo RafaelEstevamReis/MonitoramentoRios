@@ -233,13 +233,16 @@ public class EstacoesController : ControllerBase
             Estacao = e.Estacao,
             NomeEstacao = e.NomeEstacao,
             NomeResponsavel = e.NomeResponsavel,
-            UltimoEnvio = converteDados(db.ObterRegistroEstacao(e.UltimoEnvio)),
+            UltimoEnvio = converteDados(e, db.ObterRegistroEstacao(e.UltimoEnvio)),
         }));
     }
-    private DadosColetados? converteDados(TBDadosEstacoes? dados)
+    private DadosColetados? converteDados(TBEstacoes e, TBDadosEstacoes? dados)
     {
         if (dados == null) return null;
-        return Simple.DatabaseWrapper.DataClone.MapModel<TBDadosEstacoes, DadosColetados>(dados);
+        var k = Simple.DatabaseWrapper.DataClone.MapModel<TBDadosEstacoes, DadosColetados>(dados);
+        k.NomeEstacao = e.NomeEstacao;
+
+        return k;
     }
 
     public class DadosColetados
