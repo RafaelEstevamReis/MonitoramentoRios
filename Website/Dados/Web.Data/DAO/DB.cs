@@ -1,5 +1,6 @@
 ﻿namespace Web.Data.DAO;
 
+using Simple.DatabaseWrapper.Interfaces;
 using Simple.Sqlite;
 using System;
 using System.Collections.Generic;
@@ -18,16 +19,44 @@ public class DB
     public void Setup()
     {
         using var cnn = db.GetConnection();
-        cnn.CreateTables()
+        var result = cnn.CreateTables()
            .Add<DBModels.TBEstacoes>()
            .Add<DBModels.TBDadosEstacoes>()
            .Add<DBModels.TBDadosEstacoesHora>()
            .Commit();
 
+        if (result.Length > 0) // Teve migrations
+        {
+            executaMigrations(cnn, result);
+        }
+
         //cnn.Execute($"DELETE FROM {nameof(DBModels.TBDadosEstacoesHora)} WHERE NivelRio_AVG is NULL");
 
         var allKeys = cnn.Query<string>($"SELECT {nameof(DBModels.TBEstacoes.ApiKEY)} FROM {nameof(DBModels.TBEstacoes)}");
         foreach (var k in allKeys) apiKeys.Add(k);
+    }
+
+    private static void executaMigrations(ISqliteConnection cnn, ITableCommitResult[] result)
+    {
+        var migEstacoes = result.FirstOrDefault(o => o.TableName == nameof(DBModels.TBEstacoes));
+        if (migEstacoes != null && migEstacoes.ColumnsAdded.Length > 0)
+        {
+            // 20241217 - Adiciona uLtimos envios
+            if (migEstacoes.ColumnsAdded.Any(c => c == "UltimoEnvio")) // Criou a últimos envios
+            {
+                var reg = cnn.Query<DBModels.TBEstacoes>("SELECT Estacao, MAX(Id) as Id FROM TBDadosEstacoes GROUP BY Estacao");
+
+                foreach (var estacao in reg)
+                {
+                    cnn.Execute($"UPDATE {nameof(DBModels.TBEstacoes)} SET {nameof(DBModels.TBEstacoes.UltimoEnvio)} = @id WHERE {nameof(DBModels.TBEstacoes.Estacao)} = @estacao ", new
+                    {
+                        id = estacao.Id,
+                        estacao = estacao.Estacao,
+                    });
+                }
+
+            }
+        }
     }
 
     public IEnumerable<DBModels.TBEstacoes> ListarEstacoes()
@@ -54,6 +83,12 @@ public class DB
         {
             return cnn.Query<DBModels.TBDadosEstacoes>($"SELECT * FROM {nameof(DBModels.TBDadosEstacoes)} WHERE Estacao = @estacao ORDER BY Id DESC LIMIT 0,{limit} ", new { estacao });
         }
+    }
+    public DBModels.TBDadosEstacoes? ObterRegistroEstacao(long id)
+    {
+        if (id == 0) return null;
+        using var cnn = db.GetConnection();
+        return cnn.Get<DBModels.TBDadosEstacoes>(id);
     }
 
     public DBModels.TBDadosEstacoesHora? AgregadoHora(string estacao, int hourSpan)
@@ -194,10 +229,18 @@ public class DB
 
     public bool IsValidKey(string key) => apiKeys.Contains(key);
 
-    public void Registra(DBModels.TBDadosEstacoes d)
+    public long Registra(DBModels.TBDadosEstacoes d)
     {
         using var cnn = db.GetConnection();
-        cnn.Insert(d);
+        var id = cnn.Insert(d);
+
+        cnn.Execute($"UPDATE {nameof(DBModels.TBEstacoes)} SET {nameof(DBModels.TBEstacoes.UltimoEnvio)} = @id WHERE {nameof(DBModels.TBEstacoes.Estacao)} = @estacao ", new
+        {
+            id,
+            estacao = d.Estacao,
+        });
+
+        return id;
     }
     public void NovaEstacao(DBModels.TBEstacoes estacao)
     {
@@ -206,4 +249,5 @@ public class DB
 
         apiKeys.Add(estacao.ApiKEY);
     }
+
 }

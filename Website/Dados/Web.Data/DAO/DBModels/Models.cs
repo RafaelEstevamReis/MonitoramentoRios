@@ -16,6 +16,7 @@ public class TBEstacoes
     public string ApiKEY { get; set; } = string.Empty;
     public string NomeResponsavel { get; set; } = string.Empty;
     public string NomeEstacao { get; set; } = string.Empty;
+    public long UltimoEnvio { get; set; }
 }
 
 public class TBDadosEstacoes
