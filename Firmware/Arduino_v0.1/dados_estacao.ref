@@ -1,0 +1,35 @@
+const char* board_info = "ARD:0V1_BRD:NODEMCU";
+
+// Configurações WiFi
+const char* wifi_ssids[] = {"SSID1", "SSID2"};
+const char* wifi_passwords[] = {"PASSWORD1", "PASSWORD2"};
+const int num_wifi_networks = sizeof(wifi_ssids) / sizeof(wifi_ssids[0]);
+
+// Endpoint e chave
+const char* api_key = "00000000-0000-0000-0000-000000000000";
+
+// PINOS
+#define ADC_PIN 36
+#define DHT_PIN 15
+#define DHT_TYPE DHT11
+#define PULSE_PIN 25
+
+// Sleep
+const int sleep_after = 60;
+const int sleep_for = 3 * 60;
+
+// Bateria
+#define vBatCal 1.00f
+const float vBatTable[][2] = {
+  {99, 12.9},
+  {95, 12.7},
+  {80, 12.3},
+  {60, 12.1},
+  {40, 11.8},
+  {20, 11.5},
+  {10, 11.25},
+  {5, 11.1},
+  {0, 10.5}
+};
+const int vBatTableRows = sizeof(vBatTable) / sizeof(vBatTable[0]);
+

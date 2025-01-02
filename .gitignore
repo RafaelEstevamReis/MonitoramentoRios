@@ -393,3 +393,4 @@ appsettings**.json
 *.FCBak
 **/launchSettings.json
 data/
+Firmware/Arduino_v0.1/dados_estacao.h
