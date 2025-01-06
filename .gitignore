@@ -394,3 +394,4 @@ appsettings**.json
 **/launchSettings.json
 data/
 Firmware/Arduino_v0.1/dados_estacao.h
+Montagem/Acessorios/**.stl
