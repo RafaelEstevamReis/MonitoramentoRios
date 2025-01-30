@@ -265,7 +265,7 @@
         var map = L.map('map', {
             maxZoom: 13,
             minZoom: 11,
-        }).setView([-29.61, -50.50], 12); // Posição inicial [latitude, longitude] e zoom
+        }).setView([-29.61, -50.50], 11); // Posição inicial [latitude, longitude] e zoom
         // Centro Rolante -29.61, -50.55
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -289,7 +289,7 @@
                 data.forEach(dado => {
                     let text = `-`;
                     if (dado.nivelRio === null && dado.temperaturaAr === null) {
-                        text = `-/-`;
+                        text = `?/?`;
                     } else if (dado.nivelRio === null || dado.nivelRio === undefined) {
                         text = `${dado.temperaturaAr}ºC`;
                     } else {
