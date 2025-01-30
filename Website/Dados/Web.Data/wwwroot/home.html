@@ -134,14 +134,14 @@
                 data.forEach(dado => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                                                            <td>${dado.nomeEstacao || dado.estacao}</td>
-                                                            <td>${formatValue(dado.percentBateria, 0)}%</td>
-                                                            <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
-                                                            <td>${dado.temperaturaAr || '-'}ºC</td>
-                                                            <td>${dado.umidadeAr || '-'}%</td>
-                                                            <td>${formatValueUnit(dado.nivelRio, 1, 'm')}</td>
-                                                            <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
-                                                        `;
+                                                                <td>${dado.nomeEstacao || dado.estacao}</td>
+                                                                <td>${formatValue(dado.percentBateria, 0)}%</td>
+                                                                <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
+                                                                <td>${dado.temperaturaAr || '-'}ºC</td>
+                                                                <td>${dado.umidadeAr || '-'}%</td>
+                                                                <td>${formatValueUnit(dado.nivelRio, 1, 'm')}</td>
+                                                                <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
+                                                            `;
                     tableBody.appendChild(row);
                     //setColor(row, dado.nomeEstacao);
                 });
@@ -277,18 +277,20 @@
         // Todas as coordenadas devem ter apenas 2.5 casas decimais (terceira casa múltiplo de 5)
         addCircleLabel(-29.650, -50.575, noSigSvg, null); // RSRL-CE01
         addCircleLabel(-29.645, -50.511, noSigSvg, null); // RSRL-AR01
-        addCircleLabel(-29.565, -50.415, noSigSvg, null); // RSRZ-CH01
 
         adicionaEstacao(-29.565, -50.535, noSigSvg, "04109F675953A131"); // BE01
         adicionaEstacao(-29.590, -50.565, noSigSvg, "9A6EE7B45495BB7F"); // GLLS
         adicionaEstacao(-29.640, -50.540, noSigSvg, "BB45660B199C5677"); // RB01
+        adicionaEstacao(-29.565, -50.415, noSigSvg, "48B1162D47EC0FE6"); // RSRZ-CH01
 
         fetch('/estacoes/ultimos')
             .then(response => response.json())
             .then(data => {
                 data.forEach(dado => {
                     let text = `-`;
-                    if (dado.nivelRio === null || dado.nivelRio === undefined) {
+                    if (dado.nivelRio === null && dado.temperaturaAr === null) {
+                        text = `-/-`;
+                    } else if (dado.nivelRio === null || dado.nivelRio === undefined) {
                         text = `${dado.temperaturaAr}ºC`;
                     } else {
                         text = `${dado.temperaturaAr}ºC<br>${formatValue(dado.nivelRio, 1)}m`;
