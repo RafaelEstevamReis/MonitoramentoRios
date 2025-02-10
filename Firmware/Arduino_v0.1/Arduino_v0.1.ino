@@ -44,15 +44,28 @@ float vBatToPercent(float vBat){
 
 void connectToWiFi() {
   if (WiFi.status() == WL_CONNECTED) return;
-  
+  // Avisa início do WIFI
+  digitalWrite(LED_STATUS, HIGH);
+  delay(100);
+  digitalWrite(LED_STATUS, LOW);
+  delay(200);
+  digitalWrite(LED_STATUS, HIGH);
+  delay(100);
+  digitalWrite(LED_STATUS, LOW);
+
   for (int i = 0; i < num_wifi_networks; i++) {
-    WiFi.begin(wifi_ssids[i], wifi_passwords[i]);
     Serial.print("\nConectando a ");
     Serial.print(wifi_ssids[i]);
+    WiFi.begin(wifi_ssids[i], wifi_passwords[i]);
 
     int retry_count = 0;
     while (WiFi.status() != WL_CONNECTED && retry_count < 10) {
-      delay(1000);
+      // Avisa conexão...
+      digitalWrite(LED_STATUS, HIGH);
+      delay(300);
+      digitalWrite(LED_STATUS, LOW);
+      delay(700);
+
       Serial.print(".");
       retry_count++;
     }
@@ -159,8 +172,16 @@ void checkSleep(){
   if(sleep_for == 0) return; // do not sleep
 
   unsigned long tempoDecorrido = millis();
+
+    Serial.print("[DBG SLP] TC: ");
+    Serial.print(tempoDecorrido);
+    Serial.print(" SA: ");
+    Serial.print(sleep_after);
+    Serial.print(" SF: ");
+    Serial.print(sleep_for);
+    Serial.println();
   
-  if (tempoDecorrido >= sleep_after * 1000) {    
+  if (tempoDecorrido >= sleep_after * 1000) {
     Serial.println("Entering deep sleep");
     delay(1000);
     esp_deep_sleep(sleep_for * 1000000); // 3 minutos em microsegundos
@@ -168,20 +189,27 @@ void checkSleep(){
 }
 
 void setup() {
-  Serial.begin(9600);
-  delay(1000);
-  Serial.printf("\n\nBoot: %s\n", board_info);
-  
   // Seta Pinos
   pinMode(ADC_PIN, INPUT);
   pinMode(PULSE_PIN, INPUT);
+  pinMode(LED_STATUS, OUTPUT);
+  pinMode(LED_IO, OUTPUT);
+
+  digitalWrite(LED_STATUS, HIGH); // Começa Boot
+  // Serial Boot
+  Serial.begin(115200);
+  delay(1000);
+  Serial.printf("\n\nBoot: %s\n", board_info);
+  
   // Objetos
   dht.begin();
+
+  digitalWrite(LED_STATUS, LOW); // Finaliza Boot
 }
 
 void loop() {
   connectToWiFi();
-  sendData();  
+  //sendData();  
   disconnectWiFi();
 
   //delay(120000); // A cada 2 minutos
