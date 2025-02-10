@@ -35,6 +35,29 @@
             overflow: auto; /* Permite o scroll */
         }
 
+        #content a, a:visited{
+            color: beige
+        }
+
+        @media(max-width: 710px) {
+            #map {
+                height: 250px;
+                width: 100%;
+                min-width: 300px;
+            }
+            #screen {
+                display: flex;
+                flex-direction: column-reverse;
+                background-color: darkslategray;
+                height: 100%;
+                overflow: auto; /* Permite o scroll */
+            }
+            .btn, .btn:visited {
+                padding: 4px 16px;
+                font-size: 8px;
+            }
+        }
+
         h1 {
             text-align: center;
         }
@@ -134,14 +157,14 @@
                 data.forEach(dado => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                                                                <td>${dado.nomeEstacao || dado.estacao}</td>
-                                                                <td>${formatValue(dado.percentBateria, 0)}%</td>
-                                                                <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
-                                                                <td>${dado.temperaturaAr || '-'}ºC</td>
-                                                                <td>${dado.umidadeAr || '-'}%</td>
-                                                                <td>${formatValueUnit(dado.nivelRio, 1, 'm')}</td>
-                                                                <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
-                                                            `;
+                                                                                    <td>${dado.nomeEstacao || dado.estacao}</td>
+                                                                                    <td>${formatValue(dado.percentBateria, 0)}%</td>
+                                                                                    <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
+                                                                                    <td>${dado.temperaturaAr || '-'}ºC</td>
+                                                                                    <td>${dado.umidadeAr || '-'}%</td>
+                                                                                    <td>${formatValueUnit(dado.nivelRio, 1, 'm')}</td>
+                                                                                    <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
+                                                                                `;
                     tableBody.appendChild(row);
                     //setColor(row, dado.nomeEstacao);
                 });
