@@ -64,6 +64,8 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            let temNivel = false;
+            let temTemp = false;
             // Carregar gráfico após carregar os dados
             fetch('/estacoes/dados?estacao=' + getQueryParam("estacao"))
                 //fetch('https://monitorarios.xyz/estacoes/dados?estacao=' + getQueryParam("estacao"), { mode: 'no-cors' })
@@ -96,9 +98,11 @@
 
                         if (dado.temperaturaAr && dado.umidadeAr) {
                             chartData.push([hora, parseFloat(dado.temperaturaAr), parseFloat(dado.umidadeAr)]);
+                            temTemp = true;
                         }
                         if (dado.nivelRio) {
                             chartLevelData.push([hora, parseFloat(dado.nivelRio.toFixed(2))]);
+                            temNivel = true;
                         }
                     });
 
@@ -110,6 +114,9 @@
                         drawChart(reversedData);
                         if (reversedLevelData.length > 2) drawChartSimples(reversedLevelData, 'Nível', 'chartLevel_div');
                     });
+
+                    if (!temTemp) document.getElementById("chart_div").hidden = true;
+                    if (!temNivel) document.getElementById("chartLevel_div").hidden = true;
                 })
                 .catch(error => {
                     console.error('Erro ao carregar dados das estações:', error);
