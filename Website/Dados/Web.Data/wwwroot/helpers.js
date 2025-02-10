@@ -49,3 +49,10 @@ function getQueryParam(name) {
     const urlParams = new URLSearchParams(queryString);
     return urlParams.get(name);
 }
+
+function nullSlice(value, size, def) {
+    if (value === null) return def;
+    if (value === undefined) return def;
+
+    return value.slice(size);
+}

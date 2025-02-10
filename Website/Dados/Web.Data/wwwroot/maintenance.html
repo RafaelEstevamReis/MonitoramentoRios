@@ -1,0 +1,139 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="60">
+    <title>Dados das Estações</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script type="text/javascript" src="helpers.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Fazendo o request para o endpoint
+            fetch('/estacoes')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#dadosEstacoes tbody');
+                    data.forEach(e => {
+                        const ultimo = e.ultimoEnvio;
+                        const row = document.createElement('tr');
+
+                        if (ultimo !== null) {
+                            let lvl = ultimo.nivelRio === null ? '-m' : `${formatValue(ultimo.nivelRio, 1)}m (r${formatValue(ultimo.nivelRio_RAW, 1)})`;
+
+                            let rawData = JSON.parse(ultimo.rawData);
+                            const ipStr = rawData.ip === null || rawData.ip === undefined ? '-' : `${ipCut(rawData.ip, 2, '-')} @${nullSlice(rawData.mac, -5, '-')}`;
+                            const ipAddrFuncCopy = rawData === null || rawData.ip === null || rawData.ip === undefined ? '' : `onClick='copycb("http://${rawData.ip}")'`;
+                            
+                            row.innerHTML = `
+                                            <td>${new Date(ultimo.dataHoraDadosUTC).toLocaleString()}</td>
+                                            <td>${ultimo.nomeEstacao || ultimo.estacao}</td>
+                                            <td>${formatValue(ultimo.tensaoBateria, 1)}v</td>
+                                            <td>${formatValue(ultimo.temperaturaAr,1) || '-'}ºC | ${ultimo.umidadeAr || '-'}%</td>
+                                            <td>${lvl}</td>
+                                            <td>${wifiSignalToPercent(ultimo.forcaSinal)} @${rawData.bssid.slice(-5)}</td>
+                                            <td ${ipAddrFuncCopy}>${ipStr}</td>
+                                         `;
+                        } else {
+                            row.innerHTML = `
+                                            <td>-</td>
+                                            <td>${e.nomeEstacao || e.estacao}</td>
+                                            <td>-v</td>
+                                            <td>-ºC | -%</td>
+                                            <td>-m</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                         `;
+                        }
+                        tableBody.appendChild(row);
+                        setColor(row, e.nomeEstacao);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados das estações:', error);
+                });
+
+        });
+        function copycb(value) {
+            navigator.clipboard.writeText(value);
+            alert("Endereço Copiado: "+value);
+        }
+
+        function ipCut(value, groups, def) {
+            if (value === null) return def;
+            if (value === undefined) return def;
+
+            let blocks = value.split('.');
+            return blocks.slice(-groups).join('.');
+        }
+
+
+        const colorList = ['lightblue', 'lightgreen', 'lightgoldenrodyellow', 'antiquewhite', 'aliceblue', 'lightpink', 'aquamarine', 'beige', 'yellowgreen', 'skyblue'];
+        function setColor(element, idEstacao) {
+            if (idEstacao === 'RSRL-RB01') {
+                element.style.backgroundColor = 'azure';
+                return;
+            }
+            if (idEstacao === 'RSRL-BE01') {
+                element.style.backgroundColor = 'darkseagreen';
+                return;
+            }
+
+            const hsh = getHash(idEstacao);
+            // Gera um índice determinístico baseado no idEstacao
+            const index = hsh % colorList.length;
+            // Define a cor de fundo do elemento com base no índice
+            element.style.backgroundColor = colorList[index];
+            //console.log(`Hash para '${idEstacao}': ${hsh} IX: ${index} Color: ${colorList[index]}`);
+        }
+        function getHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = (hash << 5) - hash + str.charCodeAt(i);
+                hash |= 0; // Converte para um inteiro de 32 bits
+            }
+
+            return Math.abs(hash); // Garantimos que o valor seja positivo
+        }
+
+    </script>
+</head>
+<body>
+
+    <h2>Página de Manutenção</h2>
+    <table id="dadosEstacoes">
+        <thead>
+            <tr>
+                <th>Último Envio</th>
+                <th>Estação</th>
+                <th width="60px">Tensão Bateria</th>
+                <th width="100px">Dados Ar</th>
+                <th width="80px">Nível Água</th>
+                <th>Sinal Conexão</th>
+                <th>Client</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dados serão preenchidos dinamicamente aqui -->
+        </tbody>
+    </table>
+
+
+    <p>Veja mais em: <a href="https://github.com/RafaelEstevamReis/MonitoramentoRios" target="_blank">gh/MonitoramentoRios</a></p>
+</body>
+</html>
