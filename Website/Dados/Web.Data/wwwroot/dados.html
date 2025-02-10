@@ -24,6 +24,7 @@
     <script type="text/javascript" src="helpers.js"></script>
 </head>
 <body>
+    <a href="/">Voltar ao Mapa</a>
     <h2>Últimas Leituras</h2>
     <table id="ultimasLeituras">
         <thead>
@@ -74,15 +75,15 @@
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                            <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
-                                            <td>${dado.nomeEstacao || dado.estacao}</td>
-                                            <td>${formatValue(dado.tensaoBateria, 1)}v</td>
-                                            <td>${dado.temperaturaAr || '-'}ºC</td>
-                                            <td>${dado.umidadeAr || '-'}%</td>
-                                            <td>${dado.precipitacao || '-'}</td>
-                                            <td>${formatValue(dado.nivelRio, 1)}m</td>
-                                            <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
-                                        `;
+                                                <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
+                                                <td>${dado.nomeEstacao || dado.estacao}</td>
+                                                <td>${formatValue(dado.tensaoBateria, 1)}v</td>
+                                                <td>${dado.temperaturaAr || '-'}ºC</td>
+                                                <td>${dado.umidadeAr || '-'}%</td>
+                                                <td>${dado.precipitacao || '-'}</td>
+                                                <td>${formatValue(dado.nivelRio, 1)}m</td>
+                                                <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
+                                            `;
                         tableBody.appendChild(row);
                         setColor(row, dado.nomeEstacao);
                     });
@@ -98,16 +99,16 @@
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                            <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
-                                            <td>${dado.nomeEstacao || dado.estacao}</td>
-                                            <td>${formatValue(dado.tensaoBateria, 1)}v (${formatValue(dado.percentBateria, 0)}%)</td>
-                                            <td>${dado.temperaturaAr || '-'}ºC</td>
-                                            <td>${dado.umidadeAr || '-'}%</td>
-                                            <td>${dado.precipitacao || '-'}</td>
-                                            <td>${formatValue(dado.nivelRio, 1, 'm')}</td>
-                                            <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
-                                            <td><a href="live.html?estacao=${dado.estacao}">Resumo</a> | <a href="estacao.html?estacao=${dado.estacao}">Detalhar</a> </td>
-                                        `;
+                                                <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
+                                                <td>${dado.nomeEstacao || dado.estacao}</td>
+                                                <td>${formatValue(dado.tensaoBateria, 1)}v (${formatValue(dado.percentBateria, 0)}%)</td>
+                                                <td>${dado.temperaturaAr || '-'}ºC</td>
+                                                <td>${dado.umidadeAr || '-'}%</td>
+                                                <td>${dado.precipitacao || '-'}</td>
+                                                <td>${formatValue(dado.nivelRio, 1, 'm')}</td>
+                                                <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
+                                                <td><a href="live.html?estacao=${dado.estacao}">Resumo</a> | <a href="estacao.html?estacao=${dado.estacao}">Detalhar</a> </td>
+                                            `;
                         tableBody.appendChild(row);
                         setColor(row, dado.nomeEstacao);
                     });

@@ -11,6 +11,9 @@
             updateContent();
             carregaAgregado();
             carregaHistorico();
+
+            // Atualiza link detalhes
+            document.getElementById("irDetalhes").setAttribute("href", "estacao.html?estacao=" + getQueryParam("estacao"));
         });
         setInterval(updateContent, 60000);
 
@@ -208,7 +211,9 @@
     </style>
 </head>
 <body>
+    <a href="/">Voltar ao Mapa</a>
     <a href="dados.html">Listar Todas</a>
+    <a href="estacao.html" id="irDetalhes">Exibir Detalhes</a>
 
     <h2>Dados da Estação <span id="nomeEstacao">[NOME ESTACAO]</span></h2>
 
