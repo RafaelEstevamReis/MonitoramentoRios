@@ -39,26 +39,26 @@
                             let rawData = JSON.parse(ultimo.rawData);
                             const ipStr = rawData.ip === null || rawData.ip === undefined ? '-' : `${ipCut(rawData.ip, 2, '-')} @${nullSlice(rawData.mac, -5, '-')}`;
                             const ipAddrFuncCopy = rawData === null || rawData.ip === null || rawData.ip === undefined ? '' : `onClick='copycb("http://${rawData.ip}")'`;
-                            
+
                             row.innerHTML = `
-                                            <td>${new Date(ultimo.dataHoraDadosUTC).toLocaleString()}</td>
-                                            <td>${ultimo.nomeEstacao || ultimo.estacao}</td>
-                                            <td>${formatValue(ultimo.tensaoBateria, 1)}v</td>
-                                            <td>${formatValue(ultimo.temperaturaAr,1) || '-'}ºC | ${ultimo.umidadeAr || '-'}%</td>
-                                            <td>${lvl}</td>
-                                            <td>${wifiSignalToPercent(ultimo.forcaSinal)} @${rawData.bssid.slice(-5)}</td>
-                                            <td ${ipAddrFuncCopy}>${ipStr}</td>
-                                         `;
+                                                <td>${new Date(ultimo.dataHoraDadosUTC).toLocaleString()}</td>
+                                                <td>${ultimo.nomeEstacao || ultimo.estacao}</td>
+                                                <td>${formatValue(ultimo.tensaoBateria, 1)}v</td>
+                                                <td>${formatValue(ultimo.temperaturaAr, 1) || '-'}ºC | ${ultimo.umidadeAr || '-'}%</td>
+                                                <td>${lvl}</td>
+                                                <td>${wifiSignalToPercent(ultimo.forcaSinal)} @${rawData.bssid.slice(-5)}</td>
+                                                <td ${ipAddrFuncCopy}>${ipStr}</td>
+                                             `;
                         } else {
                             row.innerHTML = `
-                                            <td>-</td>
-                                            <td>${e.nomeEstacao || e.estacao}</td>
-                                            <td>-v</td>
-                                            <td>-ºC | -%</td>
-                                            <td>-m</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                         `;
+                                                <td>-</td>
+                                                <td>${e.nomeEstacao || e.estacao}</td>
+                                                <td>-v</td>
+                                                <td>-ºC | -%</td>
+                                                <td>-m</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                             `;
                         }
                         tableBody.appendChild(row);
                         setColor(row, e.nomeEstacao);
@@ -71,7 +71,7 @@
         });
         function copycb(value) {
             navigator.clipboard.writeText(value);
-            alert("Endereço Copiado: "+value);
+            alert("Endereço Copiado: " + value);
         }
 
         function ipCut(value, groups, def) {
