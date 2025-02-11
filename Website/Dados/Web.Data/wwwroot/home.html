@@ -157,14 +157,14 @@
                 data.forEach(dado => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                                                                                    <td>${dado.nomeEstacao || dado.estacao}</td>
-                                                                                    <td>${formatValue(dado.percentBateria, 0)}%</td>
-                                                                                    <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
-                                                                                    <td>${dado.temperaturaAr || '-'}ºC</td>
-                                                                                    <td>${dado.umidadeAr || '-'}%</td>
-                                                                                    <td>${formatValueUnit(dado.nivelRio, 1, 'm')}</td>
-                                                                                    <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
-                                                                                `;
+                                    <td>${dado.nomeEstacao || dado.estacao}</td>
+                                    <td>${formatValue(dado.percentBateria, 0)}%</td>
+                                    <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
+                                    <td>${formatValue(dado.temperaturaAr, 1)}ºC</td>
+                                    <td>${formatValue(dado.umidadeAr, 1)}%</td>
+                                    <td>${formatValueUnit(dado.nivelRio, 1, 'm')}</td>
+                                    <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
+                                `;
                     tableBody.appendChild(row);
                     //setColor(row, dado.nomeEstacao);
                 });
@@ -314,9 +314,9 @@
                     if (dado.nivelRio === null && dado.temperaturaAr === null) {
                         text = `?/?`;
                     } else if (dado.nivelRio === null || dado.nivelRio === undefined) {
-                        text = `${dado.temperaturaAr}ºC`;
+                        text = `${formatValue(dado.temperaturaAr,1)}ºC`;
                     } else {
-                        text = `${dado.temperaturaAr}ºC<br>${formatValue(dado.nivelRio, 1)}m`;
+                        text = `${formatValue(dado.temperaturaAr, 1)}ºC<br>${formatValue(dado.nivelRio, 1)}m`;
                     }
                     atualizaEstacao(text, dado.estacao);
                 });

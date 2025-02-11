@@ -85,7 +85,7 @@
                                             <td>${formatValue(dado.temperaturaInterna, 1)}ºC</td>
                                             <td>${formatValue(dado.tensaoBateria, 2)}v (${formatValue(dado.percentBateria, 0)}%)</td>
                                             <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
-                                            <td>${dado.temperaturaAr || '-'}ºC</td>
+                                            <td>${formatValue(dado.temperaturaAr, 1)}ºC</td>
                                             <td>${dado.umidadeAr || '-'}%</td>
                                             <td>${dado.precipitacao || '-'}</td>
                                             <td>${formatValue(dado.nivelRio, 2) || '-'}m</td>
