@@ -96,7 +96,7 @@
                         // Adicionar dados ao gráfico, se existirem valores
                         const hora = new Date(dado.dataHoraDadosUTC).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                        if (dado.temperaturaAr && dado.umidadeAr) {
+                        if (dado.temperaturaAr || dado.umidadeAr) {
                             chartData.push([hora, parseFloat(dado.temperaturaAr), parseFloat(dado.umidadeAr)]);
                             temTemp = true;
                         }

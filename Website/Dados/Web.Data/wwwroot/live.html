@@ -66,9 +66,9 @@
                     setValue('clIntTemp', `${formatValue(dado.temperaturaInterna, 1)}ºC`);
                     setValue('clSigStr', `${wifiSignalToPercent(dado.forcaSinal)} (${dado.forcaSinal || '-'}dBm)`);
                     // Ar
-                    setValue('clTemp', `${dado.temperaturaAr || '-'}ºC`);
-                    setValue('clHumd', `${dado.umidadeAr || '-'}%`);
-                    setValue('clPres', `${dado.pressaoAr || ' -'}hPa`);
+                    setValue('clTemp', `${formatValue(dado.temperaturaAr, 1)}ºC`);
+                    setValue('clHumd', `${formatValue(dado.umidadeAr, 1)}%`);
+                    setValue('clPres', `${formatValue(dado.pressaoAr, 1)}hPa`);
                     // Medição
                     setValue('clLevel', `${formatValue(dado.nivelRio, 3) || '-'}m`);
                     setValue('clRain', `${dado.precipitacao || '-'}`);
@@ -102,16 +102,16 @@
                         // Tabela
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                            <td>${dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ')}h</td>
-                                            <td style="text-align: center;">${dado.dataCount}</td>
-                                            <td>${formatValue(dado.temperaturaInterna_AVG, 1)}ºC</td>
-                                            <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
-                                            <td>${formatValue(dado.temperaturaAr_AVG, 1) || '-'}ºC</td>
-                                            <td>${formatValue(dado.umidadeAr_AVG, 1) || '-'}%</td>
-                                            <td>${formatValue(dado.pressaoAr_AVG, 1) || '-'}hPa</td>
-                                            <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
-                                            <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG, 0) || '-'}dBm)</td>
-                                            `;
+                                                <td>${dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ')}h</td>
+                                                <td style="text-align: center;">${dado.dataCount}</td>
+                                                <td>${formatValue(dado.temperaturaInterna_AVG, 1)}ºC</td>
+                                                <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
+                                                <td>${formatValue(dado.temperaturaAr_AVG, 1) || '-'}ºC</td>
+                                                <td>${formatValue(dado.umidadeAr_AVG, 1) || '-'}%</td>
+                                                <td>${formatValue(dado.pressaoAr_AVG, 1) || '-'}hPa</td>
+                                                <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
+                                                <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG, 0) || '-'}dBm)</td>
+                                                `;
                         tableBody.appendChild(row);
                     });
 
