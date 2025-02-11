@@ -29,7 +29,7 @@
                     // Ar
                     setValue('clMinTemp', `${min.temperaturaAr || '-'}ºC`);
                     setValue('clMinHumd', `${min.umidadeAr || '-'}%`);
-                    setValue('clMinPres', '-');
+                    setValue('clMinPres', `${min.pressaoAr || ' -'}hPa`);
                     // Medição
                     setValue('clMinLevel', `${formatValue(min.nivelRio, 3) || '-'}m`);
                     setValue('clMinRain', `${min.precipitacao || '-'}`);
@@ -42,7 +42,7 @@
                     // Ar
                     setValue('clMaxTemp', `${max.temperaturaAr || '-'}ºC`);
                     setValue('clMaxHumd', `${max.umidadeAr || '-'}%`);
-                    setValue('clMaxPres', '-');
+                    setValue('clMaxPres', `${max.pressaoAr || ' -'}hPa`);
                     // Medição
                     setValue('clMaxLevel', `${formatValue(max.nivelRio, 3) || '-'}m`);
                     setValue('clMaxRain', `${max.precipitacao || '-'}`);
@@ -68,7 +68,7 @@
                     // Ar
                     setValue('clTemp', `${dado.temperaturaAr || '-'}ºC`);
                     setValue('clHumd', `${dado.umidadeAr || '-'}%`);
-                    setValue('clPres', '-');
+                    setValue('clPres', `${dado.pressaoAr || ' -'}hPa`);
                     // Medição
                     setValue('clLevel', `${formatValue(dado.nivelRio, 3) || '-'}m`);
                     setValue('clRain', `${dado.precipitacao || '-'}`);
