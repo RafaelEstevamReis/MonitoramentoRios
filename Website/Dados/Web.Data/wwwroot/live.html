@@ -27,9 +27,9 @@
                     setValue('clMinIntTemp', `${formatValue(min.temperaturaInterna, 1)}ºC`);
                     setValue('clMinSigStr', `${wifiSignalToPercent(min.forcaSinal)} (${min.forcaSinal || '-'}dBm)`);
                     // Ar
-                    setValue('clMinTemp', `${min.temperaturaAr || '-'}ºC`);
-                    setValue('clMinHumd', `${min.umidadeAr || '-'}%`);
-                    setValue('clMinPres', `${min.pressaoAr || ' -'}hPa`);
+                    setValue('clMinTemp', `${formatValue(min.temperaturaAr, 1)}ºC`);
+                    setValue('clMinHumd', `${formatValue(min.umidadeAr, 1)}%`);
+                    setValue('clMinPres', `${formatValue(min.pressaoAr, 1)}hPa`);
                     // Medição
                     setValue('clMinLevel', `${formatValue(min.nivelRio, 3) || '-'}m`);
                     setValue('clMinRain', `${min.precipitacao || '-'}`);
@@ -40,9 +40,9 @@
                     setValue('clMaxIntTemp', `${formatValue(max.temperaturaInterna, 1)}ºC`);
                     setValue('clMaxSigStr', `${wifiSignalToPercent(max.forcaSinal)} (${max.forcaSinal || '-'}dBm)`);
                     // Ar
-                    setValue('clMaxTemp', `${max.temperaturaAr || '-'}ºC`);
-                    setValue('clMaxHumd', `${max.umidadeAr || '-'}%`);
-                    setValue('clMaxPres', `${max.pressaoAr || ' -'}hPa`);
+                    setValue('clMaxTemp', `${formatValue(max.temperaturaAr, 1)}ºC`);
+                    setValue('clMaxHumd', `${formatValue(max.umidadeAr, 1)}%`);
+                    setValue('clMaxPres', `${formatValue(max.pressaoAr, 1)}hPa`);
                     // Medição
                     setValue('clMaxLevel', `${formatValue(max.nivelRio, 3) || '-'}m`);
                     setValue('clMaxRain', `${max.precipitacao || '-'}`);
@@ -108,6 +108,7 @@
                                             <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
                                             <td>${formatValue(dado.temperaturaAr_AVG, 1) || '-'}ºC</td>
                                             <td>${formatValue(dado.umidadeAr_AVG, 1) || '-'}%</td>
+                                            <td>${formatValue(dado.pressaoAr_AVG, 1) || '-'}hPa</td>
                                             <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
                                             <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG, 0) || '-'}dBm)</td>
                                             `;
@@ -321,6 +322,7 @@
                 <th>Tensão da Bateria</th>
                 <th width="100px">Temperatura do Ar</th>
                 <th width="100px">Umidade do Ar</th>
+                <th width="100px">Pressão do Ar</th>
                 <th>Nível da Água</th>
                 <th>Sinal Conexão</th>
             </tr>
