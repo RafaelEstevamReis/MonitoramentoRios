@@ -141,6 +141,10 @@
                     <h3>Alto Areia - Areia, Rolante-RS</h3>
                     <canvas id="chtGLLS"></canvas>
                 </div>
+                <div class="cdvChart">
+                    <h3>Chuvisqueiro - Chuvisqueiro, Riozinho-RS</h3>
+                    <canvas id="chtCH01"></canvas>
+                </div>
                 <p>Veja mais em: <a href="https://github.com/RafaelEstevamReis/MonitoramentoRios" target="_blank">gh/MonitoramentoRios</a></p>
             </div>
 
@@ -177,6 +181,7 @@
 
         carregaHistoricoGrafico('04109F675953A131', 'chtBE01', null, 0.7);
         carregaHistoricoGrafico('9A6EE7B45495BB7F', 'chtGLLS');
+        carregaHistoricoGrafico('48B1162D47EC0FE6', 'chtCH01', null, 1.5);
 
         function carregaHistoricoGrafico(idEstacao, canvasId, nivelNormal, nivelAlerta) {
             fetch('/estacoes/lastHourly?lastHours=24&estacao=' + idEstacao)

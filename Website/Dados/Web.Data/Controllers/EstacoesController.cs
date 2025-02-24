@@ -194,7 +194,7 @@ public class EstacoesController : ControllerBase
                         .ToDictionary(o => o.Estacao, o => o.NomeEstacao);
     }
 
-    //[NonAction]
+    [NonAction]
     [HttpPost("nova")]
     public IActionResult NovaEstacao(DadosNovaEstacao dados)
     {
