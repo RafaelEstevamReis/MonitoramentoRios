@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Web.Data.DAO;
-using Web.Data.DAO.DBModels;
 
 [ApiController]
 [Route("estacoes")]
@@ -195,7 +194,7 @@ public class EstacoesController : ControllerBase
                         .ToDictionary(o => o.Estacao, o => o.NomeEstacao);
     }
 
-    [NonAction]
+    //[NonAction]
     [HttpPost("nova")]
     public IActionResult NovaEstacao(DadosNovaEstacao dados)
     {
@@ -236,10 +235,10 @@ public class EstacoesController : ControllerBase
             UltimoEnvio = converteDados(e, db.ObterRegistroEstacao(e.UltimoEnvio)),
         }));
     }
-    private DadosColetados? converteDados(TBEstacoes e, TBDadosEstacoes? dados)
+    private DadosColetados? converteDados(DAO.DBModels.TBEstacoes e, DAO.DBModels.TBDadosEstacoes? dados)
     {
         if (dados == null) return null;
-        var k = Simple.DatabaseWrapper.DataClone.MapModel<TBDadosEstacoes, DadosColetados>(dados);
+        var k = Simple.DatabaseWrapper.DataClone.MapModel<DAO.DBModels.TBDadosEstacoes, DadosColetados>(dados);
         k.NomeEstacao = e.NomeEstacao;
 
         return k;
