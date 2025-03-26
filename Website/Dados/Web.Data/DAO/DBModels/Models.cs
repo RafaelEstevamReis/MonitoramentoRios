@@ -57,6 +57,7 @@ public class TBDadosEstacoes
 
     public string RawData { get; set; } = string.Empty;
     public string IP_Origem { get; set; } = string.Empty;
+    public int Nonce { get; internal set; }
 }
 public class TBDadosEstacoesHora
 {

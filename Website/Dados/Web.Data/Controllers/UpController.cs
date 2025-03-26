@@ -101,6 +101,7 @@ public class UpController : ControllerBase
             NivelRio = dados.NivelRio,
             NivelRio_RAW = dados.NivelRio_RAW,
             ImgPath = imgPath,
+            Nonce = dados.nonce ?? 0
         };
         db.Registra(d);
     }
@@ -161,5 +162,6 @@ public class UpController : ControllerBase
         /// Imagem capturada por câmera
         /// </summary>
         public string? pic_b64 { get; set; }
+        public int? nonce { get; set; }
     }
 }
