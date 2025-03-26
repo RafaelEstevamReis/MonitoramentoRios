@@ -96,7 +96,7 @@
                     });
 
                     const tableBody = document.querySelector('#dadosEstacao tbody');
-
+                    tableBody.innerHTML = "";
                     sortedData.forEach(dado => {
                         if (dado === undefined || dado === null) return;
                         // Tabela
@@ -328,6 +328,9 @@
             </tr>
         </thead>
         <tbody>
+            <tr>
+                <td colspan="9">Carregando...</td>
+            </tr>
             <!-- Dados serão preenchidos dinamicamente aqui -->
         </tbody>
     </table>

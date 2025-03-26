@@ -57,6 +57,10 @@
             </tr>
         </thead>
         <tbody>
+            <tr>
+                <td colspan="9">Carregando...</td>
+            </tr>
+
             <!-- Dados serão preenchidos dinamicamente aqui -->
         </tbody>
     </table>
@@ -72,6 +76,7 @@
                 .then(response => response.json())
                 .then(data => {
                     const tableBody = document.querySelector('#dadosEstacao tbody');
+                    tableBody.innerHTML = "";
                     const chartData = [['Data/Hora', 'Temperatura do Ar', 'Umidade do Ar']];
                     const chartLevelData = [['Data/Hora', 'Nível']];
 
