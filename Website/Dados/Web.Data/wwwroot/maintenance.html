@@ -42,7 +42,7 @@
 
                             row.innerHTML = `
                                                 <td>${new Date(ultimo.dataHoraDadosUTC).toLocaleString()}</td>
-                                                <td>${ultimo.nomeEstacao || ultimo.estacao}</td>
+                                                <td onClick=abrirEstacao('${e.estacao}')>${e.nomeEstacao || e.estacao}</td>
                                                 <td>${formatValue(ultimo.tensaoBateria, 1)}v</td>
                                                 <td>${formatValue(ultimo.temperaturaAr, 1) || '-'}ºC | ${ultimo.umidadeAr || '-'}%</td>
                                                 <td>${lvl}</td>
@@ -52,7 +52,7 @@
                         } else {
                             row.innerHTML = `
                                                 <td>-</td>
-                                                <td>${e.nomeEstacao || e.estacao}</td>
+                                                <td onClick=abrirEstacao('${e.estacao}')>${e.nomeEstacao || e.estacao}</td>
                                                 <td>-v</td>
                                                 <td>-ºC | -%</td>
                                                 <td>-m</td>
@@ -72,6 +72,9 @@
         function copycb(value) {
             navigator.clipboard.writeText(value);
             alert("Endereço Copiado: " + value);
+        }
+        function abrirEstacao(estacao) {
+            window.open('/live.html?estacao=' + estacao, '_blank');
         }
 
         function ipCut(value, groups, def) {
