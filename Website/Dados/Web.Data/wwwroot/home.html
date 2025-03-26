@@ -109,7 +109,6 @@
     <div id="screen">
         <div id="content">
             <h1>Projeto de Monitoramento de Rios</h1>
-            <h1>Rolante-RS</h1>
 
             <h2>Estações</h2>
 
@@ -126,6 +125,9 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <tr>
+                        <td colspan="9">Carregando...</td>
+                    </tr>
                     <!-- Dados serão preenchidos dinamicamente aqui -->
                 </tbody>
             </table>
@@ -160,6 +162,7 @@
             .then(response => response.json())
             .then(data => {
                 const tableBody = document.querySelector('#ultimasLeituras tbody');
+                tableBody.innerHTML = "";
                 data.forEach(dado => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -186,7 +189,7 @@
         carregaHistoricoGrafico('48B1162D47EC0FE6', 'chtCH01', null, 1.5);
 
         function carregaHistoricoGrafico(idEstacao, canvasId, nivelNormal, nivelAlerta) {
-            fetch('/estacoes/lastHourly?lastHours=24&estacao=' + idEstacao)
+            fetch('/estacoes/lastHourly?lastHours=30&estacao=' + idEstacao)
                 .then(response => response.json())
                 .then(data => {
                     // Criar o gráfico
@@ -195,14 +198,35 @@
                     const nivelRioDataNormal = []; // Para os valores do nível do rio
                     const nivelRioDataAlerta = []; // Para os valores do nível do rio
 
-                    data.forEach(dado => {
-                        if (dado === undefined || dado === null) return;
+                    const validData = data.filter(dado => dado !== undefined && dado !== null);
 
-                        const label = dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ') + 'h';
+                    // Gerar todos os horários entre o primeiro e o último
+                    const now = new Date(); // Horário atual
+                    const endDate = new Date(now.getTime() - 1 * 60 * 60 * 1000); // Retira 1h
+                    const startDate = new Date(now.getTime() - 30 * 60 * 60 * 1000); // 24 horas atrás
+                    const allLabels = generateHourlyLabels(startDate, endDate);
+
+                    // Criar um mapa dos dados existentes para facilitar a busca
+                    const dataMap = new Map();
+                    validData.forEach(dado => {
+                        const current = new Date(dado.dataHoraDadosUTC + 'Z');
+                        const label = getDateTimeForTimezone(current, -3);
+                        dataMap.set(label, dado);
+                    });
+
+                    // Preencher os arrays com os dados, inserindo null nas janelas
+                    allLabels.forEach(label => {
                         labels.push(label);
-                        nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null);
-                        nivelRioDataNormal.push(formatValue(nivelNormal, 2) || null);
-                        nivelRioDataAlerta.push(formatValue(nivelAlerta, 2) || null);
+                        const dado = dataMap.get(label);
+                        if (dado) {
+                            nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null);
+                            nivelRioDataNormal.push(formatValue(nivelNormal, 2) || null);
+                            nivelRioDataAlerta.push(formatValue(nivelAlerta, 2) || null);
+                        } else {
+                            nivelRioData.push(null); // Janela sem dados
+                            nivelRioDataNormal.push(formatValue(nivelNormal, 2) || null); // Mantém a linha contínua se desejado
+                            nivelRioDataAlerta.push(formatValue(nivelAlerta, 2) || null); // Mantém a linha contínua se desejado
+                        }
                     });
 
                     const ctx = document.getElementById(canvasId).getContext('2d');
@@ -289,6 +313,36 @@
                     console.error('Erro ao carregar dados das estações:', error);
                 });
         }
+        function generateHourlyLabels(start, end) {
+            const labels = [];
+            let current = start;
+            const endDate = end;
+
+            while (current <= endDate) {
+                const label = getDateTimeForTimezone(current,-3);
+                labels.push(label);
+                current.setHours(current.getHours() + 1); // Incrementa 1 hora
+            }
+            return labels;
+        }
+        function getDateTimeForTimezone(current, tz) {
+            // Ajustar o horário para o timezone especificado (tz é em horas)
+            const offsetMs = tz * 60 * 60 * 1000; // Converte horas para milissegundos
+            const adjustedTime = new Date(current.getTime() + offsetMs);
+
+            // Extrair componentes da data e hora em UTC e ajustar manualmente
+            const year = adjustedTime.getUTCFullYear();
+            const month = parseInt(adjustedTime.getUTCMonth())
+            const day = String(adjustedTime.getUTCDate()).padStart(2, '0');
+            const hours = String(adjustedTime.getUTCHours()).padStart(2, '0');
+
+            const meses = ["JAN", "FEV", "MAR", "ABR", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+
+            // Formatar como "YYYY-MM-DD HHh" (sem minutos)
+            const formattedDateTime = `${day}/${meses[month]} ${hours}h`;
+
+            return formattedDateTime;
+        }
 
         /* Mapa */
         let lst = [];
@@ -360,7 +414,8 @@
 
             if (url !== null) {
                 circle.on('click', function () {
-                    window.location.href = url;
+                    //window.location.href = url;
+                    window.open(url, '_blank');
                 });
             }
 
