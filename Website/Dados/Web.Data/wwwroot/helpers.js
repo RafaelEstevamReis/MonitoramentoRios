@@ -56,3 +56,6 @@ function nullSlice(value, size, def) {
 
     return value.slice(size);
 }
+function abrirEstacao(estacao) {
+    window.open('/live.html?estacao=' + estacao, '_blank');
+}

@@ -138,15 +138,15 @@
             <div id="dvTodas">
 
                 <div class="cdvChart">
-                    <h3>Boa Esperança - Arrio Boa Esperança, Rolante-RS</h3>
+                    <h3 onclick="abrirEstacao('04109F675953A131')"><img src="Magnifying_glass_icon.svg" width=15> Boa Esperança - Arrio Boa Esperança, Rolante-RS</h3>
                     <canvas id="chtBE01"></canvas>
                 </div>
                 <div class="cdvChart">
-                    <h3>Alto Areia - Areia, Rolante-RS</h3>
+                    <h3 onclick="abrirEstacao('9A6EE7B45495BB7F')"><img src="Magnifying_glass_icon.svg" width=15> Alto Areia - Areia, Rolante-RS</h3>
                     <canvas id="chtGLLS"></canvas>
                 </div>
                 <div class="cdvChart">
-                    <h3>Chuvisqueiro - Chuvisqueiro, Riozinho-RS</h3>
+                    <h3 onclick="abrirEstacao('48B1162D47EC0FE6')"><img src="Magnifying_glass_icon.svg" width=15> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</h3>
                     <canvas id="chtCH01"></canvas>
                 </div>
                 <p>Veja mais em: <a href="https://github.com/RafaelEstevamReis/MonitoramentoRios" target="_blank">gh/MonitoramentoRios</a></p>
@@ -414,7 +414,6 @@
 
             if (url !== null) {
                 circle.on('click', function () {
-                    //window.location.href = url;
                     window.open(url, '_blank');
                 });
             }
