@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Simple.Sqlite;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -27,6 +28,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 addDatabase(builder.Services, builder.Configuration);
 
+builder.Services.AddHostedService<Web.Data.BkgWorkers.OldDataArchiver>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -52,5 +55,12 @@ void addDatabase(IServiceCollection services, Microsoft.Extensions.Configuration
     var path = configuration["Database"] ?? "data/data.db";
     var db = new Web.Data.DAO.DB(path);
     db.Setup();
+
+    //using(var cnn = ConnectionFactory.CreateConnection(path))
+    //{
+    //    cnn.Execute("VACUUM");
+    //    Log.Logger.Information("DB VACUUM Executed");
+    //}
+
     services.AddSingleton(db);
 }

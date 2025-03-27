@@ -206,6 +206,23 @@ public class DB
         return hora;
     }
 
+    internal IEnumerable<DBModels.TBDadosEstacoes> ListarAntigos(int limit = 50)
+    {
+        if (limit > 5000) limit = 5000;
+        using var cnn = db.GetConnection();
+        return cnn.Query<DBModels.TBDadosEstacoes>($"SELECT * FROM {nameof(DBModels.TBDadosEstacoes)} ORDER BY Id ASC LIMIT 0,{limit} ");
+    }
+    internal void RemoveAntigos(IEnumerable<long> ids)
+    {
+        using var cnn = db.GetConnection();
+        using var tr = cnn.BeginTransaction();
+        foreach(var id in ids)
+        {
+            tr.Execute($"DELETE FROM {nameof(DBModels.TBDadosEstacoes)} WHERE Id = @id", new { id });
+        }
+        tr.Commit();
+    }
+
     private DataAggregator.Result agregadorFiltrado(DBModels.TBDadosEstacoes[] qData, Func<DBModels.TBDadosEstacoes, decimal?> selector)
     {
         List<decimal?> valores = qData.Select(selector).Where(o => o.HasValue).ToList();
