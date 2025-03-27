@@ -27,7 +27,7 @@ public class OldDataArchiver : IHostedService, IDisposable
     public Task StartAsync(CancellationToken cancellationToken)
     {
         logger.Information("[OldDataArchiver] Iniciando serviço de limpeza de dados...");
-        _timer = new Timer(executaVerificacaoAsync, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(20));
+        _timer = new Timer(executaVerificacaoAsync, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(20));
 
         return Task.CompletedTask;
     }
