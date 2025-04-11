@@ -106,7 +106,7 @@ public class EstacoesController : ControllerBase
                     NivelRio_RAW = registrosOrdenados.FirstOrDefault(r => r.NivelRio_RAW.HasValue)?.NivelRio_RAW,
 
                     // Dados brutos
-                    RawData = registroMaisRecente.RawData
+                    //RawData = registroMaisRecente.RawData // Remove
                 };
 
                 // Atualiza o nome da estação, se disponível
