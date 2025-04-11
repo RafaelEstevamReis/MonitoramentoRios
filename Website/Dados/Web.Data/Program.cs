@@ -56,11 +56,11 @@ void addDatabase(IServiceCollection services, Microsoft.Extensions.Configuration
     var db = new Web.Data.DAO.DB(path);
     db.Setup();
 
-    //using(var cnn = ConnectionFactory.CreateConnection(path))
-    //{
-    //    cnn.Execute("VACUUM");
-    //    Log.Logger.Information("DB VACUUM Executed");
-    //}
+    using (var cnn = ConnectionFactory.CreateConnection(path))
+    {
+        cnn.Execute("VACUUM");
+        Log.Logger.Information("DB VACUUM Executed");
+    }
 
     services.AddSingleton(db);
 }
