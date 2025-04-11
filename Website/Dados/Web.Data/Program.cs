@@ -21,9 +21,10 @@ builder.Services.AddCors(options =>
     });
 });
 // Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 addDatabase(builder.Services, builder.Configuration);
@@ -44,11 +45,9 @@ app.UseCors("AllowGetMethod");
 
 app.UseStaticFiles();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
-
 
 void addDatabase(IServiceCollection services, Microsoft.Extensions.Configuration.ConfigurationManager configuration)
 {
