@@ -25,6 +25,10 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
 });
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true; // Não faz diferença, HTTPS no proxy
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 addDatabase(builder.Services, builder.Configuration);
@@ -43,6 +47,7 @@ app.UseSwaggerUI();
 // Habilita o CORS para todas as rotas com a política "AllowGetMethod"
 app.UseCors("AllowGetMethod");
 
+app.UseResponseCompression();
 app.UseStaticFiles();
 app.UseAuthorization();
 app.MapControllers();
