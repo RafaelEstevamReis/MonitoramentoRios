@@ -7,6 +7,8 @@
     <script src="chart.js"></script>
 
     <script>
+        var chartObject = null;
+
         document.addEventListener("DOMContentLoaded", function () {
             updateContent();
             carregaAgregado();
@@ -86,7 +88,15 @@
         }
 
         function carregaHistorico() {
-            fetch('/estacoes/lastHourly?lastHours=24&estacao=' + getQueryParam("estacao"))
+            var cboHoras = document.getElementById("cboIntervaloHoras");
+            const tableBody = document.querySelector('#dadosEstacao tbody');
+            tableBody.innerHTML = "";
+
+            const chart = document.getElementById('nivelRioChart');
+            chart.innerHTML = "";
+            if (chartObject != null) chartObject.destroy();
+
+            fetch('/estacoes/lastHourly?lastHours=' + cboHoras.value + '&estacao=' + getQueryParam("estacao"))
                 .then(response => response.json())
                 .then(data => {
                     const sortedData = data.slice().sort((a, b) => {
@@ -95,7 +105,6 @@
                         return new Date(b.dataHoraDadosUTC) - new Date(a.dataHoraDadosUTC);
                     });
 
-                    const tableBody = document.querySelector('#dadosEstacao tbody');
                     tableBody.innerHTML = "";
                     sortedData.forEach(dado => {
                         if (dado === undefined || dado === null) return;
@@ -128,8 +137,9 @@
                         nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null); // Adicionar null se não houver dados
                     });
 
-                    const ctx = document.getElementById('nivelRioChart').getContext('2d');
-                    new Chart(ctx, {
+                    chart.innerHTML = "";
+                    const ctx = chart.getContext('2d');
+                    chartObject = new Chart(ctx, {
                         type: 'line',
                         data: {
                             labels: labels, // Usar os rótulos preparados
@@ -312,6 +322,16 @@
     </div>
 
     <br /> <hr /> <br />
+    <div>
+        <span>Intervalo:</span>
+        <select onchange="carregaHistorico()" id="cboIntervaloHoras">
+            <option value="24" selected>24 horas</option>
+            <option value="36">36 horas</option>
+            <option value="48">48 horas</option>
+            <option value="168">7 dias</option>
+            <option value="720">30 dias</option>
+        </select>
+    </div>
 
     <table id="dadosEstacao">
         <thead>
