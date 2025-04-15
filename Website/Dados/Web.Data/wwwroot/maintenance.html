@@ -30,38 +30,47 @@
                 .then(data => {
                     const tableBody = document.querySelector('#dadosEstacoes tbody');
                     data.forEach(e => {
-                        const ultimo = e.ultimoEnvio;
                         const row = document.createElement('tr');
 
-                        if (ultimo !== null) {
-                            let lvl = ultimo.nivelRio === null ? '-m' : `${formatValue(ultimo.nivelRio, 1)}m (r${formatValue(ultimo.nivelRio_RAW, 1)})`;
+                        try {
+                            const ultimo = e.ultimoEnvio;
 
-                            let rawData = JSON.parse(ultimo.rawData);
-                            const ipStr = rawData.ip === null || rawData.ip === undefined ? '-' : `${ipCut(rawData.ip, 2, '-')} @${nullSlice(rawData.mac, -5, '-')}`;
-                            const ipAddrFuncCopy = rawData === null || rawData.ip === null || rawData.ip === undefined ? '' : `onClick='copycb("http://${rawData.ip}")'`;
+                            if (ultimo) {
+                                let lvl = ultimo.nivelRio == null ? '-m' : `${formatValue(ultimo.nivelRio, 1)}m (r${formatValue(ultimo.nivelRio_RAW, 1)})`;
 
-                            row.innerHTML = `
-                                                <td>${new Date(ultimo.dataHoraDadosUTC).toLocaleString()}</td>
-                                                <td onClick=abrirEstacao('${e.estacao}')>${e.nomeEstacao || e.estacao}</td>
-                                                <td>${formatValue(ultimo.tensaoBateria, 1)}v</td>
-                                                <td>${formatValue(ultimo.temperaturaAr, 1) || '-'}ºC | ${ultimo.umidadeAr || '-'}%</td>
-                                                <td>${lvl}</td>
-                                                <td>${wifiSignalToPercent(ultimo.forcaSinal)} @${rawData.bssid.slice(-5)}</td>
-                                                <td ${ipAddrFuncCopy}>${ipStr}</td>
-                                             `;
-                        } else {
-                            row.innerHTML = `
-                                                <td>-</td>
-                                                <td onClick=abrirEstacao('${e.estacao}')>${e.nomeEstacao || e.estacao}</td>
-                                                <td>-v</td>
-                                                <td>-ºC | -%</td>
-                                                <td>-m</td>
-                                                <td>-</td>
-                                                <td>-</td>
-                                             `;
+                                let rawData = JSON.parse(ultimo.rawData);
+                                const ipStr = rawData.ip === null || rawData.ip === undefined ? '-' : `${ipCut(rawData.ip, 2, '-')} @${nullSlice(rawData.mac, -5, '-')}`;
+                                const ipAddrFuncCopy = rawData === null || rawData.ip === null || rawData.ip === undefined ? '' : `onClick='copycb("http://${rawData.ip}")'`;
+
+                                row.innerHTML =
+                                `
+                                    <td>${new Date(ultimo.dataHoraDadosUTC).toLocaleString()}</td>
+                                    <td onClick=abrirEstacao('${e.estacao}')>${e.nomeEstacao || e.estacao}</td>
+                                    <td>${formatValue(ultimo.tensaoBateria, 1)}v</td>
+                                    <td>${formatValue(ultimo.temperaturaAr, 1) || '-'}ºC | ${ultimo.umidadeAr || '-'}%</td>
+                                    <td>${lvl}</td>
+                                    <td>${wifiSignalToPercent(ultimo.forcaSinal)} @${rawData.bssid.slice(-5)}</td>
+                                    <td ${ipAddrFuncCopy}>${ipStr}</td>
+                                `;
+                            } else {
+                                row.innerHTML =
+                                `
+                                    <td>-</td>
+                                    <td onClick=abrirEstacao('${e.estacao}')>${e.nomeEstacao || e.estacao}</td>
+                                    <td>-v</td>
+                                    <td>-ºC | -%</td>
+                                    <td>-m</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                `;
+                            }
+                            tableBody.appendChild(row);
+                            setColor(row, e.nomeEstacao);
+                        } catch (error) {
+                            console.error(error);
+                            row.innerHTML = `<td>[ERROR]</td><td colspan=6>${error}</td>`;
+                            tableBody.appendChild(row);
                         }
-                        tableBody.appendChild(row);
-                        setColor(row, e.nomeEstacao);
                     });
                 })
                 .catch(error => {
