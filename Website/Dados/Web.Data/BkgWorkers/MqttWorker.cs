@@ -164,7 +164,9 @@ public class MqttWorker : IHostedService, IDisposable
         var estacoesRegistrar = new List<DAO.DBModels.TBDadosEstacoes>();
         foreach (var linha in linhas)
         {
-            var dadosEstacao = serializaDadosEstacao(estacoes, linha, $"!{jsonEvent.from:x2}");
+            string from = $"!{jsonEvent.from:x2}";
+            logger.Information("[LoRa] Recebido dados de {from} {linha} ", from, linha);
+            var dadosEstacao = serializaDadosEstacao(estacoes, linha, from);
             dadosEstacao = dadosEstacao;
             estacoesRegistrar.Add(dadosEstacao);
         }
@@ -178,7 +180,11 @@ public class MqttWorker : IHostedService, IDisposable
                                               .Where(o => (DateTime.UtcNow - o.RecebidoUTC).TotalMinutes < 60)
                                               .Select(o => o.Nonce)
                                               .ToHashSet();
-            if (nonces.Contains(e.Nonce)) continue; // Já tem
+            if (nonces.Contains(e.Nonce))
+            {
+                logger.Information("[LoRa] NonceSkip {estacao} r={nonce} ", e.Estacao, e.Nonce);
+                continue; // Já tem
+            }
             // Registra
             db.Registra(e);
         }
