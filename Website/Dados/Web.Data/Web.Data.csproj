@@ -14,6 +14,7 @@
 		<PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
 		<PackageReference Include="Simple.Sqlite" Version="1.4.1" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+		<PackageReference Include="MQTTnet" Version="5.0.1.1416" />
 	</ItemGroup>
 
 </Project>

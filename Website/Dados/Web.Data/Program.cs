@@ -34,6 +34,13 @@ builder.Services.AddSwaggerGen();
 addDatabase(builder.Services, builder.Configuration);
 
 builder.Services.AddHostedService<Web.Data.BkgWorkers.OldDataArchiver>();
+builder.Services.AddHostedService(i =>
+{
+    var host = builder.Configuration["mqtt_server"];
+    var user = builder.Configuration["mqtt_user"];
+    var pass = builder.Configuration["mqtt_pass"];
+    return new Web.Data.BkgWorkers.MqttWorker(i.GetService<ILogger>(), i.GetService<Web.Data.DAO.DB>(), host, user, pass);
+});
 
 var app = builder.Build();
 
