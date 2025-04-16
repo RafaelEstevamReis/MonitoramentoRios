@@ -166,7 +166,7 @@ public class MqttWorker : IHostedService, IDisposable
         {
             string from = $"!{jsonEvent.from:x2}";
             logger.Information("[LoRa] Recebido dados de {from} {linha} ", from, linha);
-            var dadosEstacao = serializaDadosEstacao(estacoes, linha, from);
+            var dadosEstacao = serializaDadosEstacao(jsonEvent, estacoes, linha, from);
             dadosEstacao = dadosEstacao;
             estacoesRegistrar.Add(dadosEstacao);
         }
@@ -190,7 +190,7 @@ public class MqttWorker : IHostedService, IDisposable
         }
     }
 
-    private DAO.DBModels.TBDadosEstacoes serializaDadosEstacao(DAO.DBModels.TBEstacoes[] estacoes, string linha, string nodeFrom)
+    private DAO.DBModels.TBDadosEstacoes serializaDadosEstacao(JsonEvent jsonEvent, DAO.DBModels.TBEstacoes[] estacoes, string linha, string nodeFrom)
     {
         var dRow = linha.Split(':');
         string nome = dRow[0];
@@ -205,6 +205,7 @@ public class MqttWorker : IHostedService, IDisposable
             type = "loraMQTT",
             RawData = linha,
             IP_Origem = nodeFrom,
+            DataHoraDadosUTC = DateTime.UnixEpoch.AddSeconds(jsonEvent.timestamp),
         };
 
         // WL=0.1;vB=4.22;Tp=22.5;Hd=93.0;sg=-85.0;r=695
