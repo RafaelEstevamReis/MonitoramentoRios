@@ -54,7 +54,7 @@ public class EstacoesController : ControllerBase
         {
             if (dicEstacoes.TryGetValue(i.Estacao, out string? value)) i.NomeEstacao = value;
             if (i.TemperaturaInterna.HasValue) i.TemperaturaInterna = Math.Round(i.TemperaturaInterna ?? 0, 1);
-            i.RawData = string.Empty;
+            i.RawData = null;
         }
         return lst;
     }
@@ -250,6 +250,7 @@ public class EstacoesController : ControllerBase
         public DateTime RecebidoUTC { get; set; }
         public string Estacao { get; set; } = string.Empty;
         public string NomeEstacao { get; set; } = string.Empty;
+        public string type { get; set; } = string.Empty;
         // Dados Internos
         public DateTime DataHoraDadosUTC { get; set; }
         public decimal? ForcaSinal { get; set; }
@@ -263,7 +264,7 @@ public class EstacoesController : ControllerBase
         public decimal? Precipitacao { get; set; }
         public decimal? NivelRio { get; set; }
         public decimal? NivelRio_RAW { get; set; }
-        public string RawData { get; set; } = string.Empty;
+        public string? RawData { get; set; } = string.Empty;
     }
     public class DadosNovaEstacao
     {
