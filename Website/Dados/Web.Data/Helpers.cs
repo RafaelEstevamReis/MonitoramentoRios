@@ -33,4 +33,6 @@ public static class Helpers
         if (value == null) return null;
         return Math.Round(value.Value, decimals);
     }
+
+    public static decimal ToDecimal(this string value) => decimal.Parse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture);
 }
