@@ -68,6 +68,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            const loraIcon = "<img src='lora.svg' style='height:24px;margin-left:4px;vertical-align: middle;'>";
             let temNivel = false;
             let temTemp = false;
             // Carregar gráfico após carregar os dados
@@ -86,7 +87,7 @@
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                            <td>${new Date(dado.recebidoUTC).toLocaleString()}</td>
+                                            <td>${new Date(dado.recebidoUTC).toLocaleString()}${dado.type == 'loraMQTT' ? loraIcon : ''}</td>
                                             <td>${formatValue(dado.temperaturaInterna, 1)}ºC</td>
                                             <td>${formatValue(dado.tensaoBateria, 2)}v (${formatValue(dado.percentBateria, 0)}%)</td>
                                             <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
