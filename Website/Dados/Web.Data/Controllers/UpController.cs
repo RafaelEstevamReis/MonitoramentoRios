@@ -7,6 +7,7 @@ using Serilog;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Web.Data.DAO;
 
@@ -88,6 +89,7 @@ public class UpController : ControllerBase
             type = dados.type,
             RawData = rawJson,
             IP_Origem = ipOrigem,
+            Source = ipOrigem.StartsWith("192") ? DAO.DBModels.TBDadosEstacoes.DataSource.Lan : DAO.DBModels.TBDadosEstacoes.DataSource.Internet,
             // Internos
             ForcaSinal = dados.ForcaSinal,
             DataHoraDadosUTC = dados.DataHoraDadosUTC ?? DateTime.UtcNow,
@@ -104,6 +106,9 @@ public class UpController : ControllerBase
             Nonce = dados.nonce ?? 0
         };
         db.Registra(d);
+
+        var roj = JsonNode.Parse(rawJson);
+        db.AtualizaEstacao(estacao, roj?["mac"]?.ToString() ?? "", roj?["ip"]?.ToString() ?? "");
     }
 
     private string salvaImagem(string estacao, byte[] rawData, string ipOrigem)

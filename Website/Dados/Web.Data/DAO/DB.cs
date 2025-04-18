@@ -30,8 +30,7 @@ public class DB
             executaMigrations(cnn, result);
         }
 
-        //cnn.Execute($"DELETE FROM {nameof(DBModels.TBDadosEstacoesHora)} WHERE NivelRio_AVG is NULL");
-
+        // Gera cache de Keys
         var allKeys = cnn.Query<string>($"SELECT {nameof(DBModels.TBEstacoes.ApiKEY)} FROM {nameof(DBModels.TBEstacoes)}");
         foreach (var k in allKeys) apiKeys.Add(k);
     }
@@ -41,7 +40,7 @@ public class DB
         var migEstacoes = result.FirstOrDefault(o => o.TableName == nameof(DBModels.TBEstacoes));
         if (migEstacoes != null && migEstacoes.ColumnsAdded.Length > 0)
         {
-            // 20241217 - Adiciona uLtimos envios
+            // 20241217 - Adiciona Ultimos envios
             if (migEstacoes.ColumnsAdded.Any(c => c == "UltimoEnvio")) // Criou a últimos envios
             {
                 var reg = cnn.Query<DBModels.TBEstacoes>("SELECT Estacao, MAX(Id) as Id FROM TBDadosEstacoes GROUP BY Estacao");
@@ -54,6 +53,31 @@ public class DB
                         estacao = estacao.Estacao,
                     });
                 }
+            }
+        }
+        var migDados = result.FirstOrDefault(o => o.TableName == nameof(DBModels.TBDadosEstacoes));
+        if (migDados != null && migDados.ColumnsAdded.Length > 0)
+        {
+            // 20250418 - Adiciona DataSource
+            if (migDados.ColumnsAdded.Any(c => c == "Source")) // Criou a últimos envios
+            {
+                // Geral
+                cnn.Execute($"UPDATE {nameof(DBModels.TBDadosEstacoes)} SET {nameof(DBModels.TBDadosEstacoes.Source)} = @src ", new
+                {
+                    src = DBModels.TBDadosEstacoes.DataSource.Internet
+                });
+                // Estação RB fica na LAN
+                cnn.Execute($"UPDATE {nameof(DBModels.TBDadosEstacoes)} SET {nameof(DBModels.TBDadosEstacoes.Source)} = @src WHERE {nameof(DBModels.TBDadosEstacoes.Estacao)} = @estacao ", new
+                {
+                    src = DBModels.TBDadosEstacoes.DataSource.Lan,
+                    estacao = "BB45660B199C5677",
+                });
+                // {type = "loraMQTT"}
+                cnn.Execute($"UPDATE {nameof(DBModels.TBDadosEstacoes)} SET {nameof(DBModels.TBDadosEstacoes.Source)} = @src WHERE {nameof(DBModels.TBDadosEstacoes.type)} = @type ", new
+                {
+                    src = DBModels.TBDadosEstacoes.DataSource.LoraMQTT,
+                    type = "loraMQTT",
+                });
 
             }
         }
@@ -216,7 +240,7 @@ public class DB
     {
         using var cnn = db.GetConnection();
         using var tr = cnn.BeginTransaction();
-        foreach(var id in ids)
+        foreach (var id in ids)
         {
             tr.Execute($"DELETE FROM {nameof(DBModels.TBDadosEstacoes)} WHERE Id = @id", new { id });
         }
@@ -267,4 +291,24 @@ public class DB
         apiKeys.Add(estacao.ApiKEY);
     }
 
+    public void AtualizaEstacao(string estacao, string mac, string ipOrigem)
+    {
+        ulong s;
+        int la;
+
+        try
+        {
+            s = Convert.ToUInt64(mac.Replace(":",""), 16);
+            la = int.Parse(ipOrigem.Split('.')[^1]);
+        }
+        catch (FormatException) { return; } // Não mexe
+
+        using var cnn = db.GetConnection();
+        cnn.Execute($"UPDATE {nameof(DBModels.TBEstacoes)} SET Serial = @s, LA = @la WHERE Estacao = @estacao", new
+        {
+            s,
+            la,
+            estacao
+        });
+    }
 }

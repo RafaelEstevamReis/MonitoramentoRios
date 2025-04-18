@@ -251,6 +251,7 @@ public class EstacoesController : ControllerBase
         public string Estacao { get; set; } = string.Empty;
         public string NomeEstacao { get; set; } = string.Empty;
         public string type { get; set; } = string.Empty;
+        public int Source { get; set; }
         // Dados Internos
         public DateTime DataHoraDadosUTC { get; set; }
         public decimal? ForcaSinal { get; set; }

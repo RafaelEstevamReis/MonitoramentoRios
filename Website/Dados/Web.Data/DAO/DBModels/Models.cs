@@ -16,11 +16,21 @@ public class TBEstacoes
     public string ApiKEY { get; set; } = string.Empty;
     public string NomeResponsavel { get; set; } = string.Empty;
     public string NomeEstacao { get; set; } = string.Empty;
+    public ulong Serial { get; set; }
+    public int LA { get; set; }
     public long UltimoEnvio { get; set; }
 }
 
 public class TBDadosEstacoes
 {
+    public enum DataSource
+    {
+        Internet = 0,
+        Lan = 1,
+
+        LoraMQTT = 3,
+    }
+
     [PrimaryKey]
     public long Id { get; set; }
     public DateTime RecebidoUTC { get; set; }
@@ -58,6 +68,8 @@ public class TBDadosEstacoes
     public string RawData { get; set; } = string.Empty;
     public string IP_Origem { get; set; } = string.Empty;
     public int Nonce { get; internal set; }
+
+    public DataSource Source { get; set; } = DataSource.Internet;
 }
 public class TBDadosEstacoesHora
 {
