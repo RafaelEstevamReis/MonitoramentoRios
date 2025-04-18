@@ -22,6 +22,7 @@ public class EstacoesController : ControllerBase
     [HttpGet("dados")]
     public IEnumerable<DadosColetados> ListarDados(string? estacao = null, int limit = 64)
     {
+        // Converte nome da estação para key
         if (estacao != null && estacao.Length == 9 && estacao[4] == '-')
         {
             if (dicEstacoesNomesId.TryGetValue(estacao, out string? value) && value != null)

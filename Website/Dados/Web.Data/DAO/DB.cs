@@ -95,7 +95,8 @@ public class DB
     }
     public IEnumerable<DBModels.TBDadosEstacoes> ListarDados(string? estacao = null, int limit = 50)
     {
-        if (limit > 512) limit = 512;
+        var ceiling = estacao == null ? 256 : 512;
+        if (limit > ceiling) limit = ceiling;
 
         using var cnn = db.GetConnection();
 
@@ -298,7 +299,7 @@ public class DB
 
         try
         {
-            s = Convert.ToUInt64(mac.Replace(":",""), 16);
+            s = Convert.ToUInt64(mac.Replace(":", ""), 16);
             la = int.Parse(ipOrigem.Split('.')[^1]);
         }
         catch (FormatException) { return; } // Não mexe

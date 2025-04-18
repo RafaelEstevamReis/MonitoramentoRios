@@ -72,7 +72,7 @@
             let temNivel = false;
             let temTemp = false;
             // Carregar gráfico após carregar os dados
-            fetch('/estacoes/dados?estacao=' + getQueryParam("estacao"))
+            fetch('/estacoes/dados?limit=300&estacao=' + getQueryParam("estacao"))
                 //fetch('https://monitorarios.xyz/estacoes/dados?estacao=' + getQueryParam("estacao"), { mode: 'no-cors' })
                 .then(response => response.json())
                 .then(data => {
