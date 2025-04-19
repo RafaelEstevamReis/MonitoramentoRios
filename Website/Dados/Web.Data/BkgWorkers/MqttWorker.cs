@@ -151,7 +151,7 @@ public class MqttWorker : IHostedService, IDisposable
         if (l[4] != '-') return false;
         if (l[9] != ':') return false;
 
-        if (!l.Contains(";sg=-")) return false; // tem nível de sinal
+        if (!l.Contains(";sg=")) return false; // tem nível de sinal
         if (!l.Contains(";r=")) return false; // tem nonce
 
         return true;
