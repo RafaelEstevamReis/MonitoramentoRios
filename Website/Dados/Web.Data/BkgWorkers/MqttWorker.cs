@@ -136,9 +136,12 @@ public class MqttWorker : IHostedService, IDisposable
 
     private async Task processaMensagemTexto(MqttApplicationMessageReceivedEventArgs args, string topic, JsonEvent jsonEvent, string text)
     {
+        if (!text.Contains(':')) return; // Não é
+
         var lines = text.Replace("\r", "")
                         .Split('\n')
-                        .Where(ehLinhaEstacao);
+                        .Where(ehLinhaEstacao)
+                        .ToArray();
         await gravaDadosEstacoes(topic, jsonEvent, lines);
     }
     private bool ehLinhaEstacao(string l)
@@ -156,18 +159,19 @@ public class MqttWorker : IHostedService, IDisposable
 
         return true;
     }
-    private async Task gravaDadosEstacoes(string topic, JsonEvent jsonEvent, IEnumerable<string> linhas)
+    private async Task gravaDadosEstacoes(string topic, JsonEvent jsonEvent, string[] linhas)
     {
+        if (linhas.Length == 0) return;
         var estacoes = db.ListarEstacoes()
                          .OrderByDescending(o => o.UltimoEnvio)
                          .ToArray();
+
         var estacoesRegistrar = new List<DAO.DBModels.TBDadosEstacoes>();
         foreach (var linha in linhas)
         {
             string from = $"!{jsonEvent.from:x2}";
             logger.Information("[LoRa] Recebido dados de {from} {linha} ", from, linha);
             var dadosEstacao = serializaDadosEstacao(jsonEvent, estacoes, linha, from);
-            dadosEstacao = dadosEstacao;
             estacoesRegistrar.Add(dadosEstacao);
         }
         if (estacoesRegistrar.Count == 0) return;
