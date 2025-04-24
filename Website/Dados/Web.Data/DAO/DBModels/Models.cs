@@ -55,6 +55,7 @@ public class TBDadosEstacoes
     public decimal? UmidadeAr { get; set; }
     public decimal? PressaoAr { get; set; }
     public decimal? Precipitacao { get; set; } // Atual em mm/min
+    public decimal? Precipitacao10min { get; set; }
     /// <summary>
     /// Medição calibrada
     /// </summary>

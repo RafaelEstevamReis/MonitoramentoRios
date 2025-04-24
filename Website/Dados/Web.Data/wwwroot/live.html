@@ -119,6 +119,7 @@
                                                 <td>${formatValue(dado.umidadeAr_AVG, 1) || '-'}%</td>
                                                 <td>${formatValue(dado.pressaoAr_AVG, 1) || '-'}hPa</td>
                                                 <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
+                                                <td>${formatValue(dado.precipitacao_AVG, 1) || '-'}mm/min</td>
                                                 <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG, 0) || '-'}dBm)</td>
                                                 `;
                         tableBody.appendChild(row);
@@ -344,6 +345,7 @@
                 <th width="100px">Umidade do Ar</th>
                 <th width="100px">Pressão do Ar</th>
                 <th>Nível da Água</th>
+                <th>Precipitação</th>
                 <th>Sinal Conexão</th>
             </tr>
         </thead>
