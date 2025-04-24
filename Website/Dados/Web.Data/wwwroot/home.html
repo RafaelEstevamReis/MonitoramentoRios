@@ -35,9 +35,9 @@
             overflow: auto; /* Permite o scroll */
         }
 
-        #content a, a:visited{
-            color: beige
-        }
+            #content a, a:visited {
+                color: beige
+            }
 
         @media(max-width: 710px) {
             #map {
@@ -45,6 +45,7 @@
                 width: 100%;
                 min-width: 300px;
             }
+
             #screen {
                 display: flex;
                 flex-direction: column-reverse;
@@ -52,6 +53,7 @@
                 height: 100%;
                 overflow: auto; /* Permite o scroll */
             }
+
             .btn, .btn:visited {
                 padding: 4px 16px;
                 font-size: 8px;
@@ -166,14 +168,14 @@
                 data.forEach(dado => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                                    <td>${dado.nomeEstacao || dado.estacao}</td>
-                                    <td>${formatValue(dado.percentBateria, 0)}%</td>
-                                    <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
-                                    <td>${formatValue(dado.temperaturaAr, 1)}ºC</td>
-                                    <td>${formatValue(dado.umidadeAr, 1)}%</td>
-                                    <td>${formatValueUnit(dado.nivelRio, 1, 'm')}</td>
-                                    <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
-                                `;
+                                        <td>${dado.nomeEstacao || dado.estacao}</td>
+                                        <td>${formatValue(dado.percentBateria, 0)}%</td>
+                                        <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
+                                        <td>${formatValue(dado.temperaturaAr, 1)}ºC</td>
+                                        <td>${formatValue(dado.umidadeAr, 1)}%</td>
+                                        <td>${formatValueUnit(dado.nivelRio, 1, 'm')}</td>
+                                        <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
+                                    `;
                     tableBody.appendChild(row);
                     //setColor(row, dado.nomeEstacao);
                 });
@@ -319,7 +321,7 @@
             const endDate = end;
 
             while (current <= endDate) {
-                const label = getDateTimeForTimezone(current,-3);
+                const label = getDateTimeForTimezone(current, -3);
                 labels.push(label);
                 current.setHours(current.getHours() + 1); // Incrementa 1 hora
             }
@@ -367,6 +369,7 @@
         adicionaEstacao(-29.590, -50.565, noSigSvg, "9A6EE7B45495BB7F"); // RSRL-GLLS
         adicionaEstacao(-29.640, -50.540, noSigSvg, "BB45660B199C5677"); // RSRL-RB01
         adicionaEstacao(-29.565, -50.415, noSigSvg, "48B1162D47EC0FE6"); // RSRZ-CH01
+        adicionaEstacao(-29.505, -50.405, noSigSvg, "5BA69743261D364A"); // RSFP-RK01
 
         fetch('/estacoes/ultimos')
             .then(response => response.json())
@@ -376,7 +379,10 @@
                     if (dado.nivelRio === null && dado.temperaturaAr === null) {
                         text = `?/?`;
                     } else if (dado.nivelRio === null || dado.nivelRio === undefined) {
-                        text = `${formatValue(dado.temperaturaAr,1)}ºC`;
+                        text = `${formatValue(dado.temperaturaAr, 1)}ºC`;
+                    }
+                    else if (dado.precipitacao) {
+                        text = `${formatValue(dado.temperaturaAr, 1)}ºC<br>${formatValue(dado.precipitacao, 1)}mm/min`;
                     } else {
                         text = `${formatValue(dado.temperaturaAr, 1)}ºC<br>${formatValue(dado.nivelRio, 1)}m`;
                     }

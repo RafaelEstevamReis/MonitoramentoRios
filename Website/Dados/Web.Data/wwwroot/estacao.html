@@ -93,7 +93,7 @@
                                             <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
                                             <td>${formatValue(dado.temperaturaAr, 1)}ºC</td>
                                             <td>${dado.umidadeAr || '-'}%</td>
-                                            <td>${dado.precipitacao || '-'}</td>
+                                            <td>${formatValue(dado.precipitacao, 1) || '-'}mm/min</td>
                                             <td>${formatValue(dado.nivelRio, 2) || '-'}m</td>
                                             <td>${wifiSignalToPercent(dado.forcaSinal)} (${dado.forcaSinal || '-'}dBm)</td>
                                         `;

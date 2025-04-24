@@ -34,7 +34,7 @@
                     setValue('clMinPres', `${formatValue(min.pressaoAr, 1)}hPa`);
                     // Medição
                     setValue('clMinLevel', `${formatValue(min.nivelRio, 3) || '-'}m`);
-                    setValue('clMinRain', `${min.precipitacao || '-'}`);
+                    setValue('clMinRain', `${formatValue(min.precipitacao, 1) || '-'}mm/min`);
 
                     const max = data.max;
                     // Dados Estação
@@ -47,7 +47,7 @@
                     setValue('clMaxPres', `${formatValue(max.pressaoAr, 1)}hPa`);
                     // Medição
                     setValue('clMaxLevel', `${formatValue(max.nivelRio, 3) || '-'}m`);
-                    setValue('clMaxRain', `${max.precipitacao || '-'}`);
+                    setValue('clMaxRain', `${formatValue(max.precipitacao, 1) || '-'}mm/min`);
 
                 })
                 .catch(error => {
@@ -73,7 +73,7 @@
                     setValue('clPres', `${formatValue(dado.pressaoAr, 1)}hPa`);
                     // Medição
                     setValue('clLevel', `${formatValue(dado.nivelRio, 3) || '-'}m`);
-                    setValue('clRain', `${dado.precipitacao || '-'}`);
+                    setValue('clRain', `${formatValue(dado.precipitacao,1) || '-'}mm/min`);
 
                 })
                 .catch(error => {
