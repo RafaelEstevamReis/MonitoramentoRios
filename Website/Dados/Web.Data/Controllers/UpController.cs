@@ -100,6 +100,7 @@ public class UpController : ControllerBase
             TemperaturaAr = dados.TemperaturaAr,
             UmidadeAr = dados.UmidadeAr,
             PressaoAr = dados.PressaoAr,
+            Precipitacao = dados.Precipitacao,
             NivelRio = dados.NivelRio,
             NivelRio_RAW = dados.NivelRio_RAW,
             ImgPath = imgPath,
@@ -155,6 +156,7 @@ public class UpController : ControllerBase
         public decimal? TemperaturaAr { get; set; }
         public decimal? UmidadeAr { get; set; }
         public decimal? PressaoAr { get; set; }
+        public decimal? Precipitacao { get; set; }
         /// <summary>
         /// Medição calibrada
         /// </summary>
