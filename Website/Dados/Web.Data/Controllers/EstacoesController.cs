@@ -91,6 +91,7 @@ public class EstacoesController : ControllerBase
                     Estacao = registroMaisRecente.Estacao,
                     NomeEstacao = registroMaisRecente.NomeEstacao,
                     DataHoraDadosUTC = registroMaisRecente.DataHoraDadosUTC,
+                    Source = registroMaisRecente.Source,
 
                     // Dados internos
                     ForcaSinal = registrosOrdenados.FirstOrDefault(r => r.ForcaSinal.HasValue)?.ForcaSinal,
@@ -103,6 +104,7 @@ public class EstacoesController : ControllerBase
                     UmidadeAr = registrosOrdenados.FirstOrDefault(r => r.UmidadeAr.HasValue)?.UmidadeAr,
                     PressaoAr = registrosOrdenados.FirstOrDefault(r => r.PressaoAr.HasValue)?.PressaoAr,
                     Precipitacao = registrosOrdenados.FirstOrDefault(r => r.Precipitacao.HasValue)?.Precipitacao,
+                    Precipitacao10m = registrosOrdenados.FirstOrDefault(r => r.Precipitacao10m.HasValue)?.Precipitacao,
                     NivelRio = registrosOrdenados.FirstOrDefault(r => r.NivelRio.HasValue)?.NivelRio,
                     NivelRio_RAW = registrosOrdenados.FirstOrDefault(r => r.NivelRio_RAW.HasValue)?.NivelRio_RAW,
 
@@ -264,6 +266,7 @@ public class EstacoesController : ControllerBase
         public decimal? UmidadeAr { get; set; }
         public decimal? PressaoAr { get; set; }
         public decimal? Precipitacao { get; set; }
+        public decimal? Precipitacao10m { get; set; }
         public decimal? NivelRio { get; set; }
         public decimal? NivelRio_RAW { get; set; }
         public string? RawData { get; set; } = string.Empty;
