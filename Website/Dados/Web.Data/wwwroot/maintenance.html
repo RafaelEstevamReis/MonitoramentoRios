@@ -36,11 +36,11 @@
                             const ultimo = e.ultimoEnvio;
 
                             if (ultimo) {
-                                let lvl = ultimo.nivelRio == null ? '-m' : `${formatValue(ultimo.nivelRio, 1)}m (r${formatValue(ultimo.nivelRio_RAW, 1)})`;
+                                let lvl = ultimo.nivelRio ? '-m' : `${formatValue(ultimo.nivelRio, 1)}m (r${formatValue(ultimo.nivelRio_RAW, 1)})`;
 
-                                let rawData = JSON.parse(ultimo.rawData);
-                                const ipStr = rawData.ip === null || rawData.ip === undefined ? '-' : `${ipCut(rawData.ip, 2, '-')} @${nullSlice(rawData.mac, -5, '-')}`;
-                                const ipAddrFuncCopy = rawData === null || rawData.ip === null || rawData.ip === undefined ? '' : `onClick='copycb("http://${rawData.ip}")'`;
+                                let rawData = ultimo.rawData.startsWith('{') ? JSON.parse(ultimo.rawData) : { };
+                                const ipStr = `${ipCut(rawData.ip, 2, e.la)} @${nullSlice(rawData.mac, -5, e.serial)}`;
+                                const ipAddrFuncCopy = rawData && rawData.ip ? `onClick='copycb("http://${rawData.ip}")'` : '';
 
                                 row.innerHTML =
                                 `
@@ -49,7 +49,7 @@
                                     <td>${formatValue(ultimo.tensaoBateria, 1)}v</td>
                                     <td>${formatValue(ultimo.temperaturaAr, 1) || '-'}ºC | ${ultimo.umidadeAr || '-'}%</td>
                                     <td>${lvl}</td>
-                                    <td>${wifiSignalToPercent(ultimo.forcaSinal)} @${rawData.bssid.slice(-5)}</td>
+                                    <td>${wifiSignalToPercent(ultimo.forcaSinal)} @${nullSlice(rawData.bssid,-5,'')}</td>
                                     <td ${ipAddrFuncCopy}>${ipStr}</td>
                                 `;
                             } else {

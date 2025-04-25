@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa das Estações</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="chart.js"></script>
@@ -118,10 +119,10 @@
                 <thead>
                     <tr>
                         <th>Estação</th>
-                        <th>Bateria</th>
-                        <th>Sinal</th>
-                        <th width="100px">Temperatura</th>
-                        <th width="100px">Umidade</th>
+                        <th></th>
+                        <th></th>
+                        <th>Ar</th>
+                        <th>Água</th>
                         <th>Nível da Água</th>
                         <th></th>
                     </tr>
@@ -140,15 +141,23 @@
             <div id="dvTodas">
 
                 <div class="cdvChart">
-                    <h3><span onclick="abrirEstacao('04109F675953A131')"><img src="Magnifying_glass_icon.svg" width=15> Boa Esperança - Arrio Boa Esperança, Rolante-RS</span></h3>
+                    <h3>
+                        <span onclick="abrirEstacao('04109F675953A131')">
+                            <i class="bi-search"></i> Boa Esperança - Arrio Boa Esperança, Rolante-RS
+                        </span>
+                    </h3>
                     <canvas id="chtBE01"></canvas>
                 </div>
                 <div class="cdvChart">
-                    <h3><span onclick="abrirEstacao('9A6EE7B45495BB7F')"><img src="Magnifying_glass_icon.svg" width=15> Alto Areia - Areia, Rolante-RS</span></h3>
+                    <h3>
+                        <span onclick="abrirEstacao('9A6EE7B45495BB7F')">
+                            <i class="bi-search"></i> Alto Areia - Areia, Rolante-RS
+                        </span>
+                    </h3>
                     <canvas id="chtGLLS"></canvas>
                 </div>
                 <div class="cdvChart">
-                    <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><img src="Magnifying_glass_icon.svg" width=15> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
+                    <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-search"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
                     <canvas id="chtCH01"></canvas>
                 </div>
                 <p>Veja mais em: <a href="https://github.com/RafaelEstevamReis/MonitoramentoRios" target="_blank">gh/MonitoramentoRios</a></p>
@@ -167,16 +176,27 @@
                 const tableBody = document.querySelector('#ultimasLeituras tbody');
                 tableBody.innerHTML = "";
                 data.forEach(dado => {
+                    let bLevel = dado.percentBateria && dado.percentBateria > 30 ? (dado.percentBateria > 70 ? 'battery-full' : 'battery-half') : 'battery'
+
+                    let bat = `<i class="bi-${bLevel}"></i> ${formatValue(dado.percentBateria, 0)}%`;
+                    let sig = dado.source == 3 ? loraIcon : `<i class="bi-wifi${dado.forcaSinal && dado.forcaSinal < -70 ? '-1' : '' }"></i> ${wifiSignalToPercent(dado.forcaSinal)}`;
+
+                    let temp = dado.temperaturaAr ? `<i class="bi-thermometer"></i> ${formatValue(dado.temperaturaAr, 1)}ºC` : ''
+                    let humd = dado.umidadeAr ? `<i class="bi-moisture"></i> ${formatValue(dado.umidadeAr, 0)}%` : ''
+                    let prss = dado.pressaoAr ? `<i class="bi-box-arrow-in-down"></i> ${formatValue(dado.pressaoAr, 0)} hPa` :''
+
+                    let nivel = dado.nivelRio || dado.nivelRio==0 ? `<i class="bi-water"></i> ${formatValueUnit(dado.nivelRio, 1, 'm')}` : '';
+                    let chuva = dado.precipitacao10min || dado.precipitacao10min == 0 ? `<i class="bi-cloud-rain"></i> ${formatValueUnit(dado.precipitacao10min, 1, 'mm/min')}` : '';
+
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                                                <td>${dado.nomeEstacao || dado.estacao}</td>
-                                                <td>${formatValue(dado.percentBateria, 0)}%</td>
-                                                <td>${dado.source == 3 ? loraIcon : wifiSignalToPercent(dado.forcaSinal)}</td>
-                                                <td>${formatValue(dado.temperaturaAr, 1)}ºC</td>
-                                                <td>${formatValue(dado.umidadeAr, 1)}%</td>
-                                                <td>${formatValueUnit(dado.nivelRio, 1, 'm')}</td>
-                                                <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
-                                            `;
+                                                        <td style='text-align: left;'>${dado.nomeEstacao || dado.estacao}</td>
+                                                        <td style='text-align: left;'>${bat}</td>
+                                                        <td style='text-align: left;'>${sig}</td>
+                                                        <td>${humd} ${temp} ${prss}</td>
+                                                        <td>${nivel} ${chuva}</td>
+                                                        <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
+                                                    `;
                     tableBody.appendChild(row);
                     //setColor(row, dado.nomeEstacao);
                 });
@@ -377,7 +397,7 @@
                     let text = `-`;
                     if (dado.nivelRio === null && dado.temperaturaAr === null) {
                         text = `?/?`;
-                    } else if (dado.precipitacao10min || dado.precipitacao10min ==0) {
+                    } else if (dado.precipitacao10min || dado.precipitacao10min == 0) {
                         text = `${formatValue(dado.temperaturaAr, 1)}ºC<br>${formatValue(dado.precipitacao10min, 1)}mm`;
                     } else if (dado.nivelRio === null || dado.nivelRio === undefined) {
                         text = `${formatValue(dado.temperaturaAr, 1)}ºC`;

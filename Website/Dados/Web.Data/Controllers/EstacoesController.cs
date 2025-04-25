@@ -237,6 +237,8 @@ public class EstacoesController : ControllerBase
             NomeEstacao = e.NomeEstacao,
             NomeResponsavel = e.NomeResponsavel,
             UltimoEnvio = converteDados(e, db.ObterRegistroEstacao(e.UltimoEnvio)),
+            LA = $"*.{e.LA}",
+            Serial = e.Serial.ToString("x4")[^4..]
         }));
     }
     private DadosColetados? converteDados(DAO.DBModels.TBEstacoes e, DAO.DBModels.TBDadosEstacoes? dados)
@@ -285,6 +287,8 @@ public class EstacoesController : ControllerBase
         public string NomeResponsavel { get; set; } = string.Empty;
         public string NomeEstacao { get; set; } = string.Empty;
         public DadosColetados? UltimoEnvio { get; set; }
+        public string Serial {  get; set; } = string.Empty;
+        public string LA {  get; set; } = string.Empty;
     }
     public class DadosAgregados
     {
