@@ -46,7 +46,7 @@ public class EstacoesController : ControllerBase
         }
 
         var lst = db.ListarDados(estacao, limit)
-                    .Select(o => Simple.DatabaseWrapper.DataClone.CopyWithSerialization<DadosColetados>(o))
+                    .Select(o => converteDados(estacao ?? o.Estacao, o))
                     .ToArray();
 
         if (lst.Any(i => !dicEstacoes.ContainsKey(i.Estacao))) atualizaEstacoes(db);
@@ -240,10 +240,13 @@ public class EstacoesController : ControllerBase
         }));
     }
     private DadosColetados? converteDados(DAO.DBModels.TBEstacoes e, DAO.DBModels.TBDadosEstacoes? dados)
+        => converteDados(e.NomeEstacao, dados);
+    private DadosColetados? converteDados(string nomeEstacao, DAO.DBModels.TBDadosEstacoes? dados)
     {
         if (dados == null) return null;
         var k = Simple.DatabaseWrapper.DataClone.MapModel<DAO.DBModels.TBDadosEstacoes, DadosColetados>(dados);
-        k.NomeEstacao = e.NomeEstacao;
+        k.NomeEstacao = nomeEstacao;
+        k.Precipitacao10m = dados.Precipitacao10min;
 
         return k;
     }

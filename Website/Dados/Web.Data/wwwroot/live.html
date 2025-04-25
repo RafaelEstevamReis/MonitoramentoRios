@@ -73,7 +73,15 @@
                     setValue('clPres', `${formatValue(dado.pressaoAr, 1)}hPa`);
                     // Medição
                     setValue('clLevel', `${formatValue(dado.nivelRio, 3) || '-'}m`);
-                    setValue('clRain', `${formatValue(dado.precipitacao,1) || '-'}mm/min`);
+
+                    let sign = '';
+                    if (dado.precipitacao && dado.precipitacao10m) {
+                        let diff = Math.abs(dado.precipitacao - dado.precipitacao10m);
+                        // >1mm
+                        if (diff > 1) sign = dado.precipitacao > dado.precipitacao10m ? "&uarr;" : "&darr;";
+                        if (diff > 10) sign = dado.precipitacao > dado.precipitacao10m ? "&uarr;&uarr;" : "&darr;&darr;";
+                    } 
+                    setValue('clRain', `${formatValue(dado.precipitacao, 1) || '-'}mm/min ${sign}`);
 
                 })
                 .catch(error => {
@@ -84,7 +92,7 @@
             const element = document.getElementById(id);
             if (element === null || element === undefined) return;
 
-            element.textContent = value || '-';
+            element.innerHTML = value || '-';
         }
 
         function carregaHistorico() {
@@ -112,17 +120,17 @@
                         // Tabela
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                                <td>${dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ')}h</td>
-                                                <td style="text-align: center;">${dado.dataCount}</td>
-                                                <td>${formatValue(dado.temperaturaInterna_AVG, 1)}ºC</td>
-                                                <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
-                                                <td>${formatValue(dado.temperaturaAr_AVG, 1) || '-'}ºC</td>
-                                                <td>${formatValue(dado.umidadeAr_AVG, 1) || '-'}%</td>
-                                                <td>${formatValue(dado.pressaoAr_AVG, 1) || '-'}hPa</td>
-                                                <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
-                                                <td>${formatValue(dado.precipitacao_AVG, 1) || '-'}mm/min</td>
-                                                <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG, 0) || '-'}dBm)</td>
-                                                `;
+                                                                <td>${dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ')}h</td>
+                                                                <td style="text-align: center;">${dado.dataCount}</td>
+                                                                <td>${formatValue(dado.temperaturaInterna_AVG, 1)}ºC</td>
+                                                                <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
+                                                                <td>${formatValue(dado.temperaturaAr_AVG, 1) || '-'}ºC</td>
+                                                                <td>${formatValue(dado.umidadeAr_AVG, 1) || '-'}%</td>
+                                                                <td>${formatValue(dado.pressaoAr_AVG, 1) || '-'}hPa</td>
+                                                                <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
+                                                                <td>${formatValue(dado.precipitacao_MAX, 1) || '-'}mm/min</td>
+                                                                <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG, 0) || '-'}dBm)</td>
+                                                                `;
                         tableBody.appendChild(row);
                     });
 
@@ -275,7 +283,7 @@
                     </tr>
                     <tr>
                         <td class="cellHeader">Precipitação</td>
-                        <td class="cellValue" id="clRain">-</td>
+                        <td class="cellValue" id="clRain"></td>
                         <td class="cellValue"></td>
                         <td class="cellValue" id="clMinRain"></td>
                         <td class="cellValue" id="clMaxRain"></td>
