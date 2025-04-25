@@ -139,13 +139,20 @@
                     const labels = []; // Para os rótulos do gráfico
                     const nivelRioData = []; // Para os valores do nível do rio
 
+                    let chuva = false;
+                    data.forEach(dado => {
+                        if (!dado) return;
+                        if (dado.precipitacao_AVG) chuva = true;
+                    })
+
                     data.forEach(dado => {
                         if (dado === undefined || dado === null) return;
 
                         const label = dado.dataHoraDadosUTC.slice(8, 10) + '/' + dado.dataHoraDadosUTC.slice(5, 7) + ' ' + dado.dataHoraDadosUTC.slice(11, 13) + 'h';
 
                         labels.push(label);
-                        nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null); // Adicionar null se não houver dados
+                        if (chuva) nivelRioData.push(formatValue(dado.precipitacao_AVG, 2) || null); // Adicionar null se não houver dados
+                        else nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null); // Adicionar null se não houver dados
                     });
 
                     chart.innerHTML = "";
@@ -155,7 +162,7 @@
                         data: {
                             labels: labels, // Usar os rótulos preparados
                             datasets: [{
-                                label: 'Nível do Rio (m)',
+                                label: chuva ? 'Chuva (mm/min)' : 'Nível do Rio (m)',
                                 data: nivelRioData, // Usar os dados preparados
                                 borderColor: 'rgba(75, 192, 192, 1)',
                                 backgroundColor: 'rgba(75, 192, 192, 0.2)',

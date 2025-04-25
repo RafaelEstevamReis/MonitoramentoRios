@@ -123,7 +123,6 @@
                         <th></th>
                         <th>Ar</th>
                         <th>Água</th>
-                        <th>Nível da Água</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -182,7 +181,7 @@
                     let sig = dado.source == 3 ? loraIcon : `<i class="bi-wifi${dado.forcaSinal && dado.forcaSinal < -70 ? '-1' : '' }"></i> ${wifiSignalToPercent(dado.forcaSinal)}`;
 
                     let temp = dado.temperaturaAr ? `<i class="bi-thermometer"></i> ${formatValue(dado.temperaturaAr, 1)}ºC` : ''
-                    let humd = dado.umidadeAr ? `<i class="bi-moisture"></i> ${formatValue(dado.umidadeAr, 0)}%` : ''
+                    let humd = dado.umidadeAr ? `<i class="bi-droplet"></i> ${formatValue(dado.umidadeAr, 0)}%` : ''
                     let prss = dado.pressaoAr ? `<i class="bi-box-arrow-in-down"></i> ${formatValue(dado.pressaoAr, 0)} hPa` :''
 
                     let nivel = dado.nivelRio || dado.nivelRio==0 ? `<i class="bi-water"></i> ${formatValueUnit(dado.nivelRio, 1, 'm')}` : '';
