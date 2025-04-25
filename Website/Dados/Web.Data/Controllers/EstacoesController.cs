@@ -104,7 +104,7 @@ public class EstacoesController : ControllerBase
                     UmidadeAr = registrosOrdenados.FirstOrDefault(r => r.UmidadeAr.HasValue)?.UmidadeAr,
                     PressaoAr = registrosOrdenados.FirstOrDefault(r => r.PressaoAr.HasValue)?.PressaoAr,
                     Precipitacao = registrosOrdenados.FirstOrDefault(r => r.Precipitacao.HasValue)?.Precipitacao,
-                    Precipitacao10m = registrosOrdenados.FirstOrDefault(r => r.Precipitacao10m.HasValue)?.Precipitacao,
+                    Precipitacao10min = registrosOrdenados.FirstOrDefault(r => r.Precipitacao10min.HasValue)?.Precipitacao,
                     NivelRio = registrosOrdenados.FirstOrDefault(r => r.NivelRio.HasValue)?.NivelRio,
                     NivelRio_RAW = registrosOrdenados.FirstOrDefault(r => r.NivelRio_RAW.HasValue)?.NivelRio_RAW,
 
@@ -246,7 +246,7 @@ public class EstacoesController : ControllerBase
         if (dados == null) return null;
         var k = Simple.DatabaseWrapper.DataClone.MapModel<DAO.DBModels.TBDadosEstacoes, DadosColetados>(dados);
         k.NomeEstacao = nomeEstacao;
-        k.Precipitacao10m = dados.Precipitacao10min;
+        k.Precipitacao10min = dados.Precipitacao10min;
 
         return k;
     }
@@ -269,7 +269,7 @@ public class EstacoesController : ControllerBase
         public decimal? UmidadeAr { get; set; }
         public decimal? PressaoAr { get; set; }
         public decimal? Precipitacao { get; set; }
-        public decimal? Precipitacao10m { get; set; }
+        public decimal? Precipitacao10min { get; set; }
         public decimal? NivelRio { get; set; }
         public decimal? NivelRio_RAW { get; set; }
         public string? RawData { get; set; } = string.Empty;

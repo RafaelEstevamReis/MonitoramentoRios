@@ -75,12 +75,12 @@
                     setValue('clLevel', `${formatValue(dado.nivelRio, 3) || '-'}m`);
 
                     let sign = '';
-                    if (dado.precipitacao10m) {
+                    if (dado.precipitacao10min) {
                         if (!dado.precipitacao) dado.precipitacao = 0;
-                        let diff = Math.abs(dado.precipitacao - dado.precipitacao10m);
+                        let diff = Math.abs(dado.precipitacao - dado.precipitacao10min);
                         // >1mm
-                        if (diff > 1) sign = dado.precipitacao > dado.precipitacao10m ? "&uarr;" : "&darr;";
-                        if (diff > 10) sign = dado.precipitacao > dado.precipitacao10m ? "&uarr;&uarr;" : "&darr;&darr;";
+                        if (diff > 1) sign = dado.precipitacao > dado.precipitacao10min ? "&uarr;" : "&darr;";
+                        if (diff > 10) sign = dado.precipitacao > dado.precipitacao10min ? "&uarr;&uarr;" : "&darr;&darr;";
                     } 
                     setValue('clRain', `${formatValue(dado.precipitacao, 1) || '-'}mm/min ${sign}`);
 

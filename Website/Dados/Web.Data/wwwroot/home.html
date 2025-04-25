@@ -379,8 +379,8 @@
                     let text = `-`;
                     if (dado.nivelRio === null && dado.temperaturaAr === null) {
                         text = `?/?`;
-                    } else if (dado.precipitacao) {
-                        text = `${formatValue(dado.temperaturaAr, 1)}ºC<br>${formatValue(dado.precipitacao, 1)}mm`;
+                    } else if (dado.precipitacao10min || dado.precipitacao10min ==0) {
+                        text = `${formatValue(dado.temperaturaAr, 1)}ºC<br>${formatValue(dado.precipitacao10min, 1)}mm`;
                     } else if (dado.nivelRio === null || dado.nivelRio === undefined) {
                         text = `${formatValue(dado.temperaturaAr, 1)}ºC`;
                     } else {
