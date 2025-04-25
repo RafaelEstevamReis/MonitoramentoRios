@@ -76,6 +76,7 @@
 
                     let sign = '';
                     if (dado.precipitacao10m) {
+                        if (!dado.precipitacao) dado.precipitacao = 0;
                         let diff = Math.abs(dado.precipitacao - dado.precipitacao10m);
                         // >1mm
                         if (diff > 1) sign = dado.precipitacao > dado.precipitacao10m ? "&uarr;" : "&darr;";
