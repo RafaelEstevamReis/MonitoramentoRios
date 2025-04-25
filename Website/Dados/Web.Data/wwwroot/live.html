@@ -75,7 +75,7 @@
                     setValue('clLevel', `${formatValue(dado.nivelRio, 3) || '-'}m`);
 
                     let sign = '';
-                    if (dado.precipitacao && dado.precipitacao10m) {
+                    if (dado.precipitacao10m) {
                         let diff = Math.abs(dado.precipitacao - dado.precipitacao10m);
                         // >1mm
                         if (diff > 1) sign = dado.precipitacao > dado.precipitacao10m ? "&uarr;" : "&darr;";
