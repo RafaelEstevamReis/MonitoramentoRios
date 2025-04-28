@@ -150,6 +150,7 @@ public class DB
         var umidadeAr = DataAggregator.Aggregate(qData, o => o.UmidadeAr);
         var pressaoAr = DataAggregator.Aggregate(qData, o => o.PressaoAr);
         var precipitacao = DataAggregator.Aggregate(qData, o => o.Precipitacao);
+        var precipitacaoTotal = DataAggregator.Aggregate(qData, o => o.PrecipitacaoTotal);
         var nivelRio = agregadorFiltrado(qData, o => o.NivelRio ?? o.NivelRio_RAW);
 
         hora = new DBModels.TBDadosEstacoesHora
@@ -215,6 +216,10 @@ public class DB
             Precipitacao_AVG = precipitacao.Avg,
             Precipitacao_StdDev = precipitacao.StdDev,
             Precipitacao_Trend = precipitacao.Trend,
+            // Dados totais Hora - Ainda não suporta RESET
+            PrecipitacaoTotal_MIN = precipitacaoTotal.Min,
+            PrecipitacaoTotal_MAX = precipitacaoTotal.Max,
+            PrecipitacaoTotal_Hora = precipitacaoTotal.Max - precipitacaoTotal.Min,
 
             // Dados do Nível do Rio
             NivelRio_MAX = nivelRio.Max,

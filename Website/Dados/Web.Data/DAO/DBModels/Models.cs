@@ -56,6 +56,7 @@ public class TBDadosEstacoes
     public decimal? PressaoAr { get; set; }
     public decimal? Precipitacao { get; set; } // Atual em mm/min
     public decimal? Precipitacao10min { get; set; }
+    public decimal? PrecipitacaoTotal { get; set; }
     /// <summary>
     /// Medição calibrada
     /// </summary>
@@ -138,6 +139,10 @@ public class TBDadosEstacoesHora
     public decimal? Precipitacao_AVG { get; set; }
     public decimal? Precipitacao_StdDev { get; set; }
     public decimal? Precipitacao_Trend { get; set; }
+
+    public decimal? PrecipitacaoTotal_MAX { get; set; }
+    public decimal? PrecipitacaoTotal_MIN { get; set; }
+    public decimal? PrecipitacaoTotal_Hora { get; set; }
 
     public decimal? NivelRio_MAX { get; set; }
     public decimal? NivelRio_MIN{ get; set; }
