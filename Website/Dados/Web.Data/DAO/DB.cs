@@ -138,7 +138,7 @@ public class DB
             estacao,
             inicio,
             fim,
-        }).ToArray();
+        }).OrderBy(o => o.RecebidoUTC).ToArray();
 
         if (qData.Length == 0) return null; // Salvar que não tem? Dá full table scan
 
@@ -216,10 +216,10 @@ public class DB
             Precipitacao_AVG = precipitacao.Avg,
             Precipitacao_StdDev = precipitacao.StdDev,
             Precipitacao_Trend = precipitacao.Trend,
-            // Dados totais Hora - Ainda não suporta RESET
+            // Dados totais Hora
             PrecipitacaoTotal_MIN = precipitacaoTotal.Min,
             PrecipitacaoTotal_MAX = precipitacaoTotal.Max,
-            PrecipitacaoTotal_Hora = precipitacaoTotal.Max - precipitacaoTotal.Min,
+            PrecipitacaoTotal_Hora = calculaTotalComReset(precipitacaoTotal, qData),
 
             // Dados do Nível do Rio
             NivelRio_MAX = nivelRio.Max,
@@ -234,6 +234,33 @@ public class DB
         if (horaAgora != hourSpan) cnn.Insert(hora, OnConflict.Replace);
 
         return hora;
+    }
+    //private static decimal? calculaTotalSemReset(DataAggregator.Result precipitacaoTotal, DBModels.TBDadosEstacoes[] qData)
+    //{
+    //    var notNulls = qData.Where(o => precipitacaoTotal != null)
+    //                        .Select(o => o.PrecipitacaoTotal ?? 0) // Já não é NULL
+    //                        .ToArray();
+    //    if (notNulls.Length == 0) return null; // Não sei
+    //    if (notNulls.Length == 1) return null; // Não sei
+    //    return (notNulls[^1] - notNulls[0]);
+    //}
+    private static decimal? calculaTotalComReset(DataAggregator.Result precipitacaoTotal, DBModels.TBDadosEstacoes[] qData)
+    {
+        var notNulls = qData.Where(o => precipitacaoTotal != null)
+                            .Select(o => o.PrecipitacaoTotal ?? 0) // Já não é NULL
+                            .ToArray();
+        if (notNulls.Length == 0) return null; // Não sei
+        if (notNulls.Length == 1) return null; // Não sei
+
+        var first = notNulls[0];
+        var last = notNulls[^1];
+
+        if (last < first && last < 1000) // resetou, mas 1000mm em uma hora é muito
+        {
+            return last; // Voltou no zero, pega o valor como está
+        }
+
+        return last - first;
     }
 
     internal IEnumerable<DBModels.TBDadosEstacoes> ListarAntigos(int limit = 50)
