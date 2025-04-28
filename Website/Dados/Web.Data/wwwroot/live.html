@@ -121,7 +121,7 @@
                         // Tabela
 
                         let precRate = dado.precipitacao_MAX ? `${formatValue(dado.precipitacao_MAX, 1) || '-'}mm/min` : '';
-                        let precTotalH = dado.precipitacaoTotal_Hora ? `${formatValue(dado.precipitacaoTotal_Hora, 1) || '-'}mm/h` : '';
+                        let precTotalH = dado.precipitacaoTotal_Hora || dado.precipitacaoTotal_Hora==0 ? `${formatValue(dado.precipitacaoTotal_Hora, 1) || '-'}mm/h` : '';
 
                         const row = document.createElement('tr');
                         row.innerHTML = `
