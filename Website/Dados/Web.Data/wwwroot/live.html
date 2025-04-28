@@ -155,7 +155,7 @@
                         const label = dado.dataHoraDadosUTC.slice(8, 10) + '/' + dado.dataHoraDadosUTC.slice(5, 7) + ' ' + dado.dataHoraDadosUTC.slice(11, 13) + 'h';
 
                         labels.push(label);
-                        if (chuva) nivelRioData.push(formatValue(dado.precipitacao_AVG, 2) || null); // Adicionar null se não houver dados
+                        if (chuva) nivelRioData.push(formatValue(dado.precipitacaoTotal_Hora, 1) || null); // Adicionar null se não houver dados
                         else nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null); // Adicionar null se não houver dados
                     });
 
@@ -166,7 +166,7 @@
                         data: {
                             labels: labels, // Usar os rótulos preparados
                             datasets: [{
-                                label: chuva ? 'Chuva (mm/min)' : 'Nível do Rio (m)',
+                                label: chuva ? 'Chuva (mm/h)' : 'Nível do Rio (m)',
                                 data: nivelRioData, // Usar os dados preparados
                                 borderColor: 'rgba(75, 192, 192, 1)',
                                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
