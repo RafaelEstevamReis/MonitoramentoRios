@@ -119,6 +119,10 @@
                     sortedData.forEach(dado => {
                         if (dado === undefined || dado === null) return;
                         // Tabela
+
+                        let precRate = dado.precipitacao_MAX ? `${formatValue(dado.precipitacao_MAX, 1) || '-'}mm/min` : '';
+                        let precTotalH = dado.precipitacaoTotal_Hora ? `${formatValue(dado.precipitacaoTotal_Hora, 1) || '-'}mm/h` : '';
+
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ')}h</td>
@@ -129,7 +133,7 @@
                             <td>${formatValue(dado.umidadeAr_AVG, 1) || '-'}%</td>
                             <td>${formatValue(dado.pressaoAr_AVG, 1) || '-'}hPa</td>
                             <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
-                            <td>${formatValue(dado.precipitacao_MAX, 1) || '-'}mm/min</td>
+                            <td>${precRate} ${precTotalH}</td>
                             <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG, 0) || '-'}dBm)</td>
                             `;
                         tableBody.appendChild(row);
