@@ -246,7 +246,7 @@ public class DB
     //}
     private static decimal? calculaTotalComReset(DataAggregator.Result precipitacaoTotal, DBModels.TBDadosEstacoes[] qData)
     {
-        var notNulls = qData.Where(o => precipitacaoTotal != null)
+        var notNulls = qData.Where(o => o.PrecipitacaoTotal != null)
                             .Select(o => o.PrecipitacaoTotal ?? 0) // Já não é NULL
                             .ToArray();
         if (notNulls.Length == 0) return null; // Não sei
