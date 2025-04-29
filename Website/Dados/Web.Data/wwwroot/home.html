@@ -242,6 +242,7 @@
                         labels.push(label);
                         const dado = dataMap.get(label);
                         if (dado) {
+                            if (dado.nivelRio_AVG < 0) dado.nivelRio_AVG = 0;
                             nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null);
                             nivelRioDataNormal.push(formatValue(nivelNormal, 2) || null);
                             nivelRioDataAlerta.push(formatValue(nivelAlerta, 2) || null);
