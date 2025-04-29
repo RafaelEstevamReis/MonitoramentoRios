@@ -217,6 +217,8 @@ public class MqttWorker : IHostedService, IDisposable
         foreach (var p in partes)
         {
             var pair = p.Split('=');
+
+            if (pair[1].Equals("nan", StringComparison.InvariantCultureIgnoreCase)) continue;
             var decVal = pair[1].ToDecimal();
             // if (decVal == 0) continue; // 0.0m é nível razoável, há locais com 0.05
 
