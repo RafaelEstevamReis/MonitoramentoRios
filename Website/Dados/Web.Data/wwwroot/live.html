@@ -170,7 +170,7 @@
                     chart.innerHTML = "";
                     const ctx = chart.getContext('2d');
                     chartObject = new Chart(ctx, {
-                        type: 'bar',
+                        type: chuva ? 'bar' : 'line',
                         data: {
                             labels: labels, // Usar os rótulos preparados
                             datasets: [{
