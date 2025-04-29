@@ -144,15 +144,23 @@
                     const nivelRioData = []; // Para os valores do nível do rio
 
                     let chuva = false;
+                    let rio = false;
                     data.forEach(dado => {
                         if (!dado) return;
-                        if (dado.precipitacaoTotal_Hora || dado.precipitacaoTotal_Hora ==0) chuva = true;
+                        if (dado.precipitacaoTotal_Hora || dado.precipitacaoTotal_Hora == 0) chuva = true;
+                        if (dado.nivelRio_AVG || dado.nivelRio_AVG == 0) rio = true;
                     })
+
+                    if (rio && chuva) {
+                        chuva = false; // Prioriza Rio
+                    }
 
                     data.forEach(dado => {
                         if (dado === undefined || dado === null) return;
 
                         const label = dado.dataHoraDadosUTC.slice(8, 10) + '/' + dado.dataHoraDadosUTC.slice(5, 7) + ' ' + dado.dataHoraDadosUTC.slice(11, 13) + 'h';
+
+                        if (dado.nivelRio_AVG && dado.nivelRio_AVG < 0) dado.nivelRio_AVG = 0;
 
                         labels.push(label);
                         if (chuva) nivelRioData.push(formatValue(dado.precipitacaoTotal_Hora, 1) || null); // Adicionar null se não houver dados
