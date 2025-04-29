@@ -146,7 +146,7 @@
                     let chuva = false;
                     data.forEach(dado => {
                         if (!dado) return;
-                        if (dado.precipitacao_AVG) chuva = true;
+                        if (dado.precipitacaoTotal_Hora || dado.precipitacaoTotal_Hora ==0) chuva = true;
                     })
 
                     data.forEach(dado => {
@@ -162,7 +162,7 @@
                     chart.innerHTML = "";
                     const ctx = chart.getContext('2d');
                     chartObject = new Chart(ctx, {
-                        type: 'line',
+                        type: 'bar',
                         data: {
                             labels: labels, // Usar os rótulos preparados
                             datasets: [{
