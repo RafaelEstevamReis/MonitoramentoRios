@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processador de Transação</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        textarea, button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        textarea {
+            height: 100px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background-color: #45a049;
+            }
+
+        #output {
+            margin-top: 20px;
+        }
+
+        .chunk {
+            margin: 10px 0;
+            word-break: break-all;
+            border: 1px solid black;
+            border-radius: 7px;
+            padding: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Preparador de Transação para Transmissão LoRa</h2>
+    <textarea id="inputTx" placeholder="Insira o HEX da transação assinada"></textarea>
+    <button onclick="processTransaction()">Processar</button>
+    <div id="output">...</div>
+    <div>Envie cada uma das mensagens acima, uma por vez na rede LoRa. Aguarde a confirmação de recebimento</div>
+
+    <script>
+        function processTransaction() {
+            const input = document.getElementById('inputTx').value.trim();
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = '';
+
+            if (!input) {
+                outputDiv.innerHTML = '<p style="color: red;">Por favor, insira uma transação válida.</p>';
+                return;
+            }
+
+            // Calcular o número de chunks e o tamanho de cada chunk
+            const targetBase64Size = 200; // Tamanho alvo em base64
+            const hexPerBase64 = 3 / 4; // 3 bytes HEX geram 4 caracteres base64
+            const maxHexChunkSize = Math.floor(targetBase64Size * hexPerBase64 * 2); // ~300 caracteres HEX
+
+            // Calcular o número de chunks para tamanhos aproximadamente iguais
+            const totalHexLength = input.length;
+            const numChunks = Math.max(1, Math.ceil(totalHexLength / maxHexChunkSize));
+
+            // Validar se o número de chunks excede 9
+            if (numChunks > 9) {
+                outputDiv.innerHTML = '<p style="color: red;">Erro: A transação resulta em mais de 9 partes. Reduza o tamanho da transação.</p>';
+                return;
+            }
+
+            const hexChunkSize = Math.ceil(totalHexLength / numChunks);
+
+            // Dividir o HEX em chunks
+            const chunks = [];
+            for (let i = 0; i < totalHexLength; i += hexChunkSize) {
+                chunks.push(input.slice(i, i + hexChunkSize));
+            }
+
+            // Codificar cada chunk em base64 individualmente
+            chunks.forEach((chunk, index) => {
+                try {
+                    // Converter HEX para string de bytes
+                    const byteString = hexToByteString(chunk);
+                    // Codificar em base64
+                    const base64 = btoa(byteString);
+                    const chunkDiv = document.createElement('div');
+                    chunkDiv.className = 'chunk';
+                    // Formato BTXxy, onde x é a parte atual (index+1) e y é o total (numChunks)
+                    chunkDiv.textContent = `BTX${index + 1}${numChunks}${base64}`;
+                    outputDiv.appendChild(chunkDiv);
+                } catch (e) {
+                    outputDiv.innerHTML += `<p style="color: red;">Erro ao processar chunk ${index + 1}: ${e.message}</p>`;
+                }
+            });
+        }
+
+        // Função para converter HEX para string de bytes
+        function hexToByteString(hex) {
+            if (hex.length % 2 !== 0) {
+                throw new Error('HEX inválido: comprimento deve ser par');
+            }
+            let byteString = '';
+            for (let i = 0; i < hex.length; i += 2) {
+                const byte = parseInt(hex.slice(i, i + 2), 16);
+                if (isNaN(byte)) {
+                    throw new Error('HEX inválido: contém caracteres não-hexadecimais');
+                }
+                byteString += String.fromCharCode(byte);
+            }
+            return byteString;
+        }
+    </script>
+</body>
+</html>
