@@ -219,7 +219,7 @@ public class DB
             // Dados totais Hora
             PrecipitacaoTotal_MIN = precipitacaoTotal.Min,
             PrecipitacaoTotal_MAX = precipitacaoTotal.Max,
-            PrecipitacaoTotal_Hora = calculaTotalComReset(precipitacaoTotal, qData),
+            PrecipitacaoTotal_Hora = calculaTotalComReset(qData),
 
             // Dados do Nível do Rio
             NivelRio_MAX = nivelRio.Max,
@@ -244,7 +244,7 @@ public class DB
     //    if (notNulls.Length == 1) return null; // Não sei
     //    return (notNulls[^1] - notNulls[0]);
     //}
-    private static decimal? calculaTotalComReset(DataAggregator.Result precipitacaoTotal, DBModels.TBDadosEstacoes[] qData)
+    public static decimal? calculaTotalComReset(DBModels.TBDadosEstacoes[] qData)
     {
         var notNulls = qData.Where(o => o.PrecipitacaoTotal != null)
                             .Select(o => o.PrecipitacaoTotal ?? 0) // Já não é NULL

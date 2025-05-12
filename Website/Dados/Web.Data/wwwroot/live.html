@@ -8,7 +8,6 @@
 
     <script>
         var chartObject = null;
-
         document.addEventListener("DOMContentLoaded", function () {
             updateContent();
             carregaAgregado();
@@ -23,45 +22,46 @@
             fetch('/estacoes/agregado?hour=24&estacao=' + getQueryParam("estacao"))
                 .then(response => response.json())
                 .then(data => {
-                    const min = data.min;
+                    data = data;
                     // Dados Estação
-                    setValue('clMinBat', `${formatValue(min.tensaoBateria, 2)}v (${formatValue(min.percentBateria, 0)}%)`);
-                    setValue('clMinIntTemp', `${formatValue(min.temperaturaInterna, 1)}ºC`);
-                    setValue('clMinSigStr', `${wifiSignalToPercent(min.forcaSinal)} (${min.forcaSinal || '-'}dBm)`);
+                    setValue('clMinBat', `${formatValue(data.tensaoBateria_MIN, 2)}v (${formatValue(data.percentBateria_MIN, 0)}%)`);
+                    setValue('clMinIntTemp', `${formatValue(data.temperaturaInterna_MIN, 1)}ºC`);
+                    setValue('clMinSigStr', `${wifiSignalToPercent(data.forcaSinal_MIN)} (${data.forcaSinal_MIN || '-'}dBm)`);
                     // Ar
-                    setValue('clMinTemp', `${formatValue(min.temperaturaAr, 1)}ºC`);
-                    setValue('clMinHumd', `${formatValue(min.umidadeAr, 1)}%`);
-                    setValue('clMinPres', `${formatValue(min.pressaoAr, 1)}hPa`);
+                    setValue('clMinTemp', `${formatValue(data.temperaturaAr_MIN, 1)}ºC`);
+                    setValue('clMinHumd', `${formatValue(data.umidadeAr_MIN, 1)}%`);
+                    setValue('clMinPres', `${formatValue(data.pressaoAr_MIN, 1)}hPa`);
                     // Medição
-                    setValue('clMinLevel', `${formatValue(min.nivelRio, 3) || '-'}m`);
-                    setValue('clMinRain', `${formatValue(min.precipitacao, 1) || '-'}mm/min`);
+                    setValue('clMinLevel', `${formatValue(data.nivelRio_MIN, 3) || '-'}m`);
+                    setValue('clMinRain', `${formatValue(data.precipitacaoTotal_MIN, 1) || '-'}mm/h`);
 
-                    const max = data.max;
                     // Dados Estação
-                    setValue('clMaxBat', `${formatValue(max.tensaoBateria, 2)}v (${formatValue(max.percentBateria, 0)}%)`);
-                    setValue('clMaxIntTemp', `${formatValue(max.temperaturaInterna, 1)}ºC`);
-                    setValue('clMaxSigStr', `${wifiSignalToPercent(max.forcaSinal)} (${max.forcaSinal || '-'}dBm)`);
+                    setValue('clMaxBat', `${formatValue(data.tensaoBateria_MAX, 2)}v (${formatValue(data.percentBateria_MAX, 0)}%)`);
+                    setValue('clMaxIntTemp', `${formatValue(data.temperaturaInterna_MAX, 1)}ºC`);
+                    setValue('clMaxSigStr', `${wifiSignalToPercent(data.forcaSinal_MAX)} (${data.forcaSinal_MAX || '-'}dBm)`);
                     // Ar
-                    setValue('clMaxTemp', `${formatValue(max.temperaturaAr, 1)}ºC`);
-                    setValue('clMaxHumd', `${formatValue(max.umidadeAr, 1)}%`);
-                    setValue('clMaxPres', `${formatValue(max.pressaoAr, 1)}hPa`);
+                    setValue('clMaxTemp', `${formatValue(data.temperaturaAr_MAX, 1)}ºC`);
+                    setValue('clMaxHumd', `${formatValue(data.umidadeAr_MAX, 1)}%`);
+                    setValue('clMaxPres', `${formatValue(data.pressaoAr_MAX, 1)}hPa`);
                     // Medição
-                    setValue('clMaxLevel', `${formatValue(max.nivelRio, 3) || '-'}m`);
-                    setValue('clMaxRain', `${formatValue(max.precipitacao, 1) || '-'}mm/min`);
+                    setValue('clMaxLevel', `${formatValue(data.nivelRio_MAX, 3) || '-'}m`);
+                    setValue('clMaxRain', `${formatValue(data.precipitacaoTotal_MAX, 1) || '-'}mm/h`);
 
+                    setValue('clRain24h', `${formatValue(data.precipitacaoTotal_Hora, 1) || '-'}mm/h`);
                 })
                 .catch(error => {
                     console.error('Erro ao carregar dados das estações:', error);
                 });
         }
         function updateContent() {
-            fetch('/estacoes/dados?limit=1&estacao=' + getQueryParam("estacao"))
+            fetch('/estacoes/dados?limit=10&estacao=' + getQueryParam("estacao"))
                 .then(response => response.json())
                 .then(data => {
-                    const dado = data[0];
+                    const dado = data[0]; // Mais recente
+                    const dtD0 = new Date(dado.dataHoraDadosUTC);
                     // Header
                     setValue('nomeEstacao', dado.nomeEstacao);
-                    setValue('dtDados', new Date(dado.dataHoraDadosUTC).toLocaleString());
+                    setValue('dtDados', dtD0.toLocaleString());
                     // Dados Estação
                     setValue('clNomeEstacao', dado.nomeEstacao);
                     setValue('clBat', `${formatValue(dado.tensaoBateria, 2)}v (${formatValue(dado.percentBateria, 0)}%)`);
@@ -81,8 +81,19 @@
                         // >1mm
                         if (diff > 1) sign = dado.precipitacao > dado.precipitacao10min ? "&uarr;" : "&darr;";
                         if (diff > 10) sign = dado.precipitacao > dado.precipitacao10min ? "&uarr;&uarr;" : "&darr;&darr;";
-                    } 
+                    }
                     setValue('clRain', `${formatValue(dado.precipitacao, 1) || '-'}mm/min ${sign}`);
+
+                    let dado1h = dado;
+                    for (var i = 1; i < data.length; i++) {
+                        const dtDi = new Date(data[i].dataHoraDadosUTC);
+                        var ts = dtD0 - dtDi;
+                        if (ts < 60 * 60 * 1000) break;
+                        dado1h = data[i];
+                    }
+
+                    diff = dado.precipitacaoTotal - dado1h.precipitacaoTotal;
+                    setValue('clRain1h', `${formatValue(diff, 1) || '-'}mm/h`);
 
                 })
                 .catch(error => {
@@ -119,23 +130,22 @@
                     sortedData.forEach(dado => {
                         if (dado === undefined || dado === null) return;
                         // Tabela
-
-                        let precRate = dado.precipitacao_MAX ? `${formatValue(dado.precipitacao_MAX, 1) || '-'}mm/min` : '';
-                        let precTotalH = dado.precipitacaoTotal_Hora || dado.precipitacaoTotal_Hora==0 ? `${formatValue(dado.precipitacaoTotal_Hora, 1) || '-'}mm/h` : '';
+                        //let precRate = dado.precipitacao_MAX ? `${formatValue(dado.precipitacao_MAX, 1) || '-'}mm/min` : '';
+                        let precTotalH = dado.precipitacaoTotal_Hora || dado.precipitacaoTotal_Hora == 0 ? `${formatValue(dado.precipitacaoTotal_Hora, 1) || '-'}mm/h` : '';
 
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ')}h</td>
-                            <td style="text-align: center;">${dado.dataCount}</td>
-                            <td>${formatValue(dado.temperaturaInterna_AVG, 1)}ºC</td>
-                            <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
-                            <td>${formatValue(dado.temperaturaAr_AVG, 1) || '-'}ºC</td>
-                            <td>${formatValue(dado.umidadeAr_AVG, 1) || '-'}%</td>
-                            <td>${formatValue(dado.pressaoAr_AVG, 1) || '-'}hPa</td>
-                            <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
-                            <td>${precRate} ${precTotalH}</td>
-                            <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG, 0) || '-'}dBm)</td>
-                            `;
+                                <td>${dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ')}h</td>
+                                <td style="text-align: center;">${dado.dataCount}</td>
+                                <td>${formatValue(dado.temperaturaInterna_AVG, 1)}ºC</td>
+                                <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
+                                <td>${formatValue(dado.temperaturaAr_AVG, 1) || '-'}ºC</td>
+                                <td>${formatValue(dado.umidadeAr_AVG, 1) || '-'}%</td>
+                                <td>${formatValue(dado.pressaoAr_AVG, 1) || '-'}hPa</td>
+                                <td>${formatValue(dado.nivelRio_AVG, 2) || '-'}m</td>
+                                <td>${precTotalH}</td>
+                                <td>${wifiSignalToPercent(dado.forcaSinal_AVG)} (${formatValue(dado.forcaSinal_AVG, 0) || '-'}dBm)</td>
+                                `;
                         tableBody.appendChild(row);
                     });
 
@@ -303,10 +313,12 @@
                     </tr>
                     <tr>
                         <td class="cellHeader">Precipitação</td>
-                        <td class="cellValue" id="clRain"></td>
+                        <td class="cellValue"><b>Atual:</b><br><span id="clRain">-</span></td>
                         <td class="cellValue"></td>
-                        <td class="cellValue" id="clMinRain"></td>
-                        <td class="cellValue" id="clMaxRain"></td>
+                        <td class="cellValue"><b>Última Hora:</b><br><span id="clRain1h">-</span></td>
+                        <td class="cellValue"><b>24 Horas:</b><br><span id="clRain24h">-</span></td>
+                        <!-- <td class="cellValue"><b>Última Hora:</b><br><span id="clMinRain"></span></td> -->
+                        <!-- <td class="cellValue"><b>24 Horas</b><br><span id="clMaxRain"></span></td> -->
                     </tr>
 
                     <tr class="blockHeader">

@@ -129,48 +129,55 @@ public class EstacoesController : ControllerBase
     [HttpGet("agregado")]
     public DadosAgregados AgregarDados(string estacao, int hour = 8)
     {
-        var lst = db.ListarDados(estacao, hour * 60)
-                    .Where(o => (DateTime.UtcNow - o.DataHoraDadosUTC).TotalHours <= hour)
-                    .ToArray();
+        var horaAgora = (int)(DateTime.UtcNow - DateTime.UnixEpoch).TotalHours;
+
+        var range = Enumerable.Range(horaAgora - hour, hour).ToArray();
+        DAO.DBModels.TBDadosEstacoesHora[] lst = range.Select(h => db.AgregadoHora(estacao, h))
+            .Where(o => o != null)
+            .Cast<DAO.DBModels.TBDadosEstacoesHora>()
+            .ToArray()
+            ?? [];
+        ;
+        decimal? pTotal = null;
+        if (lst.Length > 0) pTotal = lst.Where(o => o.PrecipitacaoTotal_Hora != null).Sum(o => o.PrecipitacaoTotal_Hora);
 
         return new DadosAgregados
         {
-            Avg = new DadosColetados
-            {
-                ForcaSinal = lst.Average(o => o.ForcaSinal),
-                NivelRio = lst.Average(o => o.NivelRio),
-                PercentBateria = lst.Average(o => o.PercentBateria),
-                Precipitacao = lst.Average(o => o.Precipitacao),
-                PressaoAr = lst.Average(o => o.PressaoAr),
-                TemperaturaAr = lst.Average(o => o.TemperaturaAr),
-                UmidadeAr = lst.Average(o => o.UmidadeAr),
-                TemperaturaInterna = lst.Average(o => o.TemperaturaInterna),
-                TensaoBateria = lst.Average(o => o.TensaoBateria),
-            },
-            Max = new DadosColetados
-            {
-                ForcaSinal = lst.Max(o => o.ForcaSinal),
-                NivelRio = lst.Max(o => o.NivelRio),
-                PercentBateria = lst.Max(o => o.PercentBateria),
-                Precipitacao = lst.Max(o => o.Precipitacao),
-                PressaoAr = lst.Max(o => o.PressaoAr),
-                TemperaturaAr = lst.Max(o => o.TemperaturaAr),
-                UmidadeAr = lst.Max(o => o.UmidadeAr),
-                TemperaturaInterna = lst.Max(o => o.TemperaturaInterna),
-                TensaoBateria = lst.Max(o => o.TensaoBateria),
-            },
-            Min = new DadosColetados
-            {
-                ForcaSinal = lst.Min(o => o.ForcaSinal),
-                NivelRio = lst.Min(o => o.NivelRio),
-                PercentBateria = lst.Min(o => o.PercentBateria),
-                Precipitacao = lst.Min(o => o.Precipitacao),
-                PressaoAr = lst.Min(o => o.PressaoAr),
-                TemperaturaAr = lst.Min(o => o.TemperaturaAr),
-                UmidadeAr = lst.Min(o => o.UmidadeAr),
-                TemperaturaInterna = lst.Min(o => o.TemperaturaInterna),
-                TensaoBateria = lst.Min(o => o.TensaoBateria),
-            },
+            ForcaSinal_AVG = lst.Average(o => o.ForcaSinal_AVG),
+            ForcaSinal_MIN = lst.Min(o => o.ForcaSinal_MIN),
+            ForcaSinal_MAX = lst.Min(o => o.ForcaSinal_MAX),
+
+            TensaoBateria_AVG = lst.Average(o => o.TensaoBateria_AVG),
+            TensaoBateria_MIN = lst.Min(o => o.TensaoBateria_MIN),
+            TensaoBateria_MAX = lst.Max(o => o.TensaoBateria_MAX),
+
+            PercentBateria_AVG = lst.Average(o => o.PercentBateria_AVG),
+            PercentBateria_MIN = lst.Min(o => o.PercentBateria_MIN),
+            PercentBateria_MAX = lst.Max(o => o.PercentBateria_MAX),
+
+            TemperaturaInterna_AVG = lst.Average(o => o.TemperaturaInterna_AVG),
+            TemperaturaInterna_MIN = lst.Min(o => o.TemperaturaInterna_MIN),
+            TemperaturaInterna_MAX = lst.Max(o => o.TemperaturaInterna_MAX),
+
+            TemperaturaAr_AVG = lst.Average(o => o.TemperaturaAr_AVG),
+            TemperaturaAr_MIN = lst.Min(o => o.TemperaturaAr_MIN),
+            TemperaturaAr_MAX = lst.Max(o => o.TemperaturaAr_MAX),
+
+            UmidadeAr_AVG = lst.Average(o => o.UmidadeAr_AVG),
+            UmidadeAr_MIN = lst.Min(o => o.UmidadeAr_MIN),
+            UmidadeAr_MAX = lst.Max(o => o.UmidadeAr_MAX),
+
+            PressaoAr_AVG = lst.Average(o => o.PressaoAr_AVG),
+            PressaoAr_MIN = lst.Min(o => o.PressaoAr_MIN),
+            PressaoAr_MAX = lst.Max(o => o.PressaoAr_MAX),
+
+            NivelRio_AVG = lst.Average(o => o.NivelRio_AVG),
+            NivelRio_MIN = lst.Min(o => o.NivelRio_MIN),
+            NivelRio_MAX = lst.Max(o => o.NivelRio_MAX),
+
+            PrecipitacaoTotal_Hora = lst.Sum(o => o.PrecipitacaoTotal_Hora),
+            PrecipitacaoTotal_MIN = lst.Min(o => o.PrecipitacaoTotal_MIN),
+            PrecipitacaoTotal_MAX = lst.Max(o => o.PrecipitacaoTotal_MAX),
         };
     }
 
@@ -272,6 +279,7 @@ public class EstacoesController : ControllerBase
         public decimal? PressaoAr { get; set; }
         public decimal? Precipitacao { get; set; }
         public decimal? Precipitacao10min { get; set; }
+        public decimal? PrecipitacaoTotal { get; set; }
         public decimal? NivelRio { get; set; }
         public decimal? NivelRio_RAW { get; set; }
         public string? RawData { get; set; } = string.Empty;
@@ -287,13 +295,46 @@ public class EstacoesController : ControllerBase
         public string NomeResponsavel { get; set; } = string.Empty;
         public string NomeEstacao { get; set; } = string.Empty;
         public DadosColetados? UltimoEnvio { get; set; }
-        public string Serial {  get; set; } = string.Empty;
-        public string LA {  get; set; } = string.Empty;
+        public string Serial { get; set; } = string.Empty;
+        public string LA { get; set; } = string.Empty;
     }
     public class DadosAgregados
     {
-        public DadosColetados Min { get; set; }
-        public DadosColetados Max { get; set; }
-        public DadosColetados Avg { get; set; }
+        public decimal? ForcaSinal_MAX { get; set; }
+        public decimal? ForcaSinal_MIN { get; set; }
+        public decimal? ForcaSinal_AVG { get; set; }
+
+        public decimal? TemperaturaInterna_MAX { get; set; }
+        public decimal? TemperaturaInterna_MIN { get; set; }
+        public decimal? TemperaturaInterna_AVG { get; set; }
+
+        public decimal? TensaoBateria_MAX { get; set; }
+        public decimal? TensaoBateria_MIN { get; set; }
+        public decimal? TensaoBateria_AVG { get; set; }
+
+        public decimal? PercentBateria_MAX { get; set; }
+        public decimal? PercentBateria_MIN { get; set; }
+        public decimal? PercentBateria_AVG { get; set; }
+
+        // Medições
+        public decimal? TemperaturaAr_MAX { get; set; }
+        public decimal? TemperaturaAr_MIN { get; set; }
+        public decimal? TemperaturaAr_AVG { get; set; }
+
+        public decimal? UmidadeAr_MAX { get; set; }
+        public decimal? UmidadeAr_MIN { get; set; }
+        public decimal? UmidadeAr_AVG { get; set; }
+
+        public decimal? PressaoAr_MAX { get; set; }
+        public decimal? PressaoAr_MIN { get; set; }
+        public decimal? PressaoAr_AVG { get; set; }
+
+        public decimal? PrecipitacaoTotal_MAX { get; set; }
+        public decimal? PrecipitacaoTotal_MIN { get; set; }
+        public decimal? PrecipitacaoTotal_Hora { get; set; }
+
+        public decimal? NivelRio_MAX { get; set; }
+        public decimal? NivelRio_MIN { get; set; }
+        public decimal? NivelRio_AVG { get; set; }
     }
 }
