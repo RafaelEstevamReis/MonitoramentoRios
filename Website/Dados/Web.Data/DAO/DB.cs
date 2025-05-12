@@ -263,6 +263,22 @@ public class DB
         return last - first;
     }
 
+    public void RemoverDadosAgregados(int hourKey)
+    {
+        using var cnn = db.GetConnection();
+        cnn.Execute($"DELETE FROM {nameof(DBModels.TBDadosEstacoesHora)} WHERE {nameof(DBModels.TBDadosEstacoesHora.HourKey)} = @hourKey", new { hourKey });
+    }
+    public void AnularDadosNivel(string estacao, IEnumerable<long> ids)
+    {
+        using var cnn = db.GetConnection();
+        using var tr = cnn.BeginTransaction();
+        foreach (var id in ids)
+        {
+            tr.Execute($"UPDATE {nameof(DBModels.TBDadosEstacoes)} SET NivelRio=NULL WHERE Id = @id AND Estacao = @estacao" , new { id, estacao });
+        }
+        tr.Commit();
+    }
+
     internal IEnumerable<DBModels.TBDadosEstacoes> ListarAntigos(int limit = 50)
     {
         if (limit > 5000) limit = 5000;

@@ -41,6 +41,7 @@ builder.Services.AddHostedService(i =>
     var pass = builder.Configuration["mqtt_pass"];
     return new Web.Data.BkgWorkers.MqttWorker(i.GetService<ILogger>(), i.GetService<Web.Data.DAO.DB>(), host, user, pass);
 });
+Web.Data.Controllers.Maintenance.ApiKey = builder.Configuration["maintenance-key"] ?? "";
 
 var app = builder.Build();
 
