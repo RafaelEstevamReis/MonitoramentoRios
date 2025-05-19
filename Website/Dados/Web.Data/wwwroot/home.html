@@ -59,6 +59,12 @@
                 padding: 4px 16px;
                 font-size: 8px;
             }
+
+            .ribbon {
+                left: auto !important;
+                right: 0 !important;
+                transform: rotate(45deg) translate(18px, -8px) !important;
+            }
         }
 
         h1 {
@@ -107,9 +113,25 @@
             border: 2px solid #007bff;
             line-height: 0.85;
         }
+        .ribbon {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: auto;
+            background-color: #ff4757; /* Cor de fundo do ribbon */
+            color: #fff; /* Cor do texto */
+            text-align: center;
+            padding: 4px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            transform: rotate(-45deg) translate(-18px, -10px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1000; /* Garante que o ribbon fique acima de outros elementos */
+        }
     </style>
 </head>
 <body>
+    <div class="ribbon">BETA</div>
     <div id="screen">
         <div id="content">
             <h1>Projeto de Monitoramento de Rios</h1>
@@ -179,24 +201,24 @@
                     let bLevel = dado.percentBateria && dado.percentBateria > 30 ? (dado.percentBateria > 70 ? 'battery-full' : 'battery-half') : 'battery'
 
                     let bat = `<i class="bi-${bLevel}"></i> ${formatValue(dado.percentBateria, 0)}%`;
-                    let sig = dado.source == 3 ? loraIcon : `<i class="bi-wifi${dado.forcaSinal && dado.forcaSinal < -70 ? '-1' : '' }"></i> ${wifiSignalToPercent(dado.forcaSinal)}`;
+                    let sig = dado.source == 3 ? loraIcon : `<i class="bi-wifi${dado.forcaSinal && dado.forcaSinal < -70 ? '-1' : ''}"></i> ${wifiSignalToPercent(dado.forcaSinal)}`;
 
                     let temp = dado.temperaturaAr ? `<i class="bi-thermometer"></i> ${formatValue(dado.temperaturaAr, 1)}ºC` : ''
                     let humd = dado.umidadeAr ? `<i class="bi-droplet"></i> ${formatValue(dado.umidadeAr, 0)}%` : ''
-                    let prss = dado.pressaoAr ? `<i class="bi-box-arrow-in-down"></i> ${formatValue(dado.pressaoAr, 0)} hPa` :''
+                    let prss = dado.pressaoAr ? `<i class="bi-box-arrow-in-down"></i> ${formatValue(dado.pressaoAr, 0)} hPa` : ''
 
-                    let nivel = dado.nivelRio || dado.nivelRio==0 ? `<i class="bi-water"></i> ${formatValueUnit(dado.nivelRio, 1, 'm')}` : '';
+                    let nivel = dado.nivelRio || dado.nivelRio == 0 ? `<i class="bi-water"></i> ${formatValueUnit(dado.nivelRio, 1, 'm')}` : '';
                     let chuva = dado.precipitacao10min || dado.precipitacao10min == 0 ? `<i class="bi-cloud-rain"></i> ${formatValueUnit(dado.precipitacao10min, 1, 'mm/min')}` : '';
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                                                        <td style='text-align: left;'>${dado.nomeEstacao || dado.estacao}</td>
-                                                        <td style='text-align: left;'>${bat}</td>
-                                                        <td style='text-align: left;'>${sig}</td>
-                                                        <td>${humd} ${temp} ${prss}</td>
-                                                        <td>${nivel} ${chuva}</td>
-                                                        <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
-                                                    `;
+                                                            <td style='text-align: left;'>${dado.nomeEstacao || dado.estacao}</td>
+                                                            <td style='text-align: left;'>${bat}</td>
+                                                            <td style='text-align: left;'>${sig}</td>
+                                                            <td>${humd} ${temp} ${prss}</td>
+                                                            <td>${nivel} ${chuva}</td>
+                                                            <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
+                                                        `;
                     tableBody.appendChild(row);
                     //setColor(row, dado.nomeEstacao);
                 });
