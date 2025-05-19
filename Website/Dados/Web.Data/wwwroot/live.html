@@ -88,8 +88,8 @@
                     for (var i = 1; i < data.length; i++) {
                         const dtDi = new Date(data[i].dataHoraDadosUTC);
                         var ts = dtD0 - dtDi;
-                        if (ts < 60 * 60 * 1000) break;
                         dado1h = data[i];
+                        if (ts > 60 * 60 * 1000) break;
                     }
 
                     diff = dado.precipitacaoTotal - dado1h.precipitacaoTotal;
