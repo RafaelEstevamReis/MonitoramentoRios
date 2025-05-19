@@ -80,9 +80,13 @@
                 });
 
         });
-        function copycb(value) {
-            navigator.clipboard.writeText(value);
-            alert("Endereço Copiado: " + value);
+        async function copycb(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                alert("Endereço Copiado: " + text);
+            } catch (error) {
+                console.error(error.message);
+            }
         }
 
         function ipCut(value, groups, def) {
