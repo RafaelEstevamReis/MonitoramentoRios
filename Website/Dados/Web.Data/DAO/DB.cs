@@ -151,7 +151,7 @@ public class DB
         var pressaoAr = DataAggregator.Aggregate(qData, o => o.PressaoAr);
         var precipitacao = DataAggregator.Aggregate(qData, o => o.Precipitacao);
         var precipitacaoTotal = DataAggregator.Aggregate(qData, o => o.PrecipitacaoTotal);
-        var nivelRio = agregadorFiltrado(qData, o => o.NivelRio ?? o.NivelRio_RAW);
+        var nivelRio = agregadorFiltrado(qData, o => o.NivelRio); // Não pode ler o valor não convertido, destroi a média
 
         hora = new DBModels.TBDadosEstacoesHora
         {
