@@ -1,6 +1,7 @@
 ﻿namespace Web.Data.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
 using Web.Data.DAO;
 
@@ -14,6 +15,21 @@ public class Maintenance : ControllerBase
     public Maintenance(DB db)
     {
         this.db = db;
+    }
+
+    [HttpPost("getCurrentHourKey")]
+    public IActionResult CurrentHourKey(string apiKey)
+    {
+        if (!checkKey(apiKey)) return Unauthorized();
+
+        var dtNow = DateTime.UtcNow;
+        var hourKey = (int)(dtNow - DateTime.UnixEpoch).TotalHours;
+
+        return Ok(new
+        {
+            dtNow,
+            hourKey
+        });
     }
 
     [HttpPost("purgeHourly")]
