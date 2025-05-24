@@ -38,7 +38,7 @@
                             if (ultimo) {
                                 let lvl = '-';
                                 if (ultimo.nivelRio || ultimo.nivelRio == 0) lvl = `${formatValue(ultimo.nivelRio, 1)}m (r${formatValue(ultimo.nivelRio_RAW, 1)})`;
-                                if (ultimo.precipitacao || ultimo.precipitacao == 0) lvl = `${formatValue(ultimo.precipitacao, 1)}mm/min (t${formatValue(ultimo.precipitacaoTotal, 1)}mm)`;
+                                if (ultimo.precipitacao || ultimo.precipitacao == 0) lvl = `${formatValue(ultimo.precipitacao, 1)}mm/min (at${formatValue(ultimo.precipitacaoTotal, 1)}mm)`;
 
                                 let rawData = ultimo.rawData.startsWith('{') ? JSON.parse(ultimo.rawData) : { };
                                 const ipStr = `${ipCut(rawData.ip, 2, e.la)} @${nullSlice(rawData.mac, -5, e.serial)}`;
