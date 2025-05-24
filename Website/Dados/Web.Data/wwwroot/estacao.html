@@ -86,6 +86,10 @@
 
                     data.forEach(dado => {
                         const row = document.createElement('tr');
+
+                        let prec = '-mm/min';
+                        if (dado.precipitacao || dado.precipitacao == 0) prec = `${formatValue(dado.precipitacao, 1) || '-'}mm/min (AT ${formatValue(dado.precipitacaoTotal, 1)})`;
+
                         row.innerHTML = `
                                             <td>${new Date(dado.recebidoUTC).toLocaleString()}${dado.source == 3 ? loraIcon : ''}</td>
                                             <td>${formatValue(dado.temperaturaInterna, 1)}ºC</td>
@@ -93,7 +97,7 @@
                                             <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
                                             <td>${formatValue(dado.temperaturaAr, 1)}ºC</td>
                                             <td>${dado.umidadeAr || '-'}%</td>
-                                            <td>${formatValue(dado.precipitacao, 1) || '-'}mm/min (AT ${formatValue(dado.precipitacaoTotal, 1)})</td>
+                                            <td>${prec}</td>
                                             <td>${formatValue(dado.nivelRio, 2) || '-'}m</td>
                                             <td>${wifiSignalToPercent(dado.forcaSinal)} (${dado.forcaSinal || '-'}dBm)</td>
                                         `;
