@@ -84,21 +84,47 @@
                     }
                     setValue('clRain', `${formatValue(dado.precipitacao, 1) || '-'}mm/min ${sign}`);
 
-                    let dado1h = dado;
-                    for (var i = 1; i < data.length; i++) {
-                        const dtDi = new Date(data[i].dataHoraDadosUTC);
-                        var ts = dtD0 - dtDi;
-                        dado1h = data[i];
-                        if (ts > 60 * 60 * 1000) break;
-                    }
-
-                    diff = dado.precipitacaoTotal - dado1h.precipitacaoTotal;
+                    const diff = calcularPrecipitacaoComReset(data);
                     setValue('clRain1h', `${formatValue(diff, 1) || '-'}mm/h`);
 
                 })
                 .catch(error => {
                     console.error('Erro ao carregar dados das estações:', error);
                 });
+        }
+        function calcularPrecipitacaoComReset(data) {
+            if (!data || data.length === 0) return 0;
+
+            const dadoMaisRecente = data[0]; // Mais recente
+            const timestampLimite = new Date(dadoMaisRecente.dataHoraDadosUTC) - 60 * 60 * 1000; // 1 hora atrás
+
+            let total = 0;
+            let ultimoValor = dadoMaisRecente.precipitacaoTotal;
+
+            for (let i = 1; i < data.length; i++) {
+                const dtAtual = new Date(data[i].dataHoraDadosUTC).getTime();
+                if (dtAtual < timestampLimite) break; // Sai se ultrapassar 1 hora
+
+                const valorAtual = data[i].precipitacaoTotal;
+                if (valorAtual > ultimoValor) {
+                    // Reset detectado: soma o último valor como contribuição antes do reset
+                    total += ultimoValor;
+                } else {
+                    // Sem reset: soma a diferença entre valores consecutivos
+                    total += ultimoValor - valorAtual;
+                }
+                ultimoValor = valorAtual;
+            }
+
+            // Adiciona a contribuição do valor mais recente
+            total += dadoMaisRecente.precipitacaoTotal - (data[1] ? data[1].precipitacaoTotal : 0);
+
+            // Corrige para o caso de reset no segundo valor
+            if (data[1] && dadoMaisRecente.precipitacaoTotal < data[1].precipitacaoTotal) {
+                total += dadoMaisRecente.precipitacaoTotal;
+            }
+
+            return total;
         }
         function setValue(id, value) {
             const element = document.getElementById(id);
