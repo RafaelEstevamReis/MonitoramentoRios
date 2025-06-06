@@ -28,6 +28,25 @@ function timeSince(date) {
     }
     return 'agora';
 }
+
+function getDateTimeForTimezoneHour(currentString, tz) {
+    // Ajustar o horário para o timezone especificado (tz é em horas)
+    const offsetMs = tz * 60 * 60 * 1000; // Converte horas para milissegundos
+    const current = new Date(currentString + 'Z');
+    const adjustedTime = new Date(current.getTime() + offsetMs);
+
+    // Extrair componentes da data e hora em UTC (já ajustado)
+    const year = adjustedTime.getUTCFullYear();
+    const month = String(adjustedTime.getUTCMonth()+1).padStart(2, '0');
+    const day = String(adjustedTime.getUTCDate()).padStart(2, '0');
+    const hours = String(adjustedTime.getUTCHours()).padStart(2, '0');
+
+    // Formatar como "YYYY-MM-DD HHh" (sem minutos)
+    const formattedDateTime = `${day}/${month} ${hours}h`;
+
+    return formattedDateTime;
+}
+
 function wifiSignalToPercent(signal) {
     if (signal == null || isNaN(signal)) return '-'; // Retorna '-' para valores inválidos
     if (signal === undefined) return '-';

@@ -58,10 +58,10 @@
                 .then(response => response.json())
                 .then(data => {
                     const dado = data[0]; // Mais recente
-                    const dtD0 = new Date(dado.dataHoraDadosUTC);
+                    const dtD0 = new Date(dado.dataHoraDadosUTC+"Z");
                     // Header
                     setValue('nomeEstacao', dado.nomeEstacao);
-                    setValue('dtDados', dtD0.toLocaleString());
+                    setValue('dtDados', dtD0.toLocaleString("pt-BR"));
                     // Dados Estação
                     setValue('clNomeEstacao', dado.nomeEstacao);
                     setValue('clBat', `${formatValue(dado.tensaoBateria, 2)}v (${formatValue(dado.percentBateria, 0)}%)`);
@@ -159,9 +159,10 @@
                         //let precRate = dado.precipitacao_MAX ? `${formatValue(dado.precipitacao_MAX, 1) || '-'}mm/min` : '';
                         let precTotalH = dado.precipitacaoTotal_Hora || dado.precipitacaoTotal_Hora == 0 ? `${formatValue(dado.precipitacaoTotal_Hora, 1) || '-'}mm/h` : '';
 
+                        const localDateString = getDateTimeForTimezoneHour(dado.dataHoraDadosUTC, -3);
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                <td>${dado.dataHoraDadosUTC.slice(0, 13).replace('T', ' ')}h</td>
+                                <td>${localDateString}</td>
                                 <td style="text-align: center;">${dado.dataCount}</td>
                                 <td>${formatValue(dado.temperaturaInterna_AVG, 1)}ºC</td>
                                 <td>${formatValue(dado.tensaoBateria_AVG, 2)}v (${formatValue(dado.percentBateria_AVG, 0)}%)</td>
@@ -194,7 +195,8 @@
                     data.forEach(dado => {
                         if (dado === undefined || dado === null) return;
 
-                        const label = dado.dataHoraDadosUTC.slice(8, 10) + '/' + dado.dataHoraDadosUTC.slice(5, 7) + ' ' + dado.dataHoraDadosUTC.slice(11, 13) + 'h';
+                        const label = getDateTimeForTimezoneHour(dado.dataHoraDadosUTC, -3);
+                        //const label = dado.dataHoraDadosUTC.slice(8, 10) + '/' + dado.dataHoraDadosUTC.slice(5, 7) + ' ' + dado.dataHoraDadosUTC.slice(11, 13) + 'h';
 
                         if (dado.nivelRio_AVG && dado.nivelRio_AVG < 0) dado.nivelRio_AVG = 0;
 
@@ -382,7 +384,7 @@
                 </tbody>
             </table>
 
-            <div>Atualizado em <span id="dtDados">[HH]</span> (UTC)</div>
+            <div>Atualizado em <span id="dtDados">[HH]</span></div>
         </div>
         <div id="dvGrafico" style="max-height: 300px; width: 600px">
             <canvas id="nivelRioChart"></canvas>
@@ -404,7 +406,7 @@
     <table id="dadosEstacao">
         <thead>
             <tr>
-                <th>Recebido<br>(UTC)</th>
+                <th>Recebido</th>
                 <th>Registros</th>
                 <th width="100px">Temperatura Interna</th>
                 <th>Tensão da Bateria</th>
