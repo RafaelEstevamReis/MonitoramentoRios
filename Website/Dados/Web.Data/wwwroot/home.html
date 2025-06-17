@@ -36,9 +36,9 @@
             overflow: auto; /* Permite o scroll */
         }
 
-            #content a, a:visited {
-                color: beige
-            }
+        #content a, a:visited {
+            color: beige
+        }
 
         @media(max-width: 710px) {
             #map {
@@ -113,6 +113,7 @@
             border: 2px solid #007bff;
             line-height: 0.85;
         }
+
         .ribbon {
             position: fixed;
             top: 0;
@@ -181,9 +182,9 @@
                 </div>
 
                 <!--<div class="cdvChart">
-        <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-search"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
-        <canvas id="chtCH01"></canvas>
-    </div>-->
+                    <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-search"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
+                    <canvas id="chtCH01"></canvas>
+                </div>-->
 
                 <p>Veja mais em: <a href="https://github.com/RafaelEstevamReis/MonitoramentoRios" target="_blank">gh/MonitoramentoRios</a></p>
             </div>
@@ -211,28 +212,42 @@
                     let prss = dado.pressaoAr ? `<i class="bi-box-arrow-in-down"></i> ${formatValue(dado.pressaoAr, 0)} hPa` : ''
 
                     let nivel = dado.nivelRio || dado.nivelRio == 0 ? `<i class="bi-water"></i> ${formatValueUnit(dado.nivelRio, 1, 'm')}` : '';
-                    let chuva = dado.precipitacao10min || dado.precipitacao10min == 0 ? `<i class="bi-cloud-rain"></i> ${formatValueUnit(dado.precipitacao10min, 1, 'mm/min')}` : '';
+                    let chuva = '';
+
+                    if (dado.precipitacao10min || dado.precipitacao10min == 0) {
+                        let idCh = `ch_${dado.estacao}`;
+                        chuva = `<i class="bi-cloud-rain"></i> <span id='${idCh}'>${formatValueUnit(dado.precipitacao10min, 1, 'mm/min')}</span>`;
+                        carregaChuvaEstacao(dado.estacao, idCh);
+                    }
+
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                                                            <td style='text-align: left;'>${dado.nomeEstacao || dado.estacao}</td>
-                                                            <td style='text-align: left;'>${bat}</td>
-                                                            <td style='text-align: left;'>${sig}</td>
-                                                            <td>${humd} ${temp} ${prss}</td>
-                                                            <td>${nivel} ${chuva}</td>
-                                                            <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
-                                                        `;
+                        <td style='text-align: left;'>${dado.nomeEstacao || dado.estacao}</td>
+                        <td style='text-align: left;'>${bat}</td>
+                        <td style='text-align: left;'>${sig}</td>
+                        <td>${humd} ${temp} ${prss}</td>
+                        <td>${nivel} ${chuva}</td>
+                        <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
+                    `;
                     tableBody.appendChild(row);
-                    //setColor(row, dado.nomeEstacao);
                 });
             })
             .catch(error => {
                 console.error('Erro ao carregar dados das estações:', error);
             });
+        function carregaChuvaEstacao(estacao, id) {
+            fetch('/estacoes/agregado?hour=2&estacao=' + estacao)
+                .then(response => response.json())
+                .then(data => {
+                    data = data;
+                    const span = document.querySelector('#' + id);
+                    span.innerHTML = `${formatValue(data.precipitacaoTotal_Hora/2, 1) || '-'}mm/h`; // Em 4h
+                });
+        }
 
         /* Gráficos */
-
-        carregaHistoricoGrafico('04109F675953A131', 'chtBE01', null, 0.7);
+        carregaHistoricoGrafico('04109F675953A131', 'chtBE01', null, null);
         carregaHistoricoGrafico('9A6EE7B45495BB7F', 'chtGLLS', null, 2.0);
         carregaHistoricoGrafico('48B1162D47EC0FE6', 'chtCH01', null, 1.5);
 
