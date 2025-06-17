@@ -1,5 +1,6 @@
 ﻿namespace Web.Data.Controllers;
 
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -60,6 +61,34 @@ public class Maintenance : ControllerBase
 
         return Ok();
     }
+    [HttpPost("nova")]
+    public IActionResult NovaEstacao([FromQuery] string apiKey, EstacoesController.DadosNovaEstacao dados)
+    {
+        if (!checkKey(apiKey)) return Unauthorized();
+        if (dados is null)
+        {
+            return BadRequest("Invalid POST");
+        }
+        if (string.IsNullOrEmpty(dados.NomeResponsavel)) return BadRequest("Invalid POST - NomeResponsavel");
+        if (string.IsNullOrEmpty(dados.NomeEstacao)) return BadRequest("Invalid POST - NomeEstacao");
+
+        var guid = Guid.NewGuid();
+        var key = guid.ToString();
+        var estacao = Helpers.ApiToEstacao(key);
+        db.NovaEstacao(new DAO.DBModels.TBEstacoes
+        {
+            ApiKEY = key,
+            Estacao = estacao,
+            NomeResponsavel = dados.NomeResponsavel,
+            NomeEstacao = dados.NomeEstacao,
+        });
+        return Ok(new
+        {
+            ApiKey = key,
+            IdEstacao = estacao,
+        });
+    }
+
 
     private static bool checkKey(string requestApiKey)
     {

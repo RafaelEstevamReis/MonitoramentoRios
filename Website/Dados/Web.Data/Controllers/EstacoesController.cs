@@ -205,34 +205,6 @@ public class EstacoesController : ControllerBase
                         .ToDictionary(o => o.Estacao, o => o.NomeEstacao);
     }
 
-    [NonAction]
-    [HttpPost("nova")]
-    public IActionResult NovaEstacao(DadosNovaEstacao dados)
-    {
-        if (dados is null)
-        {
-            return BadRequest("Invalid POST");
-        }
-        if (string.IsNullOrEmpty(dados.NomeResponsavel)) return BadRequest("Invalid POST - NomeResponsavel");
-        if (string.IsNullOrEmpty(dados.NomeEstacao)) return BadRequest("Invalid POST - NomeEstacao");
-
-        var guid = Guid.NewGuid();
-        var key = guid.ToString();
-        var estacao = Helpers.ApiToEstacao(key);
-        db.NovaEstacao(new DAO.DBModels.TBEstacoes
-        {
-            ApiKEY = key,
-            Estacao = estacao,
-            NomeResponsavel = dados.NomeResponsavel,
-            NomeEstacao = dados.NomeEstacao,
-        });
-        return Ok(new
-        {
-            ApiKey = key,
-            IdEstacao = estacao,
-        });
-    }
-
     [HttpGet("")]
     public IActionResult ListarEstacoes()
     {
