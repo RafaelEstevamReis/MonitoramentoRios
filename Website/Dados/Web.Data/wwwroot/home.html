@@ -175,7 +175,7 @@
                 <div class="cdvChart">
                     <h3>
                         <span onclick="abrirEstacao('5BA69743261D364A')">
-                            <i class="bi-search"></i> Chuva Rio Branco - Rio Branco, Rolante-RS
+                            <i class="bi-cloud-rain"></i> Chuva no Rio Branco - Rio Branco, Rolante-RS
                         </span>
                     </h3>
                     <canvas id="chtRK01"></canvas>
@@ -257,7 +257,7 @@
 
         /* Gráficos */
         carregaHistoricoGrafico('04109F675953A131', 'chtBE01', null, null);
-        carregaHistoricoGrafico('9A6EE7B45495BB7F', 'chtGLLS', null, 2.0);
+        carregaHistoricoGrafico('9A6EE7B45495BB7F', 'chtGLLS', 0.2, 2.0);
         carregaHistoricoGrafico('48B1162D47EC0FE6', 'chtCH01', null, 1.5);
         carregaHistoricoGrafico('5BA69743261D364A', 'chtRK01', null, 120.0);
 
@@ -328,18 +328,7 @@
                             pointRadius: 3,
                             pointBackgroundColor: 'rgba(75, 192, 192, 1)',
                             pointBorderColor: '#fff'
-                        },
-                        //{
-                        //    label: 'Normal',
-                        //    data: nivelRioDataNormal, // Usar os dados preparados
-                        //    borderColor: 'green',
-                        //    backgroundColor: 'green',
-                        //    borderWidth: 2,
-                        //    pointRadius: 3,
-                        //    pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                        //    pointBorderColor: '#fff'
-                        //}                        
-                        ]
+                        }]
                     };
                     if (!modoNivel) {
                         chtData.datasets.push(
@@ -355,6 +344,19 @@
                                 pointBorderColor: '#fff'
                             })
                     }
+                    if (nivelNormal) {
+                        chtData.datasets.push({
+                            type: 'line',
+                            label: 'Normal',
+                            data: nivelRioDataNormal, // Usar os dados preparados
+                            borderColor: 'gray',
+                            backgroundColor: 'gray',
+                            borderWidth: 2,
+                            pointRadius: 1,
+                            pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                            pointBorderColor: '#fff'
+                        });
+                    }
                     if (nivelAlerta) {
                         chtData.datasets.push({
                             type: 'line',
@@ -363,7 +365,7 @@
                             borderColor: 'yellow',
                             backgroundColor: 'yellow',
                             borderWidth: 2,
-                            pointRadius: 3,
+                            pointRadius: 1,
                             pointBackgroundColor: 'rgba(75, 192, 192, 1)',
                             pointBorderColor: '#fff'
                         });
