@@ -70,6 +70,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             const loraIcon = "<img src='lora.svg' style='height:24px;margin-left:4px;vertical-align: middle;'>";
             let temNivel = false;
+            let temChuva = false;
             let temTemp = false;
             // Carregar gráfico após carregar os dados
             fetch('/estacoes/dados?limit=300&estacao=' + getQueryParam("estacao"))
@@ -80,9 +81,11 @@
                     tableBody.innerHTML = "";
                     const chartData = [['Data/Hora', 'Temperatura do Ar', 'Umidade do Ar']];
                     const chartLevelData = [['Data/Hora', 'Nível']];
+                    const chartRainData = [['Data/Hora', 'Chuva']];
 
                     const spnNome = document.getElementById('nomeEstacao');
                     spnNome.textContent = data[0].nomeEstacao;
+                    let precAnterior = null;
 
                     data.forEach(dado => {
                         const row = document.createElement('tr');
@@ -110,6 +113,14 @@
                             chartData.push([hora, parseFloat(dado.temperaturaAr), parseFloat(dado.umidadeAr)]);
                             temTemp = true;
                         }
+                        if (dado.precipitacao) {
+                            if (!precAnterior) precAnterior = dado.precipitacaoTotal;
+
+                            chartRainData.push([hora, parseFloat((precAnterior -dado.precipitacaoTotal).toFixed(2))]);
+
+                            precAnterior = dado.precipitacaoTotal;
+                            temChuva = true;
+                        }
                         if (dado.nivelRio) {
                             chartLevelData.push([hora, parseFloat(dado.nivelRio.toFixed(2))]);
                             temNivel = true;
@@ -118,15 +129,21 @@
 
                     const reversedData = [chartData[0]].concat(chartData.slice(1).reverse());
                     const reversedLevelData = [chartLevelData[0]].concat(chartLevelData.slice(1).reverse());
+                    const reversedRainData = [chartRainData[0]].concat(chartRainData.slice(1).reverse());
                     // Desenhar o gráfico
                     google.charts.load('current', { 'packages': ['corechart'] });
                     google.charts.setOnLoadCallback(() => {
                         drawChart(reversedData);
-                        if (reversedLevelData.length > 2) drawChartSimples(reversedLevelData, 'Nível', 'chartLevel_div');
+
+                        if (temChuva) {
+                            drawChartSimples(reversedRainData, 'Chuva (mm)', 'chartLevel_div');
+                        } else {
+                            if (reversedLevelData.length > 2) drawChartSimples(reversedLevelData, 'Nível', 'chartLevel_div');
+                        }
                     });
 
                     if (!temTemp) document.getElementById("chart_div").hidden = true;
-                    if (!temNivel) document.getElementById("chartLevel_div").hidden = true;
+                    if (!temNivel && !temChuva) document.getElementById("chartLevel_div").hidden = true;
                 })
                 .catch(error => {
                     console.error('Erro ao carregar dados das estações:', error);
