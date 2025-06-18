@@ -116,7 +116,10 @@
                         if (dado.precipitacao || dado.precipitacao == 0) {
                             if (!precAnterior) precAnterior = dado.precipitacaoTotal;
 
-                            chartRainData.push([hora, parseFloat((precAnterior -dado.precipitacaoTotal).toFixed(2))]);
+                            let diff = precAnterior - dado.precipitacaoTotal;
+                            if (diff < 0) diff = 0; // reset
+
+                            chartRainData.push([hora, parseFloat(diff.toFixed(2))]);
 
                             precAnterior = dado.precipitacaoTotal;
                             temChuva = true;
