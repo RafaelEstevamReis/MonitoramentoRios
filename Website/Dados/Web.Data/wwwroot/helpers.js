@@ -1,5 +1,6 @@
 function formatValue(value, decimals = 0) {
     if (value == null) return '-'; // Verifica null ou undefined
+    if (isNaN(value)) return '-'; // Verifica null ou undefined
     return decimals === 0 ? Math.round(value) : value.toFixed(decimals);
 }
 function formatValueUnit(value, decimals, unit) {
