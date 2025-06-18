@@ -48,7 +48,7 @@ var app = builder.Build();
 app.UseSerilogRequestLogging(options =>
 {
     // Customize the message template
-    options.MessageTemplate = "[REQ] {RemoteIpAddress} [{RequestMethod}] {RequestScheme}://{RequestHost}{RequestPath} [{UA}] responded {StatusCode} in {Elapsed:0.0000}ms - {ContentLen} {ContentType}";
+    options.MessageTemplate = "[REQ] {RemoteIpAddress} [{RequestMethod}] {RequestScheme}://{RequestHost}{RequestPath} [{UA}] responded {StatusCode} in {Elapsed:0.0000}ms - {ResponseContentLen} {ResponseContentType}";
 
     // Emit debug-level events instead of the defaults
     options.GetLevel = (httpContext, elapsed, ex) => Serilog.Events.LogEventLevel.Information;
@@ -58,7 +58,7 @@ app.UseSerilogRequestLogging(options =>
     {
         if (httpContext.Request.Headers.TryGetValue("X-Forwarded-For", out Microsoft.Extensions.Primitives.StringValues xFwFor))
         {
-            diagnosticContext.Set("RemoteIpAddress", xFwFor);
+            diagnosticContext.Set("RemoteIpAddress", xFwFor.ToString());
         }
         else
         {
@@ -67,7 +67,7 @@ app.UseSerilogRequestLogging(options =>
 
         diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
         diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
-        diagnosticContext.Set("UA", httpContext.Request.Headers.UserAgent);
+        diagnosticContext.Set("UA", httpContext.Request.Headers.UserAgent.ToString());
         diagnosticContext.Set("ResponseContentType", httpContext.Response.ContentType);
         diagnosticContext.Set("ResponseContentLen", httpContext.Response.ContentLength);
     };
