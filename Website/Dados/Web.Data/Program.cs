@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using Serilog.Events;
 using Simple.Sqlite;
-using System.Linq;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -49,23 +48,28 @@ var app = builder.Build();
 app.UseSerilogRequestLogging(options =>
 {
     // Customize the message template
-    options.MessageTemplate = "[REQ] {RemoteIpAddress} [{RequestMethod}] {RequestScheme}://{RequestHost}{RequestPath} [{UA}] responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.MessageTemplate = "[REQ] {RemoteIpAddress} [{RequestMethod}] {RequestScheme}://{RequestHost}{RequestPath} [{UA}] responded {StatusCode} in {Elapsed:0.0000}ms - {ContentLen} {ContentType}";
 
     // Emit debug-level events instead of the defaults
-    options.GetLevel = (httpContext, elapsed, ex) => LogEventLevel.Information;
+    options.GetLevel = (httpContext, elapsed, ex) => Serilog.Events.LogEventLevel.Information;
 
     // Attach additional properties to the request completion event
     options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
     {
-        diagnosticContext.Set("RemoteIpAddress", httpContext.Connection.RemoteIpAddress);
-        if (httpContext.Request.Headers.TryGetValue("X-Forwarded-For", out Microsoft.Extensions.Primitives.StringValues value))
+        if (httpContext.Request.Headers.TryGetValue("X-Forwarded-For", out Microsoft.Extensions.Primitives.StringValues xFwFor))
         {
-            diagnosticContext.Set("RemoteIpAddress", value);
+            diagnosticContext.Set("RemoteIpAddress", xFwFor);
+        }
+        else
+        {
+            diagnosticContext.Set("RemoteIpAddress", httpContext.Connection.RemoteIpAddress);
         }
 
         diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
         diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
         diagnosticContext.Set("UA", httpContext.Request.Headers.UserAgent);
+        diagnosticContext.Set("ResponseContentType", httpContext.Response.ContentType);
+        diagnosticContext.Set("ResponseContentLen", httpContext.Response.ContentLength);
     };
 });
 
