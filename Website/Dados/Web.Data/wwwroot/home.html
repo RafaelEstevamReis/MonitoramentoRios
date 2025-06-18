@@ -132,7 +132,7 @@
     </style>
 </head>
 <body>
-    <div class="ribbon">BETA</div>
+    <div class="ribbon">₿ETA</div>
     <div id="screen">
         <div id="content">
             <h1>Projeto de Monitoramento de Rios</h1>
@@ -174,17 +174,26 @@
 
                 <div class="cdvChart">
                     <h3>
+                        <span onclick="abrirEstacao('5BA69743261D364A')">
+                            <i class="bi-search"></i> Chuva Rio Branco - Rio Branco, Rolante-RS
+                        </span>
+                    </h3>
+                    <canvas id="chtRK01"></canvas>
+                </div>
+
+                <!--<div class="cdvChart">
+                    <h3>
                         <span onclick="abrirEstacao('04109F675953A131')">
                             <i class="bi-search"></i> Boa Esperança - Arroio Boa Esperança, Rolante-RS
                         </span>
                     </h3>
                     <canvas id="chtBE01"></canvas>
-                </div>
+                </div>-->
 
                 <!--<div class="cdvChart">
-                    <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-search"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
-                    <canvas id="chtCH01"></canvas>
-                </div>-->
+        <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-search"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
+        <canvas id="chtCH01"></canvas>
+    </div>-->
 
                 <p>Veja mais em: <a href="https://github.com/RafaelEstevamReis/MonitoramentoRios" target="_blank">gh/MonitoramentoRios</a></p>
             </div>
@@ -250,6 +259,7 @@
         carregaHistoricoGrafico('04109F675953A131', 'chtBE01', null, null);
         carregaHistoricoGrafico('9A6EE7B45495BB7F', 'chtGLLS', null, 2.0);
         carregaHistoricoGrafico('48B1162D47EC0FE6', 'chtCH01', null, 1.5);
+        carregaHistoricoGrafico('5BA69743261D364A', 'chtRK01', null, 120.0);
 
         function carregaHistoricoGrafico(idEstacao, canvasId, nivelNormal, nivelAlerta) {
             fetch('/estacoes/lastHourly?lastHours=30&estacao=' + idEstacao)
@@ -258,6 +268,7 @@
                     // Criar o gráfico
                     const labels = []; // Para os rótulos do gráfico
                     const nivelRioData = []; // Para os valores do nível do rio
+                    const acumuladoData = []; // Para os valores do nível do rio
                     const nivelRioDataNormal = []; // Para os valores do nível do rio
                     const nivelRioDataAlerta = []; // Para os valores do nível do rio
 
@@ -266,7 +277,7 @@
                     // Gerar todos os horários entre o primeiro e o último
                     const now = new Date(); // Horário atual
                     const endDate = new Date(now.getTime() - 1 * 60 * 60 * 1000); // Retira 1h
-                    const startDate = new Date(now.getTime() - 30 * 60 * 60 * 1000); // 24 horas atrás
+                    const startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000); // 24 horas atrás
                     const allLabels = generateHourlyLabels(startDate, endDate);
 
                     // Criar um mapa dos dados existentes para facilitar a busca
@@ -276,14 +287,25 @@
                         const label = getDateTimeForTimezone(current, -3);
                         dataMap.set(label, dado);
                     });
+                    let modoNivel = idEstacao != "5BA69743261D364A";
+                    let acumulado = 0;
 
                     // Preencher os arrays com os dados, inserindo null nas janelas
                     allLabels.forEach(label => {
                         labels.push(label);
                         const dado = dataMap.get(label);
+
                         if (dado) {
-                            if (dado.nivelRio_AVG < 0) dado.nivelRio_AVG = 0;
-                            nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null);
+
+                            if (modoNivel) {
+                                if (dado.nivelRio_AVG < 0) dado.nivelRio_AVG = 0;
+                                nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null);
+                            } else {
+                                nivelRioData.push(formatValue(dado.precipitacaoTotal_Hora, 1) || null);
+                                acumulado += dado.precipitacaoTotal_Hora;
+                                acumuladoData.push(formatValue(acumulado, 1) || null);
+                            }
+
                             nivelRioDataNormal.push(formatValue(nivelNormal, 2) || null);
                             nivelRioDataAlerta.push(formatValue(nivelAlerta, 2) || null);
                         } else {
@@ -294,42 +316,62 @@
                     });
 
                     const ctx = document.getElementById(canvasId).getContext('2d');
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: labels, // Usar os rótulos preparados
-                            datasets: [{
-                                label: 'Nível do Rio (m)',
-                                data: nivelRioData, // Usar os dados preparados
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                borderWidth: 2,
-                                pointRadius: 3,
-                                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                                pointBorderColor: '#fff'
-                            },
-                            //{
-                            //    label: 'Normal',
-                            //    data: nivelRioDataNormal, // Usar os dados preparados
-                            //    borderColor: 'green',
-                            //    backgroundColor: 'green',
-                            //    borderWidth: 2,
-                            //    pointRadius: 3,
-                            //    pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                            //    pointBorderColor: '#fff'
-                            //},
-                            {
-                                label: 'Alerta',
-                                data: nivelRioDataAlerta, // Usar os dados preparados
-                                borderColor: 'yellow',
-                                backgroundColor: 'yellow',
-                                borderWidth: 2,
-                                pointRadius: 3,
-                                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                                pointBorderColor: '#fff'
-                            }
-                            ]
+
+                    let chtData = {
+                        labels: labels, // Usar os rótulos preparados
+                        datasets: [{
+                            label: modoNivel ? 'Nível do Rio (m)' : 'Chuva (mm/h)',
+                            data: nivelRioData, // Usar os dados preparados
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                            pointBorderColor: '#fff'
                         },
+                        //{
+                        //    label: 'Normal',
+                        //    data: nivelRioDataNormal, // Usar os dados preparados
+                        //    borderColor: 'green',
+                        //    backgroundColor: 'green',
+                        //    borderWidth: 2,
+                        //    pointRadius: 3,
+                        //    pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                        //    pointBorderColor: '#fff'
+                        //}                        
+                        ]
+                    };
+                    if (!modoNivel) {
+                        chtData.datasets.push(
+                            {
+                                type: 'line',
+                                label: 'Acumulado',
+                                data: acumuladoData, // Usar os dados preparados
+                                borderColor: 'rgb(54, 162, 235)',
+                                backgroundColor: 'rgb(54, 162, 235,0.5)',
+                                borderWidth: 2,
+                                pointRadius: 3,
+                                pointBackgroundColor: 'rgba(75, 75, 192, 1)',
+                                pointBorderColor: '#fff'
+                            })
+                    }
+                    if (nivelAlerta) {
+                        chtData.datasets.push({
+                            type: 'line',
+                            label: 'Alerta',
+                            data: nivelRioDataAlerta, // Usar os dados preparados
+                            borderColor: 'yellow',
+                            backgroundColor: 'yellow',
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                            pointBorderColor: '#fff'
+                        });
+                    }
+
+                    new Chart(ctx, {
+                        type: modoNivel ? 'line' : 'bar',
+                        data: chtData,
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
@@ -360,7 +402,7 @@
                                 y: {
                                     title: {
                                         display: true,
-                                        text: 'Nível do Rio (m)',
+                                        text: modoNivel ? 'Nível do Rio (m)' : 'Chuva (mm/h)',
                                         color: 'white'
                                     },
                                     ticks: {
