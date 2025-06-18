@@ -113,7 +113,7 @@
                             chartData.push([hora, parseFloat(dado.temperaturaAr), parseFloat(dado.umidadeAr)]);
                             temTemp = true;
                         }
-                        if (dado.precipitacao) {
+                        if (dado.precipitacao || dado.precipitacao == 0) {
                             if (!precAnterior) precAnterior = dado.precipitacaoTotal;
 
                             chartRainData.push([hora, parseFloat((precAnterior -dado.precipitacaoTotal).toFixed(2))]);
