@@ -136,9 +136,9 @@
                         drawChart(reversedData);
 
                         if (temChuva) {
-                            drawChartSimples(reversedRainData, 'Chuva (mm)', 'chartLevel_div');
+                            drawChartSimples(reversedRainData, 'Chuva (mm)', 'chartLevel_div', false);
                         } else {
-                            if (reversedLevelData.length > 2) drawChartSimples(reversedLevelData, 'Nível', 'chartLevel_div');
+                            if (reversedLevelData.length > 2) drawChartSimples(reversedLevelData, 'Nível', 'chartLevel_div', true);
                         }
                     });
 
@@ -175,7 +175,7 @@
             const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
             chart.draw(data, options);
         }
-        function drawChartSimples(chartData, title, id) {
+        function drawChartSimples(chartData, title, id, graficoLinha) {
             const data = google.visualization.arrayToDataTable(chartData);
 
             const options = {
@@ -195,7 +195,7 @@
                 }
             };
 
-            const chart = new google.visualization.LineChart(document.getElementById(id));
+            const chart = graficoLinha ? new google.visualization.LineChart(document.getElementById(id)) : new google.visualization.ColumnChart(document.getElementById(id));
             chart.draw(data, options);
         }
     </script>
