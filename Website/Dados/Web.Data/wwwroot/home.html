@@ -262,7 +262,7 @@
         carregaHistoricoGrafico('5BA69743261D364A', 'chtRK01', null, 120.0);
 
         function carregaHistoricoGrafico(idEstacao, canvasId, nivelNormal, nivelAlerta) {
-            fetch('/estacoes/lastHourly?lastHours=30&estacao=' + idEstacao)
+            fetch('/estacoes/lastHourly?lastHours=36&estacao=' + idEstacao)
                 .then(response => response.json())
                 .then(data => {
                     // Criar o gráfico
@@ -280,6 +280,19 @@
                     const startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000); // 24 horas atrás
                     const allLabels = generateHourlyLabels(startDate, endDate);
 
+                    // Gera acumulado móvel 24h
+                    for (let i = 0; i < data.length; i++) {
+                        if (!data[i]) continue;
+                        let acumulado = 0;
+                        // Define o início da janela (máximo 24 horas atrás ou 0 se i < 24)
+                        let start = Math.max(0, i - 23); // i - 23 porque queremos incluir até i (24 horas no total)
+                        for (let j = start; j <= i; j++) {
+                            if (!data[j]) continue;
+                            acumulado += data[j].precipitacaoTotal_Hora || 0; // Soma o valor, tratando null/undefined como 0
+                        }
+                        data[i].acumulado24h = acumulado;
+                    }
+
                     // Criar um mapa dos dados existentes para facilitar a busca
                     const dataMap = new Map();
                     validData.forEach(dado => {
@@ -288,7 +301,6 @@
                         dataMap.set(label, dado);
                     });
                     let modoNivel = idEstacao != "5BA69743261D364A";
-                    let acumulado = 0;
 
                     // Preencher os arrays com os dados, inserindo null nas janelas
                     allLabels.forEach(label => {
@@ -302,8 +314,7 @@
                                 nivelRioData.push(formatValue(dado.nivelRio_AVG, 2) || null);
                             } else {
                                 nivelRioData.push(formatValue(dado.precipitacaoTotal_Hora, 1) || null);
-                                acumulado += dado.precipitacaoTotal_Hora;
-                                acumuladoData.push(formatValue(acumulado, 1) || null);
+                                acumuladoData.push(formatValue(dado.acumulado24h, 1) || null);
                             }
 
                             nivelRioDataNormal.push(formatValue(nivelNormal, 2) || null);
