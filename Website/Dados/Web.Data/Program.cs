@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Serilog.Events;
 using Simple.Sqlite;
+using System.Linq;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -44,6 +46,28 @@ builder.Services.AddHostedService(i =>
 Web.Data.Controllers.Maintenance.ApiKey = builder.Configuration["maintenance-key"] ?? "";
 
 var app = builder.Build();
+app.UseSerilogRequestLogging(options =>
+{
+    // Customize the message template
+    options.MessageTemplate = "[REQ] {RemoteIpAddress} [{RequestMethod}] {RequestScheme}://{RequestHost}{RequestPath} [{UA}] responded {StatusCode} in {Elapsed:0.0000} ms";
+
+    // Emit debug-level events instead of the defaults
+    options.GetLevel = (httpContext, elapsed, ex) => LogEventLevel.Information;
+
+    // Attach additional properties to the request completion event
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("RemoteIpAddress", httpContext.Connection.RemoteIpAddress);
+        if (httpContext.Request.Headers.TryGetValue("X-Forwarded-For", out Microsoft.Extensions.Primitives.StringValues value))
+        {
+            diagnosticContext.Set("RemoteIpAddress", value);
+        }
+
+        diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+        diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+        diagnosticContext.Set("UA", httpContext.Request.Headers.UserAgent);
+    };
+});
 
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
