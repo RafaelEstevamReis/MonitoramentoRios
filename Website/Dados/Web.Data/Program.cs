@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Simple.Sqlite;
@@ -34,6 +33,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 addDatabase(builder.Services, builder.Configuration);
 
+builder.Services.AddHostedService<Web.Data.BkgWorkers.ExternalArchiver>();
 builder.Services.AddHostedService<Web.Data.BkgWorkers.OldDataArchiver>();
 builder.Services.AddHostedService(i =>
 {

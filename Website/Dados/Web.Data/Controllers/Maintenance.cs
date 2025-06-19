@@ -89,6 +89,20 @@ public class Maintenance : ControllerBase
         });
     }
 
+    [HttpGet("listarExterna")]
+    public IActionResult ListarExterna(string apiKey)
+    {
+        if (!checkKey(apiKey)) return Unauthorized();
+        return Ok(db.ListarCatalogarExternas());
+    }
+    [HttpPost("cadastrarExterna")]
+    public IActionResult CadastraExterna([FromQuery] string apiKey, DAO.DBModels.TBCatalogarExternas dados)
+    {
+        if (!checkKey(apiKey)) return Unauthorized();
+
+        db.CadastraAtualizaExterna(dados);
+        return Ok();
+    }
 
     private static bool checkKey(string requestApiKey)
     {
