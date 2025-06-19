@@ -211,6 +211,7 @@
                 const tableBody = document.querySelector('#ultimasLeituras tbody');
                 tableBody.innerHTML = "";
                 data.forEach(dado => {
+                    if (dado.nomeEstacao.startsWith('EX')) return;
                     let bLevel = dado.percentBateria && dado.percentBateria > 30 ? (dado.percentBateria > 70 ? 'battery-full' : 'battery-half') : 'battery'
 
                     let bat = `<i class="bi-${bLevel}"></i> ${formatValue(dado.percentBateria, 0)}%`;
