@@ -23,6 +23,7 @@ public class DB
            .Add<DBModels.TBEstacoes>()
            .Add<DBModels.TBDadosEstacoes>()
            .Add<DBModels.TBDadosEstacoesHora>()
+           .Add<DBModels.TBCatalogarExternas>()
            .Commit();
 
         if (result.Length > 0) // Teve migrations
@@ -274,7 +275,7 @@ public class DB
         using var tr = cnn.BeginTransaction();
         foreach (var id in ids)
         {
-            tr.Execute($"UPDATE {nameof(DBModels.TBDadosEstacoes)} SET NivelRio=NULL WHERE Id = @id AND Estacao = @estacao" , new { id, estacao });
+            tr.Execute($"UPDATE {nameof(DBModels.TBDadosEstacoes)} SET NivelRio=NULL WHERE Id = @id AND Estacao = @estacao", new { id, estacao });
         }
         tr.Commit();
     }
@@ -361,5 +362,16 @@ public class DB
             la,
             estacao
         });
+    }
+
+    public IEnumerable<DBModels.TBCatalogarExternas> ListarCatalogarExternas()
+    {
+        using var cnn = db.GetConnection();
+        return cnn.GetAll<DBModels.TBCatalogarExternas>();
+    }
+    public void CadastraAtualizaExterna(DBModels.TBCatalogarExternas registro)
+    {
+        using var cnn = db.GetConnection();
+        cnn.Insert(registro, OnConflict.Replace);
     }
 }

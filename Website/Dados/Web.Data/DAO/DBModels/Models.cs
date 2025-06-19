@@ -29,6 +29,7 @@ public class TBDadosEstacoes
         Lan = 1,
 
         LoraMQTT = 3,
+        Externo = 5,
     }
 
     [PrimaryKey]
@@ -150,4 +151,20 @@ public class TBDadosEstacoesHora
     public decimal? NivelRio_StdDev { get; set; }
     public decimal? NivelRio_Trend { get; set; }
 
+}
+
+public class TBCatalogarExternas
+{
+    public enum DataSource
+    {
+        WLink = 1,
+    }
+
+    [PrimaryKey]
+    public long Id { get; set; }
+    [Unique]
+    public string Estacao { get; set; } = string.Empty;
+    public string ExternalKey { get; set; } = string.Empty;
+    public DataSource Origem { get; set; }
+    public bool Ativo { get; set; } = false;
 }
