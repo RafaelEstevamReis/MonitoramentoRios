@@ -34,7 +34,7 @@ public class ExternalArchiver : IHostedService, IDisposable
     public Task StartAsync(CancellationToken cancellationToken)
     {
         logger.Information("[ExternalArchiver] Iniciando serviço de Archive Externo de dados...");
-        _timer = new Timer(executaVerificacaoAsync, null, TimeSpan.FromSeconds(5), TimeSpan.FromMinutes(10));
+        _timer = new Timer(executaVerificacaoAsync, null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(15));
 
         return Task.CompletedTask;
     }
