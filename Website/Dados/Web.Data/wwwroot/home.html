@@ -166,7 +166,7 @@
                 <div class="cdvChart">
                     <h3>
                         <span onclick="abrirEstacao('9A6EE7B45495BB7F')">
-                            <i class="bi-water"></i> Arrio da Areia - Alto Areia, Rolante-RS
+                            <i class="bi-water"></i> Arroio da Areia - Alto Areia, Rolante-RS
                         </span>
                     </h3>
                     <canvas id="chtGLLS"></canvas>
@@ -380,7 +380,7 @@
                     if (nivelAlerta) {
                         chtData.datasets.push({
                             type: 'line',
-                            label: 'Alerta (mm/24h)',
+                            label: modoNivel ? 'Alerta (m)' : 'Alerta (mm/24h)',
                             data: nivelRioDataAlerta, // Usar os dados preparados
                             borderColor: 'yellow',
                             backgroundColor: 'yellow',
