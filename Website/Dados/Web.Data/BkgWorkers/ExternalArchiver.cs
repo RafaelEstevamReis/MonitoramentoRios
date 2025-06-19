@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using Serilog;
 using Simple.API;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ public class ExternalArchiver : IHostedService, IDisposable
     public Task StartAsync(CancellationToken cancellationToken)
     {
         logger.Information("[ExternalArchiver] Iniciando serviço de Archive Externo de dados...");
-        _timer = new Timer(executaVerificacaoAsync, null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(10));
+        _timer = new Timer(executaVerificacaoAsync, null, TimeSpan.FromSeconds(5), TimeSpan.FromMinutes(10));
 
         return Task.CompletedTask;
     }
@@ -76,23 +77,26 @@ public class ExternalArchiver : IHostedService, IDisposable
         var current = r.Data["currConditionValues"];
         foreach (var v in current)
         {
-            var id = (int)v["sensorDataTypeId"];
-            //var name = (string)v["sensorDataName"];
+            //var id = (int)v["sensorDataTypeId"];
+            var name = (string)v["sensorDataName"];
             //var value = (decimal)v["value"];
 
-            switch (id)
+            var convValue = ((string)v["convertedValue"]).Replace(",",".");
+            if (!decimal.TryParse(convValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal dVal)) continue;
+
+            switch (name)
             {
-                case 50: // Barometer
-                    dados.PressaoAr = (decimal)v["convertedValue"];
+                case "Barometer": // Barometer
+                    dados.PressaoAr = dVal;
                     break;
-                case 58: // Temp
-                    dados.TemperaturaAr = (decimal)v["convertedValue"];
+                case "Temp": // Temp
+                    dados.TemperaturaAr = dVal;
                     break;
-                case 59: // Hum
-                    dados.UmidadeAr = (decimal)v["convertedValue"];
+                case "Hum": // Hum
+                    dados.UmidadeAr = dVal;
                     break;
-                case 63: // Rain Rate
-                    dados.Precipitacao = Math.Round((decimal)v["convertedValue"] / 60, 2); // h -> min
+                case "Rain Rate": // Rain Rate
+                    dados.Precipitacao = Math.Round(dVal / 60, 2); // h -> min
                     break;
             }
         }
@@ -102,8 +106,10 @@ public class ExternalArchiver : IHostedService, IDisposable
             var name = (string)v["sensorDataName"];
             if (name != "Rain") continue;
 
-            var month = (decimal)v["convertedValues"]["MONTH"];
-            dados.PrecipitacaoTotal = month;
+            var convValue = ((string)v["convertedValues"]["MONTH"]).Replace(",", ".");
+            if (!decimal.TryParse(convValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal dVal)) continue;
+
+            dados.PrecipitacaoTotal = dVal;
         }
 
         Controllers.UpController.sFinalizaGravacaoDados(db, logger, dados, Newtonsoft.Json.JsonConvert.SerializeObject(dados), $"EX.{e.Id}", e.Estacao);
