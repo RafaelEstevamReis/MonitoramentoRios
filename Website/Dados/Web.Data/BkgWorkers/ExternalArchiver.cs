@@ -33,8 +33,15 @@ public class ExternalArchiver : IHostedService, IDisposable
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
+        TimeSpan start;
+#if DEBUG
+        start = TimeSpan.FromSeconds(15);
+#else
+        start = TimeSpan.FromMinutes(15);
+#endif
+
         logger.Information("[ExternalArchiver] Iniciando serviço de Archive Externo de dados...");
-        _timer = new Timer(executaVerificacaoAsync, null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(15));
+        _timer = new Timer(executaVerificacaoAsync, null, start, TimeSpan.FromMinutes(15));
 
         return Task.CompletedTask;
     }
@@ -69,48 +76,48 @@ public class ExternalArchiver : IHostedService, IDisposable
         var r = await wlClient.GetAsync<JObject>($"/embeddablePage/summaryData/{e.ExternalKey}");
         r.EnsureSuccessStatusCode();
 
-        var dados = new Controllers.UpController.UploadData()
+        var dados = new Controllers.UpController.UploadData();
+        if (r.Data["lastReceived"] != null)
         {
-            DataHoraDadosUTC = DateTime.UnixEpoch.AddMilliseconds((long)r.Data["lastReceived"]),
-        };
+            dados.DataHoraDadosUTC = DateTime.UnixEpoch.AddMilliseconds((long?)r.Data["lastReceived"] ?? 0);
+        }        
 
         var current = r.Data["currConditionValues"];
-        foreach (var v in current)
-        {
-            //var id = (int)v["sensorDataTypeId"];
-            var name = (string)v["sensorDataName"];
-            //var value = (decimal)v["value"];
-
-            var convValue = ((string)v["convertedValue"]).Replace(",",".");
-            if (!decimal.TryParse(convValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal dVal)) continue;
-
-            switch (name)
+        if (current != null) foreach (var v in current)
             {
-                case "Barometer": // Barometer
-                    dados.PressaoAr = dVal;
-                    break;
-                case "Temp": // Temp
-                    dados.TemperaturaAr = dVal;
-                    break;
-                case "Hum": // Hum
-                    dados.UmidadeAr = dVal;
-                    break;
-                case "Rain Rate": // Rain Rate
-                    dados.Precipitacao = Math.Round(dVal / 60, 2); // h -> min
-                    break;
+                var name = (string?)v["sensorDataName"] ?? "";
+                var convValue = ((string?)v["convertedValue"])?.Replace(",", ".");
+                if (!decimal.TryParse(convValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal dVal)) continue;
+
+                switch (name)
+                {
+                    case "Barometer": // Barometer
+                        dados.PressaoAr = dVal;
+                        break;
+                    case "Temp": // Temp
+                        dados.TemperaturaAr = dVal;
+                        break;
+                    case "Hum": // Hum
+                        dados.UmidadeAr = dVal;
+                        break;
+                    case "Rain Rate": // Rain Rate
+                        dados.Precipitacao = Math.Round(dVal / 60, 2); // h -> min
+                        break;
+                }
             }
-        }
         var aggr = r.Data["aggregatedValues"];
-        foreach (var v in aggr)
-        {
-            var name = (string)v["sensorDataName"];
-            if (name != "Rain") continue;
+        if (aggr != null) foreach (var v in aggr)
+            {
+                var name = (string?)v["sensorDataName"];
+                if (name != "Rain") continue;
 
-            var convValue = ((string)v["convertedValues"]["MONTH"]).Replace(",", ".");
-            if (!decimal.TryParse(convValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal dVal)) continue;
+                string? convValue = null;
+                var cv = v["convertedValues"];
+                if (cv != null) convValue = ((string?)cv["MONTH"])?.Replace(",", ".");
+                if (!decimal.TryParse(convValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal dVal)) continue;
 
-            dados.PrecipitacaoTotal = dVal;
-        }
+                dados.PrecipitacaoTotal = dVal;
+            }
 
         Controllers.UpController.sFinalizaGravacaoDados(db, logger, dados, Newtonsoft.Json.JsonConvert.SerializeObject(dados), $"EX.{e.Id}", e.Estacao);
         logger.Information("[ExternalArchiver] Dados externos {estacao}", e.Estacao);
