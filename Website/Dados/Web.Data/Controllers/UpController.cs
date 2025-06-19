@@ -67,6 +67,8 @@ public class UpController : ControllerBase
     }
 
     private void finalizaGravacaoDados(UploadData dados, string rawJson, string ipOrigem, string estacao)
+        => sFinalizaGravacaoDados(db, log, dados, rawJson, ipOrigem, estacao);
+    internal static void sFinalizaGravacaoDados(DB db, ILogger log, UploadData dados, string rawJson, string ipOrigem, string estacao)
     {
         // Corrige valores
         if (dados.ForcaSinal == 0) dados.ForcaSinal = null;
@@ -76,8 +78,15 @@ public class UpController : ControllerBase
         if (dados.pic_b64 != null)
         {
             var imgBytes = Convert.FromBase64String(dados.pic_b64);
-            imgPath = salvaImagem(estacao, imgBytes, ipOrigem);
+            imgPath = salvaImagem(log, estacao, imgBytes, ipOrigem);
             rawJson = rawJson.Replace(dados.pic_b64, "[PIC]");
+        }
+
+        var origem = DAO.DBModels.TBDadosEstacoes.DataSource.Internet;
+        if (ipOrigem != null)
+        {
+            if (ipOrigem.StartsWith("192")) origem = DAO.DBModels.TBDadosEstacoes.DataSource.Lan;
+            if (ipOrigem.StartsWith("EX.")) origem = DAO.DBModels.TBDadosEstacoes.DataSource.Externo;
         }
 
         var d = new DAO.DBModels.TBDadosEstacoes
@@ -89,7 +98,7 @@ public class UpController : ControllerBase
             type = dados.type,
             RawData = rawJson,
             IP_Origem = ipOrigem,
-            Source = ipOrigem.StartsWith("192") ? DAO.DBModels.TBDadosEstacoes.DataSource.Lan : DAO.DBModels.TBDadosEstacoes.DataSource.Internet,
+            Source = origem,
             // Internos
             ForcaSinal = dados.ForcaSinal,
             DataHoraDadosUTC = dados.DataHoraDadosUTC ?? DateTime.UtcNow,
@@ -114,7 +123,7 @@ public class UpController : ControllerBase
         db.AtualizaEstacao(estacao, roj?["mac"]?.ToString() ?? "", roj?["ip"]?.ToString() ?? "");
     }
 
-    private string salvaImagem(string estacao, byte[] rawData, string ipOrigem)
+    private static string salvaImagem(ILogger log, string estacao, byte[] rawData, string ipOrigem)
     {
         var dir = Path.Combine("data", "img", estacao);
         if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
