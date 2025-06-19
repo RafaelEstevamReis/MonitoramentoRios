@@ -342,6 +342,8 @@ public class DB
 
     public void AtualizaEstacao(string estacao, string mac, string ipOrigem)
     {
+        if (string.IsNullOrWhiteSpace(mac)) return;
+
         ulong s;
         int la;
 
