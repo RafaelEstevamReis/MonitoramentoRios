@@ -15,44 +15,58 @@
             padding: 0;
             height: 100%;
             color: white;
+            background-color: darkslategray;
         }
 
         #screen {
+            height: 100%;
+        }
+
+        #top {
             display: flex;
             flex-direction: row;
-            background-color: darkslategray;
+            height: 400px;
+        }
+
+        #topTable {
             height: 100%;
+            width: 60%;
         }
 
         #map {
             height: 100%;
-            width: 30%;
+            width: 40%;
             min-width: 350px;
         }
-
+        /*
         #content {
             padding: 5px;
             flex: 1;
-            overflow: auto; /* Permite o scroll */
+            overflow: auto; /* Permite o scroll
         }
 
         #content a, a:visited {
             color: beige
         }
+        */
 
-        @media(max-width: 710px) {
+        @media(max-width: 800px) {
             #map {
-                height: 250px;
+                height: 600px;
                 width: 100%;
                 min-width: 300px;
             }
 
-            #screen {
+            #top {
                 display: flex;
                 flex-direction: column-reverse;
                 background-color: darkslategray;
                 height: 100%;
-                overflow: auto; /* Permite o scroll */
+                overflow: auto;
+            }
+
+            #topTable {
+                width: 100%;
             }
 
             .btn, .btn:visited {
@@ -67,6 +81,7 @@
             }
         }
 
+
         h1 {
             text-align: center;
         }
@@ -77,6 +92,9 @@
 
         td {
             text-align: center;
+        }
+        td > span {
+            white-space: nowrap;
         }
 
         .cdvChart {
@@ -92,7 +110,7 @@
             border: none;
             border-radius: 10px;
             color: white;
-            padding: 8px 32px;
+            padding: 8px 15px;
             text-align: center;
             display: inline-block;
             font-size: 16px;
@@ -134,35 +152,34 @@
 <body>
     <div class="ribbon">₿ETA</div>
     <div id="screen">
-        <div id="content">
-            <h1>Projeto de Monitoramento de Rios</h1>
+        <div id="top">
+            <div id="topTable">
+                <h1>Projeto de Monitoramento de Rios</h1>
 
-            <h2>Estações</h2>
-
-            <table id="ultimasLeituras">
-                <thead>
-                    <tr>
-                        <th>Estação</th>
-                        <th></th>
-                        <th></th>
-                        <th>Ar</th>
-                        <th>Água</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="9">Carregando...</td>
-                    </tr>
-                    <!-- Dados serão preenchidos dinamicamente aqui -->
-                </tbody>
-            </table>
-
-
-            <h2>Comparativo</h2>
-
+                <table id="ultimasLeituras">
+                    <thead>
+                        <tr>
+                            <th>Estação</th>
+                            <th></th>
+                            <th></th>
+                            <th>Ar</th>
+                            <th>Água</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="9">Carregando...</td>
+                        </tr>
+                        <!-- Dados serão preenchidos dinamicamente aqui -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="map"></div>
+        </div>
+        <hr />
+        <div id="bottom">
             <div id="dvTodas">
-
                 <div class="cdvChart">
                     <h3>
                         <span onclick="abrirEstacao('9A6EE7B45495BB7F')">
@@ -189,17 +206,14 @@
                     </h3>
                     <canvas id="chtBE01"></canvas>
                 </div>-->
-
                 <!--<div class="cdvChart">
-        <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-water"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
-        <canvas id="chtCH01"></canvas>
-    </div>-->
+                    <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-water"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
+                    <canvas id="chtCH01"></canvas>
+                </div>-->
 
                 <p>Veja mais em: <a href="https://github.com/RafaelEstevamReis/MonitoramentoRios" target="_blank">gh/MonitoramentoRios</a></p>
             </div>
-
         </div>
-        <div id="map"></div>
     </div>
 
     <script>
@@ -233,13 +247,13 @@
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td style='text-align: left;'>${dado.nomeEstacao || dado.estacao}</td>
-                        <td style='text-align: left;'>${bat}</td>
-                        <td style='text-align: left;'>${sig}</td>
-                        <td>${humd} ${temp} ${prss}</td>
-                        <td>${nivel} ${chuva}</td>
-                        <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
-                    `;
+                                    <td style='text-align: left; width: 90px'>${dado.nomeEstacao || dado.estacao}</td>
+                                    <td style='text-align: left;'>${bat}</td>
+                                    <td style='text-align: left;'>${sig}</td>
+                                    <td><span>${humd}</span> <span>${temp}</span> <span>${prss}</span></td>
+                                    <td><span>${nivel}</span> <span>${chuva}</span></td>
+                                    <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
+                                `;
                     tableBody.appendChild(row);
                 });
             })
@@ -252,7 +266,7 @@
                 .then(data => {
                     data = data;
                     const span = document.querySelector('#' + id);
-                    span.innerHTML = `${formatValue(data.precipitacaoTotal_Hora/2, 1) || '-'}mm/h`; // Em 4h
+                    span.innerHTML = `${formatValue(data.precipitacaoTotal_Hora / 2, 1) || '-'}mm/h`; // Em 4h
                 });
         }
 
@@ -263,6 +277,8 @@
         carregaHistoricoGrafico('5BA69743261D364A', 'chtRK01', null, 120.0);
 
         function carregaHistoricoGrafico(idEstacao, canvasId, nivelNormal, nivelAlerta) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
             fetch('/estacoes/lastHourly?lastHours=36&estacao=' + idEstacao)
                 .then(response => response.json())
                 .then(data => {
@@ -344,7 +360,7 @@
                         }
                     });
 
-                    const ctx = document.getElementById(canvasId).getContext('2d');
+                    const ctx = canvas.getContext('2d');
 
                     let chtData = {
                         labels: labels, // Usar os rótulos preparados
