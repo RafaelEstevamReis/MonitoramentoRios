@@ -30,12 +30,12 @@
 
         #topTable {
             height: 100%;
-            width: 60%;
+            width: 50%;
         }
 
         #map {
             height: 100%;
-            width: 40%;
+            width: 50%;
             min-width: 350px;
         }
         /*
@@ -49,37 +49,6 @@
             color: beige
         }
         */
-
-        @media(max-width: 800px) {
-            #map {
-                height: 600px;
-                width: 100%;
-                min-width: 300px;
-            }
-
-            #top {
-                display: flex;
-                flex-direction: column-reverse;
-                background-color: darkslategray;
-                height: 100%;
-                overflow: auto;
-            }
-
-            #topTable {
-                width: 100%;
-            }
-
-            .btn, .btn:visited {
-                padding: 4px 16px;
-                font-size: 8px;
-            }
-
-            .ribbon {
-                left: auto !important;
-                right: 0 !important;
-                transform: rotate(45deg) translate(18px, -8px) !important;
-            }
-        }
 
 
         h1 {
@@ -147,6 +116,40 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             z-index: 1000; /* Garante que o ribbon fique acima de outros elementos */
         }
+
+        @media(max-width: 800px) {
+            #map {
+                height: 600px;
+                width: 100%;
+                min-width: 300px;
+            }
+
+            #top {
+                display: flex;
+                flex-direction: column-reverse;
+                background-color: darkslategray;
+                /*height: 100%;*/
+                min-height: 600px;
+                overflow: auto;
+            }
+
+            #topTable {
+                height: auto;
+                width: 100%;
+            }
+
+            .btn, .btn:visited {
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+
+            .ribbon {
+                left: auto ;
+                right: 0;
+                transform: rotate(45deg) translate(18px, -8px);
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -160,7 +163,6 @@
                     <thead>
                         <tr>
                             <th>Estação</th>
-                            <th></th>
                             <th></th>
                             <th>Ar</th>
                             <th>Água</th>
@@ -248,8 +250,7 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                                     <td style='text-align: left; width: 90px'>${dado.nomeEstacao || dado.estacao}</td>
-                                    <td style='text-align: left;'>${bat}</td>
-                                    <td style='text-align: left;'>${sig}</td>
+                                    <td style='text-align: left;'><span>${bat}</span> <span>${sig}</span></td>
                                     <td><span>${humd}</span> <span>${temp}</span> <span>${prss}</span></td>
                                     <td><span>${nivel}</span> <span>${chuva}</span></td>
                                     <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
