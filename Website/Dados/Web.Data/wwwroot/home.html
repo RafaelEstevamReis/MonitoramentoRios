@@ -483,11 +483,11 @@
 
             // Extrair componentes da data e hora em UTC e ajustar manualmente
             const year = adjustedTime.getUTCFullYear();
-            const month = parseInt(adjustedTime.getUTCMonth())
+            const month = parseInt(adjustedTime.getUTCMonth());
             const day = String(adjustedTime.getUTCDate()).padStart(2, '0');
             const hours = String(adjustedTime.getUTCHours()).padStart(2, '0');
 
-            const meses = ["JAN", "FEV", "MAR", "ABR", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+            const meses = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
 
             // Formatar como "YYYY-MM-DD HHh" (sem minutos)
             const formattedDateTime = `${day}/${meses[month]} ${hours}h`;
