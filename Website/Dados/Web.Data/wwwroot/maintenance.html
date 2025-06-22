@@ -47,7 +47,7 @@
                                 row.innerHTML =
                                 `
                                     <td>${new Date(ultimo.dataHoraDadosUTC).toLocaleString()}</td>
-                                    <td onClick=abrirEstacao('${e.estacao}')>${e.nomeEstacao || e.estacao}</td>
+                                    <td><a href="/live.html?estacao=${e.estacao}" target='_blank'>${e.nomeEstacao || e.estacao}</td>
                                     <td>${formatValue(ultimo.tensaoBateria, 1)}v</td>
                                     <td>${formatValue(ultimo.temperaturaAr, 1) || '-'}ºC | ${ultimo.umidadeAr || '-'}%</td>
                                     <td>${lvl}</td>
