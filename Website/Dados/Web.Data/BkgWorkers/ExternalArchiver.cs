@@ -80,7 +80,11 @@ public class ExternalArchiver : IHostedService, IDisposable
         if (r.Data["lastReceived"] != null)
         {
             dados.DataHoraDadosUTC = DateTime.UnixEpoch.AddMilliseconds((long?)r.Data["lastReceived"] ?? 0);
-        }        
+        }
+
+        decimal? velocidadeVento = null;
+        decimal? direcaoVento = null;
+        decimal? radiacaoSolar = null;
 
         var current = r.Data["currConditionValues"];
         if (current != null) foreach (var v in current)
@@ -103,6 +107,16 @@ public class ExternalArchiver : IHostedService, IDisposable
                     case "Rain Rate": // Rain Rate
                         dados.Precipitacao = Math.Round(dVal / 60, 2); // h -> min
                         break;
+
+                    case "Wind Speed":
+                        velocidadeVento = dVal;
+                        break;
+                    case "Wind Direction":
+                        direcaoVento = (decimal?)v["value"];
+                        break;
+                    case "Solar Rad":
+                        radiacaoSolar = dVal;
+                        break;
                 }
             }
         var aggr = r.Data["aggregatedValues"];
@@ -119,7 +133,20 @@ public class ExternalArchiver : IHostedService, IDisposable
                 dados.PrecipitacaoTotal = dVal;
             }
 
-        Controllers.UpController.sFinalizaGravacaoDados(db, logger, dados, Newtonsoft.Json.JsonConvert.SerializeObject(dados), $"EX.{e.Id}", e.Estacao);
+        var obj = new
+        {
+            dados.DataHoraDadosUTC,
+            dados.TemperaturaAr,
+            dados.PressaoAr,
+            dados.UmidadeAr,
+            dados.Precipitacao,
+            dados.PrecipitacaoTotal,
+            velocidadeVento,
+            direcaoVento,
+            radiacaoSolar,
+        };
+
+        Controllers.UpController.sFinalizaGravacaoDados(db, logger, dados, Newtonsoft.Json.JsonConvert.SerializeObject(obj), $"EX.{e.Id}", e.Estacao);
         logger.Information("[ExternalArchiver] Dados externos {estacao}", e.Estacao);
     }
 }
