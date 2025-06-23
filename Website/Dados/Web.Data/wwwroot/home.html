@@ -370,6 +370,8 @@
                     let chtData = {
                         labels: labels, // Usar os rótulos preparados
                         datasets: [{
+                            type: modoNivel ? 'line' : 'bar',
+                            pointStyle: modoNivel ? 'circle' : 'rect',
                             label: modoNivel ? 'Nível do Rio (m)' : 'Chuva (mm/h)',
                             data: nivelRioData, // Usar os dados preparados
                             borderColor: 'rgba(75, 192, 192, 1)',
@@ -384,18 +386,20 @@
                         chtData.datasets.push(
                             {
                                 type: 'line',
+                                pointStyle: 'circle',
                                 label: 'Acumulado 12h (mm)',
                                 data: acumulado12Data,
                                 borderColor: 'rgb(54, 162, 235)',
                                 backgroundColor: 'rgb(54, 162, 235,0.5)',
                                 borderWidth: 2,
                                 pointRadius: 3,
-                                pointBackgroundColor: 'rgba(75, 75, 192, 1)',
+                                pointBackgroundColor: 'rgb(54, 162, 235)',
                                 pointBorderColor: '#fff',
                             })
                         chtData.datasets.push(
                             {
                                 type: 'line',
+                                pointStyle: 'circle',
                                 label: 'Acumulado 24h (mm)',
                                 data: acumulado24Data,
                                 borderColor: 'aquamarine',
@@ -410,6 +414,7 @@
                     if (nivelNormal) {
                         chtData.datasets.push({
                             type: 'line',
+                            pointStyle: 'rect',
                             label: 'Normal',
                             data: nivelRioDataNormal, // Usar os dados preparados
                             borderColor: 'gray',
@@ -423,8 +428,10 @@
                     if (nivelAlerta) {
                         chtData.datasets.push({
                             type: 'line',
+                            pointStyle: 'rect',
                             label: modoNivel ? 'Alerta (m)' : 'Alerta (mm)',
                             data: nivelRioDataAlerta, // Usar os dados preparados
+                            color: 'yellow',
                             borderColor: 'yellow',
                             backgroundColor: 'yellow',
                             borderWidth: 2,
@@ -436,7 +443,6 @@
                     }
 
                     new Chart(ctx, {
-                        type: modoNivel ? 'line' : 'bar',
                         data: chtData,
                         options: {
                             responsive: true,
@@ -444,10 +450,11 @@
                             plugins: {
                                 legend: {
                                     labels: {
-                                        color: 'white' // Cor dos nomes das séries na legenda
+                                        color: 'white', // Cor dos nomes das séries na legenda
+                                        usePointStyle: true,
                                     },
                                     display: true,
-                                    position: 'top'
+                                    position: 'top',
                                 },
                                 tooltip: {
                                     mode: 'index',
