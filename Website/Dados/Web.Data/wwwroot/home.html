@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa das Estações</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="chart.js"></script>
@@ -38,18 +38,9 @@
             width: 50%;
             min-width: 350px;
         }
-        /*
-        #content {
-            padding: 5px;
-            flex: 1;
-            overflow: auto; /* Permite o scroll
+        #ultimasLeituras {
+            width: 100%;
         }
-
-        #content a, a:visited {
-            color: beige
-        }
-        */
-
 
         h1 {
             text-align: center;
@@ -62,6 +53,7 @@
         td {
             text-align: center;
         }
+
         td > span {
             white-space: nowrap;
         }
@@ -117,7 +109,7 @@
             z-index: 1000; /* Garante que o ribbon fique acima de outros elementos */
         }
 
-        @media(max-width: 800px) {
+        @media(max-width: 850px) {
             #map {
                 height: 600px;
                 width: 100%;
@@ -128,7 +120,6 @@
                 display: flex;
                 flex-direction: column-reverse;
                 background-color: darkslategray;
-                /*height: 100%;*/
                 min-height: 600px;
                 overflow: auto;
             }
@@ -144,12 +135,11 @@
             }
 
             .ribbon {
-                left: auto ;
+                left: auto;
                 right: 0;
                 transform: rotate(45deg) translate(18px, -8px);
             }
         }
-
     </style>
 </head>
 <body>
@@ -228,10 +218,9 @@
                 tableBody.innerHTML = "";
                 data.forEach(dado => {
                     if (dado.nomeEstacao.startsWith('EX')) return;
-                    let bLevel = dado.percentBateria && dado.percentBateria > 30 ? (dado.percentBateria > 70 ? 'battery-full' : 'battery-half') : 'battery'
-
-                    let bat = `<i class="bi-${bLevel}"></i> ${formatValue(dado.percentBateria, 0)}%`;
-                    let sig = dado.source == 3 ? loraIcon : `<i class="bi-wifi${dado.forcaSinal && dado.forcaSinal < -70 ? '-1' : ''}"></i> ${wifiSignalToPercent(dado.forcaSinal)}`;
+                    let bat = `<i class="bi ${iconeBateria(dado.percentBateria)}"></i>`;
+                    let wifiSigPerc = wifiSignalToPercent(dado.forcaSinal);
+                    let sig = dado.source == 3 ? loraIcon : `<i class="${iconeWifi(wifiSigPerc)}"></i>`;
 
                     let temp = dado.temperaturaAr ? `<i class="bi-thermometer"></i> ${formatValue(dado.temperaturaAr, 1)}ºC` : ''
                     let humd = dado.umidadeAr ? `<i class="bi-droplet"></i> ${formatValue(dado.umidadeAr, 0)}%` : ''
@@ -246,11 +235,10 @@
                         carregaChuvaEstacao(dado.estacao, idCh);
                     }
 
-
                     const row = document.createElement('tr');
                     row.innerHTML = `
                                     <td style='text-align: left; width: 90px'>${dado.nomeEstacao || dado.estacao}</td>
-                                    <td style='text-align: left;'><span>${bat}</span> <span>${sig}</span></td>
+                                    <td style='text-align: left;'><span>${sig}</span> <span>${bat}</span></td>
                                     <td><span>${humd}</span> <span>${temp}</span> <span>${prss}</span></td>
                                     <td><span>${nivel}</span> <span>${chuva}</span></td>
                                     <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
@@ -270,7 +258,23 @@
                     span.innerHTML = `${formatValue(data.precipitacaoTotal_Hora / 2, 1) || '-'}mm/h`; // Em 4h
                 });
         }
+        function iconeWifi(forcaSinalStr) {
+            if (forcaSinalStr == "-") return 'bi-wifi-off';
 
+            const perc = parseInt(forcaSinalStr.replace('%', ''));
+            if (perc < 15) return 'bi-wifi-off';
+            if (perc < 30) return 'bi-wifi-1';
+            if (perc < 70) return 'bi-wifi-2';
+            return 'bi-wifi'; // >70
+        }
+        function iconeBateria(perc) {
+            if (!perc) return 'bi-battery';
+
+            if (perc < 10) return 'bi-battery';
+            if (perc < 30) return 'bi-battery-low';
+            if (perc < 70) return 'bi-battery-half';
+            return 'bi-battery-full'; // >70
+        }
         /* Gráficos */
         carregaHistoricoGrafico('04109F675953A131', 'chtBE01', null, null);
         carregaHistoricoGrafico('9A6EE7B45495BB7F', 'chtGLLS', 0.2, 2.0);
