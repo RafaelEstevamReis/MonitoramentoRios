@@ -218,7 +218,7 @@
                 tableBody.innerHTML = "";
                 data.forEach(dado => {
                     if (dado.nomeEstacao.startsWith('EX')) return;
-                    let bat = `<i class="bi ${iconeBateria(dado.percentBateria)}"></i>`;
+                    let bat = (dado.percentBateria || dado.percentBateria == 0) ? `<i class="bi ${iconeBateria(dado.percentBateria)}"></i>` : '';
                     let wifiSigPerc = wifiSignalToPercent(dado.forcaSinal);
                     let sig = dado.source == 3 ? loraIcon : `<i class="${iconeWifi(wifiSigPerc)}"></i>`;
 
