@@ -26,13 +26,13 @@ Este repositório tem por objetivo desenvolver uma stack de Software e Hardware 
 
 SIM!, mas não necessariamente.
 O objetivo deste projeto é compartilhar informações, porém há muitas entidades que coletam os dados e os fecham, tornando-os inúteis para um amplo acesso.
-Portanto, se você é uma dessas entidades, você NÃO PODE utilizar/acessar os nossos. Se você compartilha seus dados, você pode usar os nossos; se você restringe seus dados, você não pode usar os nossos.
+Portanto, se você compartilha seus dados, você pode usar os nossos; se você restringe seus dados, você não pode usar os nossos.
 
-Leia mais abaixo o texto completo do licenciamento antes de cotribuir ou utilizar este repositório.
+Leia mais abaixo o texto completo do licenciamento antes de contribuir ou utilizar este repositório.
 
 ## Licença
 
-Este repositório está licenciado sob uma dupla licença (MIT e Licença Restrita). Leia atenciosamente antes de contribuir e usar os dados gerados por estes softwares e hardwares.
+Este repositório está licenciado sob uma dupla licença (`MIT` e `Licença Restrita`). Leia atenciosamente antes de contribuir e usar os dados gerados por estes softwares e hardwares.
 
 A licença geral é MIT. No entanto, se você coleta, fornece e/ou processa dados de monitoramento atmosférico, manancial, fluvial, pluvial ou semelhantes, está sujeito às seguintes condições: Se os dados que você coleta são fechados, privados, compartilhados com limitações de acesso ou licenciamento, possuem mecanismos de controle de acesso, e/ou limitações na forma de acesso, então você não pode acessar, visualizar, compartilhar, utilizar, ou divulgar os dados coletados e gerados por este repositório e suas derivações. Nestes casos, você está sujeito à `Licença Restrita`.
 
