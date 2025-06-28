@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Web.Data.DAO;
@@ -15,6 +17,20 @@ using Web.Data.DAO;
 [Route("[controller]")]
 public class UpController : ControllerBase
 {
+    static CalibracaoDigital.ICalibracaoDigital[] calibracoes;
+    static UpController()
+    {
+        var tIC = typeof(CalibracaoDigital.ICalibracaoDigital);
+        var thisAsm = Assembly.GetExecutingAssembly();
+        var types = thisAsm.GetTypes();
+        var tCal = types.Where(t => tIC.IsAssignableFrom(t)) // todas as calibrações
+                        .Where(t => !t.IsInterface) // remove a interface
+                        .ToArray();
+
+        calibracoes = tCal.Select(o => (CalibracaoDigital.ICalibracaoDigital)(Activator.CreateInstance(o) ?? throw new InvalidOperationException()))
+                          .ToArray();
+    }
+
     private readonly DB db;
     private readonly ILogger log;
 
@@ -70,6 +86,42 @@ public class UpController : ControllerBase
         => sFinalizaGravacaoDados(db, log, dados, rawJson, ipOrigem, estacao);
     internal static void sFinalizaGravacaoDados(DB db, ILogger log, UploadData dados, string rawJson, string ipOrigem, string estacao)
     {
+        var roj = JsonNode.Parse(rawJson) ?? JsonNode.Parse("{}");
+        List<string> lstCal = [];
+        try
+        {
+            if (calibracoes.Length > 0) // Ainda não precisa de um dicionário
+            {
+                var utcNow = DateTime.UtcNow;
+                foreach (var cal in calibracoes)
+                {
+                    // Estação correta?
+                    if (cal.Estacao != estacao) continue;
+                    // Válido?
+                    if (cal.ValidadeInicioUTC > utcNow) continue;
+                    if (cal.ValidadeFimUTC < utcNow) continue;
+
+                    if (!cal.ProcessaDados(dados, roj)) continue;
+
+                    lstCal.Add(cal.GetType().Name); // Marca como feito
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            log.Error(ex, "UpController:sFinalizaGravacaoDados Falha ao listar calibrações");
+        }
+
+        if (lstCal.Count > 0)
+        {
+            log.Information("[UpController] Calibração {estacao} Lista: {@lista}", estacao, lstCal);
+            var calArr = new JsonArray();
+            foreach (var cal in lstCal) calArr.Add(cal);
+            roj["CAL"] = calArr;
+
+            rawJson = roj.ToJsonString();
+        }
+
         // Corrige valores
         if (dados.ForcaSinal == 0) dados.ForcaSinal = null;
         if (dados.PercentBateria > 100) dados.PercentBateria = 100;
@@ -119,7 +171,6 @@ public class UpController : ControllerBase
         };
         db.Registra(d);
 
-        var roj = JsonNode.Parse(rawJson);
         db.AtualizaEstacao(estacao, roj?["mac"]?.ToString() ?? "", roj?["ip"]?.ToString() ?? "");
     }
 
