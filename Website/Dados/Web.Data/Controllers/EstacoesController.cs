@@ -132,12 +132,8 @@ public class EstacoesController : ControllerBase
         var horaAgora = (int)(DateTime.UtcNow - DateTime.UnixEpoch).TotalHours;
 
         var range = Enumerable.Range(horaAgora - hour, hour).ToArray();
-        DAO.DBModels.TBDadosEstacoesHora[] lst = range.Select(h => db.AgregadoHora(estacao, h))
-            .Where(o => o != null)
-            .Cast<DAO.DBModels.TBDadosEstacoesHora>()
-            .ToArray()
-            ?? [];
-        ;
+        var lst = db.AgregadoHoraRange(estacao, range);
+
         decimal? pTotal = null;
         if (lst.Length > 0) pTotal = lst.Where(o => o.PrecipitacaoTotal_Hora != null).Sum(o => o.PrecipitacaoTotal_Hora);
 
@@ -196,7 +192,8 @@ public class EstacoesController : ControllerBase
         var horaAgora = (int)(DateTime.UtcNow - DateTime.UnixEpoch).TotalHours;
 
         var range = Enumerable.Range(horaAgora - lastHours, lastHours).ToArray();
-        return Ok(range.Select(h => db.AgregadoHora(estacao, h)));
+        //return Ok(range.Select(h => db.AgregadoHora(estacao, h)));
+        return Ok(db.AgregadoHoraRange(estacao, range));
     }
 
     private static void atualizaEstacoes(DB db)

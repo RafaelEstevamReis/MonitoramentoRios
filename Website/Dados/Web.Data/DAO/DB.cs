@@ -120,9 +120,22 @@ public class DB
 
     public DBModels.TBDadosEstacoesHora? AgregadoHora(string estacao, int hourSpan)
     {
+        using var cnn = db.GetConnection();
+        return _agregadoHora(cnn, estacao, hourSpan);
+    }
+    public DBModels.TBDadosEstacoesHora[] AgregadoHoraRange(string estacao, int[] range)
+    {
+        using var cnn = db.GetConnection();
+        return range.Select(h => _agregadoHora(cnn, estacao, h))
+            .Where(o => o != null)
+            .Cast<DBModels.TBDadosEstacoesHora>()
+            .ToArray()
+            ?? [];
+    }
+    DBModels.TBDadosEstacoesHora? _agregadoHora(ISqliteConnection cnn, string estacao, int hourSpan)
+    {
         if (string.IsNullOrEmpty(estacao)) return null;
 
-        using var cnn = db.GetConnection();
         var qhora = cnn.Query<DBModels.TBDadosEstacoesHora>($"SELECT * FROM {nameof(DBModels.TBDadosEstacoesHora)} WHERE Estacao = @estacao AND HourKey = @hourSpan ", new
         {
             estacao,
@@ -131,6 +144,9 @@ public class DB
 
         var hora = qhora.FirstOrDefault();
         if (hora != null) return hora;
+
+        // Hora corrente
+        var horaAgora = (int)(DateTime.UtcNow - DateTime.UnixEpoch).TotalHours;
 
         // Coletar a hora manualmente 
         var inicio = DateTime.UnixEpoch.AddHours(hourSpan);
@@ -232,7 +248,6 @@ public class DB
         };
 
         // Salva db, exceto se for hora corrente
-        var horaAgora = (int)(DateTime.UtcNow - DateTime.UnixEpoch).TotalHours;
         if (horaAgora != hourSpan) cnn.Insert(hora, OnConflict.Replace);
 
         return hora;
