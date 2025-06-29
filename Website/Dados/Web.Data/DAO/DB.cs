@@ -132,7 +132,7 @@ public class DB
             .ToArray()
             ?? [];
     }
-    DBModels.TBDadosEstacoesHora? _agregadoHora(ISqliteConnection cnn, string estacao, int hourSpan)
+    private DBModels.TBDadosEstacoesHora? _agregadoHora(ISqliteConnection cnn, string estacao, int hourSpan)
     {
         if (string.IsNullOrEmpty(estacao)) return null;
 
@@ -273,16 +273,7 @@ public class DB
 
         return hora;
     }
-    //private static decimal? calculaTotalSemReset(DataAggregator.Result precipitacaoTotal, DBModels.TBDadosEstacoes[] qData)
-    //{
-    //    var notNulls = qData.Where(o => precipitacaoTotal != null)
-    //                        .Select(o => o.PrecipitacaoTotal ?? 0) // Já não é NULL
-    //                        .ToArray();
-    //    if (notNulls.Length == 0) return null; // Não sei
-    //    if (notNulls.Length == 1) return null; // Não sei
-    //    return (notNulls[^1] - notNulls[0]);
-    //}
-    public static decimal? calculaTotalComReset(DBModels.TBDadosEstacoes[] qData)
+    private static decimal? calculaTotalComReset(DBModels.TBDadosEstacoes[] qData)
     {
         var notNulls = qData.Where(o => o.PrecipitacaoTotal != null)
                             .Select(o => o.PrecipitacaoTotal ?? 0) // Já não é NULL

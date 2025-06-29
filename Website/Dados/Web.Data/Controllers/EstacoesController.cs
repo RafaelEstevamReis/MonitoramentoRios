@@ -186,13 +186,11 @@ public class EstacoesController : ControllerBase
     }
 
     [HttpGet("lastHourly")]
-    //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60 * 5)] // 5mins
     public IActionResult FaixaHora(string estacao, int lastHours = 8)
     {
         var horaAgora = (int)(DateTime.UtcNow - DateTime.UnixEpoch).TotalHours;
 
         var range = Enumerable.Range(horaAgora - lastHours, lastHours).ToArray();
-        //return Ok(range.Select(h => db.AgregadoHora(estacao, h)));
         return Ok(db.AgregadoHoraRange(estacao, range));
     }
 
