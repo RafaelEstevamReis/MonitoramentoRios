@@ -168,3 +168,30 @@ public class TBCatalogarExternas
     public DataSource Origem { get; set; }
     public bool Ativo { get; set; } = false;
 }
+
+public class TBWeather
+{
+    [PrimaryKey]
+    public long Id { get; set; }
+
+    [Index("ixTBWeather_ForecastUTC")]
+    public DateTime ForecastUTC { get; set; }
+    [Index("ixTBWeather_ColetaUTC")]
+    public DateTime ColetaUTC { get; set; }
+
+    public bool LuzDia { get; set; }
+    public int UvIndex { get; set; }
+    public decimal Temperatura { get; set; }
+    public decimal SensacaoTermica { get; set; }
+    public decimal Umidade { get; set; }
+    public decimal Pressao { get; set; }
+    public decimal VentoVelocidade { get; set; }
+    public int VentoDirecao { get; set; }
+    public decimal PrecipitacaoProb { get; set; }
+    public decimal Precipitacao { get; set; }
+
+    public decimal Lat {  get; set; }
+    public decimal Lon {  get; set; }
+}
+
+

@@ -24,6 +24,7 @@ public class DB
            .Add<DBModels.TBDadosEstacoes>()
            .Add<DBModels.TBDadosEstacoesHora>()
            .Add<DBModels.TBCatalogarExternas>()
+           .Add<DBModels.TBWeather>()
            .Commit();
 
         if (result.Length > 0) // Teve migrations
@@ -373,5 +374,28 @@ public class DB
     {
         using var cnn = db.GetConnection();
         cnn.Insert(registro, OnConflict.Replace);
+    }
+
+    public void RegistraWeather(IEnumerable<DBModels.TBWeather> data)
+    {
+        using var cnn = db.GetConnection();
+        cnn.BulkInsert(data, OnConflict.Ignore);
+    }
+    public IEnumerable<DBModels.TBWeather> ObterWeatherProximasHoras()
+    {
+        using var cnn = db.GetConnection();
+        var d = cnn.Query<DBModels.TBWeather>("SELECT * FROM TBWeather WHERE ForecastUTC BETWEEN @inicio AND @fim ORDER BY ColetaUTC DESC, ForecastUTC ASC LIMIT 0,36", new
+        {
+            inicio = DateTime.UtcNow.AddHours(-2),
+            fim = DateTime.UtcNow.AddHours(12),
+        });
+
+        // Garante que não tem duplicata e está ordenado
+        return d.GroupBy(o => $"{o.ForecastUTC:yyyyMMddHHmm}") // Agrupa textualmente
+                .Select(g => g.MaxBy(o => o.ColetaUTC)) // Pega mais novos
+                .Where(o => o is not null) // Não nulos
+                .Cast<DBModels.TBWeather>() // Arruma retorno
+                .OrderBy(o => o.ForecastUTC)
+                ;
     }
 }
