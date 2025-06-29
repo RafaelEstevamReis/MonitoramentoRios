@@ -274,7 +274,7 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                                     <td style='text-align: left; width: 90px'>${dado.nomeEstacao || dado.estacao}</td>
-                                    <td style='text-align: left;'><span>${sig}</span> <span>${bat}</span></td>
+                                    <td style='text-align: left;'><span title="WiFi: ${wifiSigPerc}">${sig}</span> <span title="Bateria: ${(dado.percentBateria ?? 0).toFixed(0)}%">${bat}</span></td>
                                     <td><span>${humd}</span> <span>${temp}</span> <span>${prss}</span></td>
                                     <td><span>${nivel}</span> <span>${chuva}</span></td>
                                     <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
