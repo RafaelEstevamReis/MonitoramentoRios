@@ -143,7 +143,11 @@ public class DB
         });
 
         var hora = qhora.FirstOrDefault();
-        if (hora != null) return hora;
+        if (hora != null)
+        {
+            if (hora.DataCount == 0) return null; // Antigo comportamento "Não Tem"
+            return hora;
+        }
 
         // Hora corrente
         var horaAgora = (int)(DateTime.UtcNow - DateTime.UnixEpoch).TotalHours;
@@ -158,7 +162,24 @@ public class DB
             fim,
         }).OrderBy(o => o.RecebidoUTC).ToArray();
 
-        if (qData.Length == 0) return null; // Salvar que não tem? Dá full table scan
+        if (qData.Length == 0) // Salvar que não tem? Dá full table scan
+        {
+            if (DateTime.UtcNow < fim) return null;
+            var horaVazia = new DBModels.TBDadosEstacoesHora()
+            {
+                Id = 0,
+                Estacao = estacao,
+                HourKey = hourSpan,
+                DataHoraDadosUTC = inicio,
+                DataCount = 0,
+                FirstDataRow = 0,
+                LastDataRow = 0,
+            };
+            // Salva db, exceto se for hora corrente
+            if (horaAgora != hourSpan) cnn.Insert(horaVazia, OnConflict.Replace);
+
+            return horaVazia;
+        }
 
         var forcaSinal = DataAggregator.Aggregate(qData, o => o.ForcaSinal);
         var temperaturaInterna = DataAggregator.Aggregate(qData, o => o.TemperaturaInterna);
