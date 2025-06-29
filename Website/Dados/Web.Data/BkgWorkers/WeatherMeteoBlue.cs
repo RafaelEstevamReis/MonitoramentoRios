@@ -99,7 +99,8 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
     }
     private bool temRecente()
     {
-        var lista = db.ObterWeatherProximasHoras();
+        var lista = db.ObterWeatherProximasHoras().ToArray();
+        if (lista.Length == 0) return false; // Não tem
 
         var coletaMax = lista.Max(o => o.ColetaUTC);
         var age = DateTime.UtcNow - coletaMax;
