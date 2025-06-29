@@ -42,7 +42,10 @@ builder.Services.AddHostedService(i =>
     var pass = builder.Configuration["mqtt_pass"];
     return new Web.Data.BkgWorkers.MqttWorker(i.GetService<ILogger>(), i.GetService<Web.Data.DAO.DB>(), host, user, pass);
 });
-Web.Data.Controllers.Maintenance.ApiKey = builder.Configuration["maintenance-key"] ?? "";
+Web.Data.Controllers.Maintenance.ApiKey = builder.Configuration["maintenance-key"] ?? string.Empty;
+
+Web.Data.BkgWorkers.WeatherMeteoBlue.API_KEY = builder.Configuration["meteoblue_key"] ?? string.Empty;
+builder.Services.AddHostedService<Web.Data.BkgWorkers.WeatherMeteoBlue>();
 
 var app = builder.Build();
 app.UseSerilogRequestLogging(options =>
