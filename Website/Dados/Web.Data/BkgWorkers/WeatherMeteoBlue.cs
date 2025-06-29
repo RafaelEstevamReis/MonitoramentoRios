@@ -90,7 +90,7 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
             }
 
             db.RegistraWeather(lst);
-
+            logger.Information("[WeatherMeteoBlue] Registrados {qtd} horários", lst.Count);
         }
         catch (Exception ex)
         {
@@ -104,7 +104,7 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
         var coletaMax = lista.Max(o => o.ColetaUTC);
         var age = DateTime.UtcNow - coletaMax;
 
-        return age.TotalHours < 2;
+        return age.TotalHours < 4; // Não mais rápido que 4h
     }
     private DateTime pegaData(string strDate)
     {
@@ -120,8 +120,8 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
             return "/packages/basic-1h_agro-1h?lat=47.56&lon=7.57&apikey=DEMOKEY&sig=e85c990f1d5d476b29eddd989ca56859";
         }
 
-        decimal lat = 0;
-        decimal lon = 0;
+        decimal lat = -29.64M;
+        decimal lon = -50.57M;
 
         string sLat = lat.ToString(CultureInfo.InvariantCulture);
         string sLon = lon.ToString(CultureInfo.InvariantCulture);
