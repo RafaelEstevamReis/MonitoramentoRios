@@ -238,10 +238,10 @@
             </div>
             <hr />
 
-            <h2> Previsão do Tempo das Próximas Horas </h2>
+            <h2> Previsão do Tempo para as Próximas Horas </h2>
             <div id="previsaoTempo">
                 <div id="previsaoCards" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;"></div>
-                <div style="text-align: center;"> <small id="dataHoraColetaPrevisao"></small> </div>
+                <div style="text-align: center; margin-top:10px"> <small id="dataHoraColetaPrevisao"></small> </div>
                 <!--<canvas id="graficoPrevisao" style="max-width: 600px; margin: 20px auto;"></canvas>-->
 
             </div>
@@ -331,37 +331,38 @@
                 data.forEach(item => {
                     const card = document.createElement('div');
                     card.style.cssText = `
+                    background-color: whitesmoke;
                     border: 2px solid white;
                     border-radius: 10px;
-                    padding: 15px;
-                    width: 80px;
+                    padding: 10px;
+                    width: 90px;
+                    min-height: 110px;
                     text-align: center;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                    /*font-size: 1.2em;*/
+                    box-shadow: 4px 2px 5px rgba(0,0,0,0.9);
+                    font-size: 1.1em;
                 `;
                     const dataHora = new Date(item.forecastUTC+'Z').toLocaleString('pt-BR', {
                         hour: '2-digit',
                         minute: '2-digit'
                     });
+
+                    let iconRain = 'bi-cloud-slash';
+                    if (item.precipitacao > 0.1) iconRain = 'bi-cloud';
+                    if (item.precipitacao > 0.5) iconRain = 'bi-cloud-drizzle';
+                    if (item.precipitacao > 4) iconRain = 'bi-cloud-rain';
+                    if (item.precipitacao > 9) iconRain = 'bi-cloud-rain-heavy';
+
+                    let tagProb = item.precipitacao > 0.5 ? `<small style="color: #2980b9;">(${item.precipitacaoProb.toFixed(0)}%)</small>` : ''
+                    let tagVento = item.ventoVelocidade > 10 ? `<div style="margin: 5px 0;"> <span style="color: teal;"><i class="bi bi-wind"></i> ${item.ventoVelocidade.toFixed(0)} km/h</span> </div>` : ''
+
                     card.innerHTML = `
-                    <div style="font-weight: bold; margin-bottom: 10px;">${dataHora}</div>
+                    <div style="font-weight: bold; margin-bottom: 10px; color: black;">${dataHora}</div>
                     <div style="font-size: 1.5em; color: #d9534f;">${item.temperatura.toFixed(1)}°C</div>
-                    <!--
+
+                    ${tagVento}
                     <div style="margin: 5px 0;">
-                        <span style="color: #3498db;">💧 ${item.umidade.toFixed(1)}%</span>
-                    </div>
-                    <div style="margin: 5px 0;">
-                        <span style="color: #2980b9;">🌧️ ${item.precipitacaoProb.toFixed(1)}%</span>
-                    </div>
-                    <div style="margin: 5px 0;">
-                        <span style="color: #2ecc71;">☔ ${item.precipitacao.toFixed(1)} mm</span>
-                    </div>
-                    -->
-                    <div style="margin: 5px 0;">
-                        <span style="color: #2ecc71;">☔ ${item.precipitacao.toFixed(1)} mm</span>
-                    </div>
-                    <div style="margin: 5px 0;">
-                        <span style="color: #2980b9;">(${item.precipitacaoProb.toFixed(0)}%)</span>
+                        <span style="color: navy;"><i class="bi ${iconRain}"></i> ${item.precipitacao.toFixed(1)} mm</span>
+                        ${tagProb}
                     </div>
                 `;
                     cardsContainer.appendChild(card);
