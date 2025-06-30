@@ -158,6 +158,7 @@ public class TBCatalogarExternas
     public enum DataSource
     {
         WLink = 1,
+        CEMADEN = 2,
     }
 
     [PrimaryKey]

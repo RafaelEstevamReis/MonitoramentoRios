@@ -61,6 +61,7 @@ public class ExternalArchiver : IHostedService, IDisposable
 
         foreach (var e in externas)
         {
+            if (e.Origem == DAO.DBModels.TBCatalogarExternas.DataSource.WLink) continue;
             try
             {
                 await Task.Delay(5000);
@@ -68,6 +69,11 @@ public class ExternalArchiver : IHostedService, IDisposable
                 if (e.Origem == DAO.DBModels.TBCatalogarExternas.DataSource.WLink)
                 {
                     await catalogarWLink(e);
+                }
+
+                if (e.Origem == DAO.DBModels.TBCatalogarExternas.DataSource.CEMADEN)
+                {
+                    await catalogarCemaden(e);
                 }
             }
             catch (Exception ex)
@@ -153,6 +159,67 @@ public class ExternalArchiver : IHostedService, IDisposable
         };
 
         Controllers.UpController.sFinalizaGravacaoDados(db, logger, dados, Newtonsoft.Json.JsonConvert.SerializeObject(obj), $"EX.{e.Id}", e.Estacao);
-        logger.Information("[ExternalArchiver] Dados externos {estacao}", e.Estacao);
+        logger.Information("[ExternalArchiver] Dados externos WL/{estacao}", e.Estacao);
     }
+    private async Task catalogarCemaden(DAO.DBModels.TBCatalogarExternas e)
+    {
+        var recentesEstacao = db.ListarDados(e.Estacao);
+        var hsh = recentesEstacao.Select(o => $"{o.Estacao}#{o.DataHoraDadosUTC:yyyyMMddHHmm}").ToHashSet();
+
+        string url = $"https://resources.cemaden.gov.br/graficos/interativo/grafico_pcds.php?idpcd={e.ExternalKey}&hr=24&dia=185";
+
+        var r = await httpClient.GetAsync(url);
+        if (!r.IsSuccessStatusCode) throw new HttpRequestException($"[{r.RequestMessage.Method}] {r.RequestMessage.RequestUri} [{r.StatusCode}] failed with {r.ReasonPhrase}");
+
+        var html = await r.Content.ReadAsStringAsync();
+        var blScript = html.Split("<script ");
+        var graficos = blScript.Where(h => h.Contains("Grafico(")).ToArray();
+
+        var js = graficos[0];
+        var ixGrafico = js.IndexOf("{");
+        js = js.Substring(ixGrafico);
+
+        var ixFim = js.IndexOf("]);");
+        js = js.Substring(0, ixFim);
+
+        js = js.Replace("Grafico(", "\"data\":[");
+        js = js + "]]}";
+        js = js.Replace("'", "\"");
+
+        var objData = JObject.Parse(js)["data"];
+        var arrHorarios = objData[4].ToArray().Select(o => (string?)o ?? "").ToArray();
+        var arrValores = objData[6].ToArray().Select(o => (decimal?)o ?? 0).ToArray();
+
+        for (int i = 0; i < arrHorarios.Length; i++)
+        {
+            var dados = new Controllers.UpController.UploadData();
+
+            var strDt = arrHorarios[i];
+            strDt = strDt.Replace("h", ":")
+                         .Replace("  ", " ")
+                         .Replace(" UTC", ":00")
+                         .Replace(" ", "T")
+                         ;
+
+            dados.DataHoraDadosUTC = DateTime.Parse(strDt + "z");
+            dados.Precipitacao = arrValores[i];
+
+            string stacaoHoraKey = $"{e.Estacao}#{dados.DataHoraDadosUTC:yyyyMMddHHmm}";
+            if (hsh.Contains(stacaoHoraKey))
+            {
+                logger.Information("[ExternalArchiver] Dados externos SKIP CDM/{estacao}", e.Estacao);
+                continue;
+            }
+
+            var serObj = new
+            {
+                dados.DataHoraDadosUTC,
+                dados.Precipitacao
+            };
+
+            Controllers.UpController.sFinalizaGravacaoDados(db, logger, dados, Newtonsoft.Json.JsonConvert.SerializeObject(serObj), $"EX.{e.Id}", e.Estacao);
+            logger.Information("[ExternalArchiver] Dados externos CDM/{estacao}", e.Estacao);
+        }
+    }
+
 }

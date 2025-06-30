@@ -278,6 +278,16 @@ public class DB
         var notNulls = qData.Where(o => o.PrecipitacaoTotal != null)
                             .Select(o => o.PrecipitacaoTotal ?? 0) // Já não é NULL
                             .ToArray();
+
+        if (qData.Length > 0 && notNulls.Length == 0) // Pode não ter "hodômetro"
+        {
+            var precNotNulls = qData.Where(o => o.Precipitacao != null).ToArray();
+            if(precNotNulls.Length > 0)
+            {
+                return precNotNulls.Sum(o => o.Precipitacao);
+            }
+        }
+
         if (notNulls.Length == 0) return null; // Não sei
         if (notNulls.Length == 1) return null; // Não sei
 
