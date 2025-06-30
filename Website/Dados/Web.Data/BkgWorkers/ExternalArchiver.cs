@@ -61,7 +61,6 @@ public class ExternalArchiver : IHostedService, IDisposable
 
         foreach (var e in externas)
         {
-            if (e.Origem == DAO.DBModels.TBCatalogarExternas.DataSource.WLink) continue;
             try
             {
                 await Task.Delay(5000);
