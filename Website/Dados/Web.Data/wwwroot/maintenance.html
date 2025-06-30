@@ -28,9 +28,28 @@
             fetch('/estacoes')
                 .then(response => response.json())
                 .then(data => {
+                    data.sort((a, b) => {
+                        if (a.nomeEstacao.startsWith('EX')) return 1; // Final
+                        if (a.nomeEstacao.startsWith('RS')) {
+
+                            if (b.nomeEstacao.startsWith('RS')) return a.nomeEstacao.localeCompare(b.nomeEstacao);
+                            return -1; // Começo
+                        }
+                        return a.nomeEstacao.localeCompare(b.nomeEstacao);
+                    });
+
                     const tableBody = document.querySelector('#dadosEstacoes tbody');
+                    let espacoEX = false;
                     data.forEach(e => {
                         const row = document.createElement('tr');
+
+                        if (!espacoEX && e.nomeEstacao.startsWith("EX")) {
+                            espacoEX = true;
+                            const empty = document.createElement('tr');
+                            empty.innerHTML = '<td colspan=9> </td>';
+
+                            tableBody.appendChild(empty);
+                        }
 
                         try {
                             const ultimo = e.ultimoEnvio;

@@ -75,15 +75,15 @@
                     data.forEach(dado => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                                                <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
-                                                <td>${dado.nomeEstacao || dado.estacao}</td>
-                                                <td>${formatValue(dado.tensaoBateria, 1)}v</td>
-                                                <td>${formatValue(dado.temperaturaAr, 1) }ºC</td>
-                                                <td>${formatValue(dado.umidadeAr, 1) }%</td>
-                                                <td>${dado.precipitacao || '-'}</td>
-                                                <td>${formatValue(dado.nivelRio, 1)}m</td>
-                                                <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
-                                            `;
+                                        <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
+                                        <td>${dado.nomeEstacao || dado.estacao}</td>
+                                        <td>${formatValue(dado.tensaoBateria, 1)}v</td>
+                                        <td>${formatValue(dado.temperaturaAr, 1) }ºC</td>
+                                        <td>${formatValue(dado.umidadeAr, 1) }%</td>
+                                        <td>${dado.precipitacao || '-'}</td>
+                                        <td>${formatValue(dado.nivelRio, 1)}m</td>
+                                        <td>${wifiSignalToPercent(dado.forcaSinal)}</td>
+                                    `;
                         tableBody.appendChild(row);
                         setColor(row, dado.nomeEstacao);
                     });
@@ -96,7 +96,16 @@
                 .then(response => response.json())
                 .then(data => {
                     const tableBody = document.querySelector('#ultimasLeituras tbody');
+                    let espacoEX = false;
                     data.forEach(dado => {
+                        if (!espacoEX && !dado.nomeEstacao.startsWith("EX")) {
+                            espacoEX = true;
+                            const empty = document.createElement('tr');
+                            empty.innerHTML = '<td colspan=9> </td>';
+
+                            tableBody.appendChild(empty);
+                        }
+
                         const row = document.createElement('tr');
                         row.innerHTML = `
                                                 <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
