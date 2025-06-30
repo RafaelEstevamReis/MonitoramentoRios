@@ -251,11 +251,6 @@ public class EstacoesController : ControllerBase
         public decimal? NivelRio_RAW { get; set; }
         public string? RawData { get; set; } = string.Empty;
     }
-    public class DadosNovaEstacao
-    {
-        public string NomeResponsavel { get; set; } = string.Empty;
-        public string NomeEstacao { get; set; } = string.Empty;
-    }
     public class DadosEstacao
     {
         public string Estacao { get; set; } = string.Empty;

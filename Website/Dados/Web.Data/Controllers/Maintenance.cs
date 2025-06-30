@@ -1,6 +1,5 @@
 ﻿namespace Web.Data.Controllers;
 
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -62,7 +61,7 @@ public class Maintenance : ControllerBase
         return Ok();
     }
     [HttpPost("nova")]
-    public IActionResult NovaEstacao([FromQuery] string apiKey, EstacoesController.DadosNovaEstacao dados)
+    public IActionResult NovaEstacao([FromQuery] string apiKey, DadosNovaEstacao dados)
     {
         if (!checkKey(apiKey)) return Unauthorized();
         if (dados is null)
@@ -88,6 +87,27 @@ public class Maintenance : ControllerBase
             IdEstacao = estacao,
         });
     }
+    [HttpPost("editar")]
+    public IActionResult EditarEstacao([FromQuery] string apiKey, DadosEditarEstacao dados)
+    {
+        if (!checkKey(apiKey)) return Unauthorized();
+        if (dados is null)
+        {
+            return BadRequest("Invalid POST");
+        }
+        if (string.IsNullOrEmpty(dados.NomeResponsavel)) return BadRequest("Invalid POST - NomeResponsavel");
+        if (string.IsNullOrEmpty(dados.NomeEstacao)) return BadRequest("Invalid POST - NomeEstacao");
+
+        var todas = db.ListarEstacoes();
+        var estacao = todas.Where(o => o.Estacao == dados.IdEstacao).FirstOrDefault();
+        if (estacao == null) return BadRequest("Estacao inválida");
+
+        estacao.NomeEstacao = dados.NomeEstacao;
+        dados.NomeResponsavel = dados.NomeEstacao;
+
+        db.EditaEstacao(estacao);
+        return Ok();
+    }
 
     [HttpGet("listarExterna")]
     public IActionResult ListarExterna(string apiKey)
@@ -110,5 +130,18 @@ public class Maintenance : ControllerBase
         if (string.IsNullOrWhiteSpace(requestApiKey)) return false;
 
         return ApiKey.Equals(requestApiKey);
+    }
+
+
+    public class DadosNovaEstacao
+    {
+        public string NomeResponsavel { get; set; } = string.Empty;
+        public string NomeEstacao { get; set; } = string.Empty;
+    }
+    public class DadosEditarEstacao
+    {
+        public string IdEstacao { get; set; } = string.Empty;
+        public string NomeResponsavel { get; set; } = string.Empty;
+        public string NomeEstacao { get; set; } = string.Empty;
     }
 }

@@ -368,6 +368,11 @@ public class DB
 
         apiKeys.Add(estacao.ApiKEY);
     }
+    public void EditaEstacao(DBModels.TBEstacoes estacao)
+    {
+        using var cnn = db.GetConnection();
+        cnn.Insert(estacao, OnConflict.Replace);
+    }
 
     public void AtualizaEstacao(string estacao, string mac, string ipOrigem)
     {
