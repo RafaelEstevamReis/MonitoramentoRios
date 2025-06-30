@@ -296,7 +296,7 @@
 
                     if (dado.precipitacao10min || dado.precipitacao10min == 0) {
                         let idCh = `ch_${dado.estacao}`;
-                        chuva = `<i class="bi-cloud-rain"></i> <span id='${idCh}'>${formatValueUnit(dado.precipitacao10min, 1, 'mm/min')}</span>`;
+                        chuva = `<i class="${dado.precipitacao10min && dado.precipitacao10min > 0 ? 'bi-cloud-rain' : 'bi-cloud'}"></i> <span id='${idCh}'>${formatValueUnit(dado.precipitacao10min, 1, 'mm/min')}</span>`;
                         carregaChuvaEstacao(dado.estacao, idCh);
                     }
 
