@@ -241,6 +241,7 @@
             <h2> Previsão do Tempo das Próximas Horas </h2>
             <div id="previsaoTempo">
                 <div id="previsaoCards" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;"></div>
+                <div style="text-align: center;"> <small id="dataHoraColetaPrevisao"></small> </div>
                 <!--<canvas id="graficoPrevisao" style="max-width: 600px; margin: 20px auto;"></canvas>-->
 
             </div>
@@ -320,6 +321,12 @@
                 // Criar cards visuais
                 const cardsContainer = document.querySelector('#previsaoCards');
                 cardsContainer.innerHTML = ''; // Limpar container
+
+                if (data.length > 0) {
+                    const dataHora = new Date(data[0].coletaUTC + 'Z').toLocaleString('pt-BR');
+                    const spanDH = document.querySelector('#dataHoraColetaPrevisao');
+                    spanDH.textContent = `Coleta dos Dados: ${dataHora}`;
+                }
 
                 data.forEach(item => {
                     const card = document.createElement('div');
