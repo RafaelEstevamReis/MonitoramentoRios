@@ -23,8 +23,8 @@ public class WeatherController : ControllerBase
         return Ok(db.ObterWeatherProximasHoras());
     }
 
-    [HttpGet]
-    public IActionResult ObterHourKey(int hourKey)
+    [HttpGet("dia")]
+    public IActionResult ObterHourKey([FromQuery] int hourKey)
     {
         return Ok(db.ObterWeatherDia(hourKey));
     }
