@@ -7,6 +7,7 @@ using Simple.API;
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Web.Data.DAO;
@@ -16,6 +17,7 @@ public class ExternalArchiver : IHostedService, IDisposable
     private readonly ILogger logger;
     private readonly DB db;
     private readonly ClientInfo wlClient;
+    private readonly HttpClient httpClient;
 
     private Timer _timer;
     public ExternalArchiver(DB db, ILogger logger)
@@ -25,6 +27,8 @@ public class ExternalArchiver : IHostedService, IDisposable
 
         wlClient = new ClientInfo("https://www.weatherlink.com");
         wlClient.SetHeader("x-requested-with", "XMLHttpRequest");
+
+        httpClient = new HttpClient();
     }
     public void Dispose()
     {
@@ -59,9 +63,10 @@ public class ExternalArchiver : IHostedService, IDisposable
         {
             try
             {
+                await Task.Delay(5000);
+
                 if (e.Origem == DAO.DBModels.TBCatalogarExternas.DataSource.WLink)
                 {
-                    await Task.Delay(5000);
                     await catalogarWLink(e);
                 }
             }
