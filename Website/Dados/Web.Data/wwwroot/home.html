@@ -46,6 +46,25 @@
             text-align: center;
         }
 
+        #previsaoTempo {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        #previsaoCards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+/*
+        #previsaoCards div {
+            transition: transform 0.2s;
+        }
+        #previsaoCards div:hover {
+            transform: scale(1.05);
+        }
+*/
         h1 {
             text-align: center;
         }
@@ -218,26 +237,35 @@
 
             </div>
             <hr />
+
+            <h2> Previsão do Tempo das Próximas Horas </h2>
+            <div id="previsaoTempo">
+                <div id="previsaoCards" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;"></div>
+                <!--<canvas id="graficoPrevisao" style="max-width: 600px; margin: 20px auto;"></canvas>-->
+
+            </div>
+
+            <hr />
             <div id="divSobre">
                 <h2> Sobre o Sistema </h2>
                 <p>O sistema de monitoramento dos rios é uma iniciativa do <strong>Projeto ₿itcoin é Aqui de Rolante-RS</strong></p>
                 <p>As estações de monitoramento são financiadas exclusivamente por recursos privados, captados em Bitcoin, com o apoio de moradores locais que contribuem com locais para instalação e conhecimento sobre os rios e padrões de chuvas da região.</p>
                 <p>
-                     O sistema é de código aberto e está disponível em:
-                     <a href="https://github.com/RafaelEstevamReis/MonitoramentoRios" target="_blank">github.com/MonitoramentoRios</a>.
+                    O sistema é de código aberto e está disponível em:
+                    <a href="https://github.com/RafaelEstevamReis/MonitoramentoRios" target="_blank">github.com/MonitoramentoRios</a>.
                 </p> <p>
-                     Siga-nos nas redes sociais:
-                     <a href="https://x.com/bitcoineaqui" target="_blank" class="social-icon">
+                    Siga-nos nas redes sociais:
+                    <a href="https://x.com/bitcoineaqui" target="_blank" class="social-icon">
                         <i class="bi bi-twitter-x"></i>
-                     </a>
-                     <a href="https://instagram.com/bitcoinrolante" target="_blank" class="social-icon">
+                    </a>
+                    <a href="https://instagram.com/bitcoinrolante" target="_blank" class="social-icon">
                         <i class="bi bi-instagram"></i>
-                     </a>.
+                    </a>.
                 </p> <p>
                     Apoie o projeto com doações:
-                     <a href="https://coinos.io/enchenterolante" style="vertical-align: middle" target="_blank">
+                    <a href="https://coinos.io/enchenterolante" style="vertical-align: middle" target="_blank">
                         <img src='coinos.svg' style='height:24px;margin-left:4px;vertical-align: middle;'>
-                     </a>
+                    </a>
                 </p>
             </div>
             <br><br><br>
@@ -285,6 +313,124 @@
             .catch(error => {
                 console.error('Erro ao carregar dados das estações:', error);
             });
+
+        fetch('/weather')
+            .then(response => response.json())
+            .then(data => {
+                // Criar cards visuais
+                const cardsContainer = document.querySelector('#previsaoCards');
+                cardsContainer.innerHTML = ''; // Limpar container
+
+                data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.style.cssText = `
+                    border: 2px solid white;
+                    border-radius: 10px;
+                    padding: 15px;
+                    width: 80px;
+                    text-align: center;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                    /*font-size: 1.2em;*/
+                `;
+                    const dataHora = new Date(item.forecastUTC+'Z').toLocaleString('pt-BR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    card.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 10px;">${dataHora}</div>
+                    <div style="font-size: 1.5em; color: #d9534f;">${item.temperatura.toFixed(1)}°C</div>
+                    <!--
+                    <div style="margin: 5px 0;">
+                        <span style="color: #3498db;">💧 ${item.umidade.toFixed(1)}%</span>
+                    </div>
+                    <div style="margin: 5px 0;">
+                        <span style="color: #2980b9;">🌧️ ${item.precipitacaoProb.toFixed(1)}%</span>
+                    </div>
+                    <div style="margin: 5px 0;">
+                        <span style="color: #2ecc71;">☔ ${item.precipitacao.toFixed(1)} mm</span>
+                    </div>
+                    -->
+                    <div style="margin: 5px 0;">
+                        <span style="color: #2ecc71;">☔ ${item.precipitacao.toFixed(1)} mm</span>
+                    </div>
+                    <div style="margin: 5px 0;">
+                        <span style="color: #2980b9;">(${item.precipitacaoProb.toFixed(0)}%)</span>
+                    </div>
+                `;
+                    cardsContainer.appendChild(card);
+                });
+
+                // Criar gráfico com Chart.js
+                const divChart = document.getElementById('graficoPrevisao')
+                if (!divChart) return;
+
+                const ctx = divChart.getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(item => new Date(item.forecastUTC).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })),
+                        datasets: [
+                            {
+                                label: 'Temperatura (°C)',
+                                data: data.map(item => item.temperatura),
+                                borderColor: '#d9534f',
+                                backgroundColor: 'rgba(217, 83, 79, 0.2)',
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Umidade (%)',
+                                data: data.map(item => item.umidade),
+                                borderColor: '#3498db',
+                                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Prob. Precipitação (%)',
+                                data: data.map(item => item.precipitacaoProb),
+                                borderColor: '#2980b9',
+                                backgroundColor: 'rgba(41, 128, 185, 0.2)',
+                                fill: true,
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                title: {
+                                    display: true,
+                                    text: 'Valores'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Hora'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao buscar previsão:', error);
+                document.querySelector('#previsaoTempo').innerHTML = '<p style="text-align: center; color: red; font-size: 1.2em;">Erro ao carregar previsão do tempo.</p>';
+            });
+
+
         function carregaChuvaEstacao(estacao, id) {
             fetch('/estacoes/agregado?hour=2&estacao=' + estacao)
                 .then(response => response.json())
