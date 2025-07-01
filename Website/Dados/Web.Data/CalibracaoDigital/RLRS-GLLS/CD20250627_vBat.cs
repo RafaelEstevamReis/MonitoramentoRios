@@ -24,6 +24,15 @@ public class CD20250627_vBat : ICalibracaoDigital
         //  0.2200v => 4.12v
         var ratio = 4.12M / 0.22M;
         var vBat = Math.Round(adc.Value * ratio, 2);
+
+        // Margem?
+        if (d.TensaoBateria != null)
+        {
+            var diff = Math.Abs(vBat - d.TensaoBateria.Value);
+            var diffP = diff / vBat;
+            if (diffP < 0.1M) return false; // <10%
+        }
+
         d.TensaoBateria = vBat;
         // Ajusta percentual
         d.PercentBateria = Math.Round((decimal)vBatToPercent((float)vBat), 2);
