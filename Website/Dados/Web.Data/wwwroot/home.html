@@ -353,7 +353,17 @@
                     if (item.precipitacao > 9) iconRain = 'bi-cloud-rain-heavy';
 
                     let tagProb = item.precipitacao > 0.5 ? `<small style="color: #2980b9;">(${item.precipitacaoProb.toFixed(0)}%)</small>` : ''
-                    let tagVento = item.ventoVelocidade > 10 ? `<div style="margin: 5px 0;"> <span style="color: teal;"><i class="bi bi-wind"></i> ${item.ventoVelocidade.toFixed(0)} km/h</span> </div>` : ''
+                    // Na Beaufort Wind Scale
+                    //  "Brisa leve" é de 4 a 7km/h (Wind felt on face; leaves rustle; ordinary vanes moved by wind)
+                    //  "Brisa gentil" é de 8 a 12km/h (Leaves and small twigs in constant motion; wind extends light flag.)
+                    //  "Brisa moderada" é de 13 a 18km/h (Raises dust and loose paper; small branches are moved.)
+                    //  ...
+                    //  "Quase vendaval" é de 32 a 38km/h (Whole trees in motion; inconvenience felt when walking against the wind.)
+                    //  "Vendaval" é de 39 a 46km/h (Breaks twigs off trees; generally impedes progress.)
+                    //  Vou exibir a partir da faixa superior da leve, em 6
+                    let corVento = "teal";
+                    if (item.ventoVelocidade > 30) corVento = "red";
+                    let tagVento = item.ventoVelocidade > 6 ? `<div style="margin: 5px 0;"> <span style="color: ${corVento};"><i class="bi bi-wind"></i> ${item.ventoVelocidade.toFixed(0)} km/h</span> </div>` : ''
 
                     card.innerHTML = `
                     <div style="font-weight: bold; margin-bottom: 10px; color: black;">${dataHora}</div>
