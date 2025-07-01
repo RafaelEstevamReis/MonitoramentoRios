@@ -84,6 +84,9 @@ public class ExternalArchiver : IHostedService, IDisposable
 
     private async Task catalogarWLink(DAO.DBModels.TBCatalogarExternas e)
     {
+        var recentesEstacao = db.ListarDados(e.Estacao);
+        var hsh = recentesEstacao.Select(o => $"{o.Estacao}#{o.DataHoraDadosUTC:yyyyMMddHHmm}").ToHashSet();
+
         var r = await wlClient.GetAsync<JObject>($"/embeddablePage/summaryData/{e.ExternalKey}");
         r.EnsureSuccessStatusCode();
 
@@ -91,7 +94,15 @@ public class ExternalArchiver : IHostedService, IDisposable
         if (r.Data["lastReceived"] != null)
         {
             dados.DataHoraDadosUTC = DateTime.UnixEpoch.AddMilliseconds((long?)r.Data["lastReceived"] ?? 0);
+
+            string stacaoHoraKey = $"{e.Estacao}#{dados.DataHoraDadosUTC:yyyyMMddHHmm}";
+            if (hsh.Contains(stacaoHoraKey))
+            {
+                logger.Information("[ExternalArchiver] Dados externos SKIP WL/{estacao}", e.Estacao);
+                return;
+            }
         }
+        else return; // Não continua
 
         decimal? velocidadeVento = null;
         decimal? direcaoVento = null;
