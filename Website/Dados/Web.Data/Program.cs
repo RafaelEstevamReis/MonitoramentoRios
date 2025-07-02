@@ -14,8 +14,7 @@ if (File.Exists("gitHash.txt"))
     var gitVersion = File.ReadAllText("gitHash.txt").Trim();
     Log.Logger.Information("GIT COMMIT: {commit}", gitVersion);
 
-    if(gitVersion.Length > 7) gitVersion = gitVersion[7..];
-    Web.Data.Controllers.HomeController.VERSION.Revision = gitVersion;
+    Web.Data.Controllers.HomeController.VERSION.Revision = gitVersion.Length > 7 ? gitVersion[..7] : gitVersion;
 }
 
 var builder = WebApplication.CreateBuilder(args);
