@@ -96,6 +96,7 @@ app.UseSwaggerUI();
 app.UseCors("AllowGetMethod");
 
 app.UseResponseCompression();
+app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseAuthorization();
 app.MapControllers();

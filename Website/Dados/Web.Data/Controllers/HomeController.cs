@@ -7,10 +7,10 @@ public class HomeController : ControllerBase
 {
     internal static readonly VersionInfo VERSION = new VersionInfo { Revision = "0000" };
 
-    [HttpGet("/")]
-    public IActionResult GetHome()
+    [HttpGet("/home.html")] // Corrige antigo home para INDEX
+    public IActionResult GetIndex()
     {
-        return Redirect("/home.html");
+        return Redirect("/index.html");
     }
 
     [HttpGet("robots.txt")]
