@@ -1,5 +1,6 @@
 ﻿namespace Web.Data.Controllers;
 
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -95,18 +96,24 @@ public class Maintenance : ControllerBase
         {
             return BadRequest("Invalid POST");
         }
-        if (string.IsNullOrEmpty(dados.NomeResponsavel)) return BadRequest("Invalid POST - NomeResponsavel");
         if (string.IsNullOrEmpty(dados.NomeEstacao)) return BadRequest("Invalid POST - NomeEstacao");
 
-        var todas = db.ListarEstacoes();
-        var estacao = todas.Where(o => o.Estacao == dados.IdEstacao).FirstOrDefault();
+        var estacao = db.ObterDadosCompletosEstacao(dados.IdEstacao);
         if (estacao == null) return BadRequest("Estacao inválida");
 
         estacao.NomeEstacao = dados.NomeEstacao;
-        dados.NomeResponsavel = dados.NomeEstacao;
+        if (string.IsNullOrEmpty(dados.NomeResponsavel)) estacao.NomeResponsavel = dados.NomeResponsavel;
+
+        if (dados.ResetarApiKey || string.IsNullOrWhiteSpace(estacao.ApiKEY))
+        {
+            var guid = Guid.NewGuid();
+            var key = guid.ToString();
+
+            estacao.ApiKEY = key;
+        }
 
         db.EditaEstacao(estacao);
-        return Ok();
+        return Ok(estacao);
     }
 
     [HttpGet("listarExterna")]
@@ -141,7 +148,8 @@ public class Maintenance : ControllerBase
     public class DadosEditarEstacao
     {
         public string IdEstacao { get; set; } = string.Empty;
-        public string NomeResponsavel { get; set; } = string.Empty;
+        public string? NomeResponsavel { get; set; } = null;
         public string NomeEstacao { get; set; } = string.Empty;
+        public bool ResetarApiKey { get; set; } = false;
     }
 }

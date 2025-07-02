@@ -32,9 +32,7 @@ public class DB
             executaMigrations(cnn, result);
         }
 
-        // Gera cache de Keys
-        var allKeys = cnn.Query<string>($"SELECT {nameof(DBModels.TBEstacoes.ApiKEY)} FROM {nameof(DBModels.TBEstacoes)}");
-        foreach (var k in allKeys) apiKeys.Add(k);
+        resetKeys(cnn);
     }
 
     private static void executaMigrations(ISqliteConnection cnn, ITableCommitResult[] result)
@@ -84,7 +82,11 @@ public class DB
             }
         }
     }
-
+    public DBModels.TBEstacoes? ObterDadosCompletosEstacao(string estacao)
+    {
+        using var cnn = db.GetConnection();
+        return cnn.Get<DBModels.TBEstacoes>("Estacao", estacao);
+    }
     public IEnumerable<DBModels.TBEstacoes> ListarEstacoes()
     {
         using var cnn = db.GetConnection();
@@ -380,12 +382,21 @@ public class DB
         using var cnn = db.GetConnection();
         cnn.Insert(estacao, OnConflict.Abort);
 
-        apiKeys.Add(estacao.ApiKEY);
+        resetKeys(cnn);
     }
     public void EditaEstacao(DBModels.TBEstacoes estacao)
     {
         using var cnn = db.GetConnection();
         cnn.Insert(estacao, OnConflict.Replace);
+
+        resetKeys(cnn);
+    }
+    void resetKeys(ISqliteConnection cnn)
+    {
+        apiKeys.Clear();
+        // Gera cache de Keys
+        var allKeys = cnn.Query<string>($"SELECT {nameof(DBModels.TBEstacoes.ApiKEY)} FROM {nameof(DBModels.TBEstacoes)}");
+        foreach (var k in allKeys) apiKeys.Add(k);
     }
 
     public void AtualizaEstacao(string estacao, string mac, string ipOrigem)
@@ -458,4 +469,5 @@ public class DB
         return d.OrderBy(o => o.ColetaUTC)
                 ;
     }
+
 }
