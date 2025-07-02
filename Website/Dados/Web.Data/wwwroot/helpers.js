@@ -33,7 +33,10 @@ function timeSince(date) {
 function getDateTimeForTimezoneHour(currentString, tz) {
     // Ajustar o horário para o timezone especificado (tz é em horas)
     const offsetMs = tz * 60 * 60 * 1000; // Converte horas para milissegundos
-    const current = new Date(currentString + 'Z');
+
+    if (!currentString.endsWith('Z')) currentString = currentString + 'Z';
+
+    const current = new Date(currentString);
     const adjustedTime = new Date(current.getTime() + offsetMs);
 
     // Extrair componentes da data e hora em UTC (já ajustado)
@@ -41,6 +44,8 @@ function getDateTimeForTimezoneHour(currentString, tz) {
     const month = String(adjustedTime.getUTCMonth()+1).padStart(2, '0');
     const day = String(adjustedTime.getUTCDate()).padStart(2, '0');
     const hours = String(adjustedTime.getUTCHours()).padStart(2, '0');
+
+    if (hours == NaN || hours === NaN) debugger;
 
     // Formatar como "YYYY-MM-DD HHh" (sem minutos)
     const formattedDateTime = `${day}/${month} ${hours}h`;
