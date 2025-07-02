@@ -39,7 +39,7 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
         }
 
         logger.Information("[WeatherMeteoBlue] Iniciando serviço de meteorologia MeteoBlue...");
-        _timer = new Timer(executaVerificacaoAsync, null, TimeSpan.FromHours(1), TimeSpan.FromHours(12));
+        _timer = new Timer(executaVerificacaoAsync, null, TimeSpan.FromHours(1), TimeSpan.FromHours(13));
 
         await Task.CompletedTask;
     }
