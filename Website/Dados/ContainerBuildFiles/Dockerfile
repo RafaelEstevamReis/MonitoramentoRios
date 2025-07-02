@@ -24,7 +24,7 @@ COPY --from=build /app/publish .
 COPY --from=build /app/gitHash.txt .
 COPY appsettings.json .
 
-RUN HASH=$(head -c 7 /app/gitHash.txt) && sed -i "s|{{GIT_HASH}}|$HASH|g" /app/wwwroot/home.html
+RUN HASH=$(head -c 7 /app/gitHash.txt) && sed -i "s|{{GIT_HASH}}|$HASH|g" /app/wwwroot/index.html
 
 # Exponha a porta na qual a aplicação vai rodar
 EXPOSE 8080
