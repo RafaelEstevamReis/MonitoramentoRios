@@ -57,14 +57,7 @@
             gap: 20px;
             justify-content: center;
         }
-/*
-        #previsaoCards div {
-            transition: transform 0.2s;
-        }
-        #previsaoCards div:hover {
-            transform: scale(1.05);
-        }
-*/
+
         h1 {
             text-align: center;
         }
@@ -365,9 +358,10 @@
                     if (item.ventoVelocidade > 30) corVento = "red";
                     let tagVento = item.ventoVelocidade > 6 ? `<div style="margin: 5px 0;"> <span style="color: ${corVento};"><i class="bi bi-wind"></i> ${item.ventoVelocidade.toFixed(0)} km/h</span> </div>` : ''
 
+                    let strTemp = item.temperatura < 10 ? item.temperatura.toFixed(1) : item.temperatura.toFixed(0);
                     card.innerHTML = `
                     <div style="font-weight: bold; margin-bottom: 10px; color: black;">${dataHora}</div>
-                    <div style="font-size: 1.5em; color: #d9534f;">${item.temperatura.toFixed(1)}°C</div>
+                    <div style="font-size: 1.5em; color: #d9534f;">${strTemp}°C</div>
 
                     ${tagVento}
                     <div style="margin: 5px 0;">
