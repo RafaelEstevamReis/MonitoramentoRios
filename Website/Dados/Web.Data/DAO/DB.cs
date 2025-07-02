@@ -269,7 +269,11 @@ public class DB
         };
 
         // Salva db, exceto se for hora corrente
-        if (horaAgora != hourSpan) cnn.Insert(hora, OnConflict.Replace);
+        if (horaAgora != hourSpan)
+        {
+            // Seta Id
+            hora.Id = cnn.Insert(hora, OnConflict.Replace);
+        }
 
         return hora;
     }
@@ -282,7 +286,7 @@ public class DB
         if (qData.Length > 0 && notNulls.Length == 0) // Pode não ter "hodômetro"
         {
             var precNotNulls = qData.Where(o => o.Precipitacao != null).ToArray();
-            if(precNotNulls.Length > 0)
+            if (precNotNulls.Length > 0)
             {
                 return precNotNulls.Sum(o => o.Precipitacao);
             }
