@@ -264,6 +264,9 @@
             </div>
             <br><br><br>
         </div>
+
+        <hr />        
+        <div style="text-align: center;"> <small id="versaoSistema"></small> / {{GIT_HASH}} </div>
     </div>
 
     <script>
@@ -442,6 +445,15 @@
                 document.querySelector('#previsaoTempo').innerHTML = '<p style="text-align: center; color: red; font-size: 1.2em;">Erro ao carregar previsão do tempo.</p>';
             });
 
+        fetch('/version')
+            .then(response => response.json())
+            .then(data => {
+                const tag = document.querySelector('#versaoSistema');
+                tag.innerHTML = `Versão: 1.0.${data.revision}[B]`;
+            })
+            .catch(error => {
+                console.error('Erro ao carregar dados das estações:', error);
+            });
 
         function carregaChuvaEstacao(estacao, id) {
             fetch('/estacoes/agregado?hour=2&estacao=' + estacao)

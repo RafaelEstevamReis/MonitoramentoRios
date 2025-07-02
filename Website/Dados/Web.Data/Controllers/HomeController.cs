@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 [ApiController]
 public class HomeController : ControllerBase
 {
-    internal static readonly VersionInfo VERSION = new VersionInfo { Revision = "-" };
+    internal static readonly VersionInfo VERSION = new VersionInfo { Revision = "0000" };
 
     [HttpGet("/")]
     public IActionResult GetHome()
