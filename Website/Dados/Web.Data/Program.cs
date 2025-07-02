@@ -2,11 +2,23 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Simple.Sqlite;
+using System.IO;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("data/logs/log.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
+
+if (File.Exists("/app/gitHash.txt"))
+{
+    var gitVersion = File.ReadAllText("/app/gitHash.txt");
+    Log.Logger.Information("A GIT COMMIT: {commit}", gitVersion);
+}
+if (File.Exists("gitHash.txt"))
+{
+    var gitVersion = File.ReadAllText("gitHash.txt");
+    Log.Logger.Information("R GIT COMMIT: {commit}", gitVersion);
+}
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSerilog();
