@@ -57,7 +57,10 @@ public class ExternalArchiver : IHostedService, IDisposable
 
     private async void executaVerificacaoAsync(object? state)
     {
-        var externas = db.ListarCatalogarExternas().Where(o => o.Ativo).ToArray();
+        var externas = db.ListarCatalogarExternas()
+                         .Where(o => o.Ativo)
+                         .OrderBy(o => o.Estacao[^1]) // Randomiza para esperar mais em cada provedor
+                         .ToArray();
 
         foreach (var e in externas)
         {
