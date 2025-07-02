@@ -5,16 +5,28 @@ using Microsoft.AspNetCore.Mvc;
 [ApiController]
 public class HomeController : ControllerBase
 {
+    internal static readonly VersionInfo VERSION = new VersionInfo { Revision = "-" };
+
     [HttpGet("/")]
-    public IActionResult Home()
+    public IActionResult GetHome()
     {
         return Redirect("/home.html");
     }
 
-    [NonAction]
     [HttpGet("robots.txt")]
-    public IActionResult RobotsTxt()
+    public IActionResult GetRobotsTxt()
     {
         return Ok("");
+    }
+
+    [HttpGet("version")]
+    public IActionResult GetVersionInfo()
+    {
+        return Ok(VERSION);
+    }
+
+    public record VersionInfo
+    {
+        public string Revision { get; set; } = string.Empty;
     }
 }

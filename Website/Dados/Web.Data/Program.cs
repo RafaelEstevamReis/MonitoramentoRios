@@ -9,15 +9,13 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File("data/logs/log.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
-if (File.Exists("/app/gitHash.txt"))
-{
-    var gitVersion = File.ReadAllText("/app/gitHash.txt");
-    Log.Logger.Information("A GIT COMMIT: {commit}", gitVersion);
-}
 if (File.Exists("gitHash.txt"))
 {
-    var gitVersion = File.ReadAllText("gitHash.txt");
-    Log.Logger.Information("R GIT COMMIT: {commit}", gitVersion);
+    var gitVersion = File.ReadAllText("gitHash.txt").Trim();
+    Log.Logger.Information("GIT COMMIT: {commit}", gitVersion);
+
+    if(gitVersion.Length > 7) gitVersion = gitVersion[7..];
+    Web.Data.Controllers.HomeController.VERSION.Revision = gitVersion;
 }
 
 var builder = WebApplication.CreateBuilder(args);
