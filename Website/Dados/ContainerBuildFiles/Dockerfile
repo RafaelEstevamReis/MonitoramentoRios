@@ -5,6 +5,8 @@ WORKDIR /app
 # Baixe o repositório
 RUN apt-get update && apt-get install -y git
 RUN git clone https://github.com/RafaelEstevamReis/MonitoramentoRios.git
+RUN git -C /app/MonitoramentoRios rev-parse HEAD > /app/gitHash.txt
+
 WORKDIR /app/MonitoramentoRios/Website/Dados
 
 # Restaure as dependências
@@ -19,10 +21,11 @@ WORKDIR /app
 
 # Copie os arquivos compilados da imagem de build
 COPY --from=build /app/publish .
+COPY --from=build /app/gitHash.txt .
+COPY appsettings.json .
 
 # Exponha a porta na qual a aplicação vai rodar
 EXPOSE 8080
 
-#RUN chown -R 1000:1000 ~/app/wwwroot
 # Rode a aplicação
 ENTRYPOINT ["dotnet", "Web.Data.dll"]
