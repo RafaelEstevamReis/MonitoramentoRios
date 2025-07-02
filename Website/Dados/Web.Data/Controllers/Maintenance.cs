@@ -1,6 +1,5 @@
 ﻿namespace Web.Data.Controllers;
 
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -102,14 +101,16 @@ public class Maintenance : ControllerBase
         if (estacao == null) return BadRequest("Estacao inválida");
 
         estacao.NomeEstacao = dados.NomeEstacao;
-        if (string.IsNullOrEmpty(dados.NomeResponsavel)) estacao.NomeResponsavel = dados.NomeResponsavel;
+        if (!string.IsNullOrEmpty(dados.NomeResponsavel)) estacao.NomeResponsavel = dados.NomeResponsavel;
 
-        if (dados.ResetarApiKey || string.IsNullOrWhiteSpace(estacao.ApiKEY))
+        if (dados.ResetarApiKey)
         {
             var guid = Guid.NewGuid();
             var key = guid.ToString();
+            string novoId = Helpers.ApiToEstacao(apiKey);
 
             estacao.ApiKEY = key;
+            estacao.Estacao = novoId;
         }
 
         db.EditaEstacao(estacao);
