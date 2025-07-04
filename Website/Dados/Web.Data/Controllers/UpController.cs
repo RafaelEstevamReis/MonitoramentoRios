@@ -125,6 +125,15 @@ public class UpController : ControllerBase
         // Corrige valores
         if (dados.ForcaSinal == 0) dados.ForcaSinal = null;
         if (dados.PercentBateria > 100) dados.PercentBateria = 100;
+        // Se tem Temp2 e Temp1 não veio, utiliza ele
+        if(dados.TemperaturaAr == null)
+        {
+            if(roj?["Temperatura2"] != null)
+            {
+                dados.TemperaturaAr = (decimal?)roj["Temperatura2"];
+            }
+        }
+
 
         string? imgPath = null;
         if (dados.pic_b64 != null)
