@@ -39,13 +39,13 @@ public class ExternalArchiver : IHostedService, IDisposable
     {
         TimeSpan start;
 #if DEBUG
-        start = TimeSpan.FromSeconds(15);
+        start = TimeSpan.FromSeconds(12);
 #else
-        start = TimeSpan.FromMinutes(15);
+        start = TimeSpan.FromMinutes(12);
 #endif
 
         logger.Information("[ExternalArchiver] Iniciando serviço de Archive Externo de dados...");
-        _timer = new Timer(executaVerificacaoAsync, null, start, TimeSpan.FromMinutes(15));
+        _timer = new Timer(executaVerificacaoAsync, null, start, TimeSpan.FromMinutes(12)); // 5/h
 
         return Task.CompletedTask;
     }
