@@ -21,14 +21,14 @@
         th {
             background-color: #f2f2f2;
         }
-
-        #chart_div, #chartLevel_div {
+/*
+        #chart_div, #chartLevel_div, #chartBat_div {
             width: 100%;
             height: 400px;
             margin-top: 20px;
             max-width: 1250px;
         }
-
+*/
     </style>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="helpers.js"></script>
@@ -41,13 +41,13 @@
     <!-- Gráfico -->
     <div id="chart_div"></div>
     <div id="chartLevel_div"></div>
+    <div id="chartBat_div"></div>
 
     <table id="dadosEstacao">
         <thead>
             <tr>
                 <th>Recebido (UTC)</th>
-                <th width="100px">Temperatura Interna</th>
-                <th>Tensão da Bateria</th>
+                <th>Internos</th>
                 <th>Reportado (UTC)</th>
                 <th>Ar</th>
                 <th>Água</th>
@@ -80,6 +80,7 @@
                     const chartData = [['Data/Hora', 'Temperatura do Ar', 'Umidade do Ar']];
                     const chartLevelData = [['Data/Hora', 'Nível']];
                     const chartRainData = [['Data/Hora', 'Chuva']];
+                    const chartBatData = [['Data/Hora', '% Bat', 'v Bat']];
 
                     const spnNome = document.getElementById('nomeEstacao');
                     spnNome.textContent = data[0].nomeEstacao;
@@ -93,8 +94,7 @@
 
                         row.innerHTML = `
                                             <td>${new Date(dado.recebidoUTC).toLocaleString()}${dado.source == 3 ? loraIcon : ''}</td>
-                                            <td>${formatValue(dado.temperaturaInterna, 1)}ºC</td>
-                                            <td>${formatValue(dado.tensaoBateria, 2)}v (${formatValue(dado.percentBateria, 0)}%)</td>
+                                            <td>${formatValue(dado.temperaturaInterna, 1)}ºC | ${formatValue(dado.tensaoBateria, 2)}v (${formatValue(dado.percentBateria, 0)}%)</td>
                                             <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
                                             <td>${formatValue(dado.temperaturaAr, 1)}ºC | ${formatValue(dado.umidadeAr, 0)}% | ${formatValue(dado.pressaoAr, 1)}hPa</td>
                                             <td>${prec} | ${formatValue(dado.nivelRio, 2) || '-'}m</td>
@@ -124,15 +124,18 @@
                             chartLevelData.push([hora, parseFloat(dado.nivelRio.toFixed(2))]);
                             temNivel = true;
                         }
+                        chartBatData.push([hora, parseFloat(dado.percentBateria), parseFloat(dado.tensaoBateria)])
                     });
 
                     const reversedData = [chartData[0]].concat(chartData.slice(1).reverse());
                     const reversedLevelData = [chartLevelData[0]].concat(chartLevelData.slice(1).reverse());
                     const reversedRainData = [chartRainData[0]].concat(chartRainData.slice(1).reverse());
+                    const reversedBatData = [chartBatData[0]].concat(chartBatData.slice(1).reverse());
                     // Desenhar o gráfico
                     google.charts.load('current', { 'packages': ['corechart'] });
                     google.charts.setOnLoadCallback(() => {
                         drawChart(reversedData);
+                        drawChartBat(reversedBatData);
 
                         if (temChuva) {
                             drawChartSimples(reversedRainData, 'Chuva (mm)', 'chartLevel_div', false);
@@ -162,8 +165,13 @@
                     gridlines: { count: 15 }  // Ajuste para quantidade de gridlines (opcional)
                 },
                 vAxes: {
-                    0: { title: 'Temperatura (°C)' },  // Eixo Y esquerdo (Temperatura)
-                    1: { title: 'Umidade (%)' }        // Eixo Y direito (Umidade)
+                    0: { title: 'Temperatura (°C)' },
+                    1: {
+                        title: 'Umidade (%)',
+                        viewWindow: {
+                            max: 100,
+                        }
+                    }
                 },
                 series: {
                     0: { targetAxisIndex: 0 },  // Temperatura no eixo esquerdo
@@ -172,6 +180,37 @@
             };
 
             const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+        function drawChartBat(chartData) {
+            const data = google.visualization.arrayToDataTable(chartData);
+
+            const options = {
+                title: 'Bateria',
+                curveType: 'function',
+                legend: { position: 'bottom' },
+                hAxis: {
+                    title: 'Horário',
+                    format: 'HH:mm',  // Formato para exibir apenas as horas
+                    gridlines: { count: 15 }  // Ajuste para quantidade de gridlines (opcional)
+                },
+                vAxes: {
+                    0: {
+                        title: 'Percentual',
+                        viewWindow: {
+                            max: 100,
+                            min: 0
+                        },
+                    },
+                    1: { title: 'Tensão (v)' } 
+                },
+                series: {
+                    0: { targetAxisIndex: 0 },  // Temperatura no eixo esquerdo
+                    1: { targetAxisIndex: 1 }   // Umidade no eixo direito
+                }
+            };
+
+            const chart = new google.visualization.LineChart(document.getElementById('chartBat_div'));
             chart.draw(data, options);
         }
         function drawChartSimples(chartData, title, id, graficoLinha) {
