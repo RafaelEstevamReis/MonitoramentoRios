@@ -40,6 +40,7 @@
 
     <!-- Gráfico -->
     <div id="chart_div"></div>
+    <div id="chartPress_div"></div>
     <div id="chartLevel_div"></div>
     <div id="chartBat_div"></div>
 
@@ -80,6 +81,7 @@
                     const chartData = [['Data/Hora', 'Temperatura do Ar', 'Umidade do Ar']];
                     const chartLevelData = [['Data/Hora', 'Nível']];
                     const chartRainData = [['Data/Hora', 'Chuva']];
+                    const chartPressData = [['Data/Hora', 'Pressão']];
                     const chartBatData = [['Data/Hora', '% Bat', 'v Bat']];
 
                     const spnNome = document.getElementById('nomeEstacao');
@@ -125,17 +127,21 @@
                             temNivel = true;
                         }
                         chartBatData.push([hora, parseFloat(dado.percentBateria), parseFloat(dado.tensaoBateria)])
+                        chartPressData.push([hora, parseFloat(dado.pressaoAr)])
                     });
 
                     const reversedData = [chartData[0]].concat(chartData.slice(1).reverse());
                     const reversedLevelData = [chartLevelData[0]].concat(chartLevelData.slice(1).reverse());
                     const reversedRainData = [chartRainData[0]].concat(chartRainData.slice(1).reverse());
                     const reversedBatData = [chartBatData[0]].concat(chartBatData.slice(1).reverse());
+                    const reversedPressData = [chartPressData[0]].concat(chartPressData.slice(1).reverse());
                     // Desenhar o gráfico
                     google.charts.load('current', { 'packages': ['corechart'] });
                     google.charts.setOnLoadCallback(() => {
                         drawChart(reversedData);
                         drawChartBat(reversedBatData);
+
+                        drawChartSimples(reversedPressData, 'Pressão (hPa)', 'chartPress_div', false);
 
                         if (temChuva) {
                             drawChartSimples(reversedRainData, 'Chuva (mm)', 'chartLevel_div', false);
@@ -213,6 +219,7 @@
             const chart = new google.visualization.LineChart(document.getElementById('chartBat_div'));
             chart.draw(data, options);
         }
+
         function drawChartSimples(chartData, title, id, graficoLinha) {
             const data = google.visualization.arrayToDataTable(chartData);
 
