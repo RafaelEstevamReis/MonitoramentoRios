@@ -49,10 +49,8 @@
                 <th width="100px">Temperatura Interna</th>
                 <th>Tensão da Bateria</th>
                 <th>Reportado (UTC)</th>
-                <th width="100px">Temperatura do Ar</th>
-                <th width="100px">Umidade do Ar</th>
-                <th>Precipitação</th>
-                <th>Nível da Água</th>
+                <th>Ar</th>
+                <th>Água</th>
                 <th>Sinal Conexão</th>
             </tr>
         </thead>
@@ -98,10 +96,8 @@
                                             <td>${formatValue(dado.temperaturaInterna, 1)}ºC</td>
                                             <td>${formatValue(dado.tensaoBateria, 2)}v (${formatValue(dado.percentBateria, 0)}%)</td>
                                             <td>${new Date(dado.dataHoraDadosUTC).toLocaleString()}</td>
-                                            <td>${formatValue(dado.temperaturaAr, 1)}ºC</td>
-                                            <td>${dado.umidadeAr || '-'}%</td>
-                                            <td>${prec}</td>
-                                            <td>${formatValue(dado.nivelRio, 2) || '-'}m</td>
+                                            <td>${formatValue(dado.temperaturaAr, 1)}ºC | ${formatValue(dado.umidadeAr, 0)}% | ${formatValue(dado.pressaoAr, 1)}hPa</td>
+                                            <td>${prec} | ${formatValue(dado.nivelRio, 2) || '-'}m</td>
                                             <td>${wifiSignalToPercent(dado.forcaSinal)} (${dado.forcaSinal || '-'}dBm)</td>
                                         `;
                         tableBody.appendChild(row);
