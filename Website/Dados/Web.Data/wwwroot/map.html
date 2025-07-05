@@ -83,7 +83,7 @@
         adicionaEstacao(-29.550, -50.570, noSigSvg, "936F7F3769D0B500", 'estEX'); // EXFP-IN01
         adicionaEstacao(-29.660, -50.625, noSigSvg, "726A95A4D3247CB4", 'estEX'); // EXFP-CP01
         adicionaEstacao(-29.500, -50.405, noSigSvg, "A954066DFFE75CEB", 'estEX'); // EXFP-RK01
-        adicionaEstacao(-29.650, -50.565, noSigSvg, "91661F2504450922", 'estEX'); // EXRL-BV01
+        adicionaEstacao(-29.640, -50.460, noSigSvg, "91661F2504450922", 'estEX'); // EXRL-BV01
         adicionaEstacao(-29.590, -50.530, noSigSvg, "CEF2144E84EF82A0", 'estEX'); // EXRL-MG01
         adicionaEstacao(-29.575, -50.420, noSigSvg, "D01D80E734592AFB", 'estEX'); // EXRZ-CH01
 
@@ -91,16 +91,23 @@
             .then(response => response.json())
             .then(data => {
                 data.forEach(dado => {
-                    let text = `-`;
-                    if (dado.nivelRio === null && dado.temperaturaAr === null) {
-                        text = `?/?`;
-                    } else if (dado.precipitacao10min || dado.precipitacao10min == 0) {
-                        text = `${formatValue(dado.temperaturaAr, 1)}ºC<br>${formatValue(dado.precipitacao10min, 1)}mm`;
-                    } else if (dado.nivelRio === null || dado.nivelRio === undefined) {
-                        text = `${formatValue(dado.temperaturaAr, 1)}ºC`;
-                    } else {
-                        text = `${formatValue(dado.temperaturaAr, 1)}ºC<br>${formatValue(dado.nivelRio, 1)}m`;
+                    const displayItems = [];
+
+                    if (dado.temperaturaAr !== null && dado.temperaturaAr !== undefined) {
+                        displayItems.push(`${formatValue(dado.temperaturaAr, 1)}ºC`);
                     }
+                    if (dado.pressaoAr !== null && dado.pressaoAr !== undefined) {
+                        displayItems.push(`${formatValue(dado.pressaoAr, 0)}hPa`);
+                    }
+                    if (dado.precipitacao10min !== null && dado.precipitacao10min !== undefined) {
+                        displayItems.push(`${formatValue(dado.precipitacao10min, 1)}mm`);
+                    }
+                    if (dado.nivelRio !== null && dado.nivelRio !== undefined) {
+                        displayItems.push(`${formatValue(dado.nivelRio, 1)}m`);
+                    }
+
+                    const text = displayItems.length > 0 ? displayItems.join('<br>') : '-';
+
                     atualizaEstacao(text, dado.estacao);
                 });
             })
