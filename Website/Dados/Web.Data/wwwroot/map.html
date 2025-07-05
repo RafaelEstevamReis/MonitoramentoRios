@@ -1,0 +1,141 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa das Estações</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="chart.js"></script>
+    <script type="text/javascript" src="helpers.js"></script>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            color: white;
+            background-color: darkslategray;
+        }
+
+        #screen {
+            height: 100%;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            min-width: 350px;
+        }
+
+        .circle-label {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 123, 255, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+            text-align: center;
+            border: 2px solid #007bff;
+            line-height: 0.85;
+        }
+        .estEX {
+            border: 2px solid darkslategray;
+            background: rgba(128, 128, 75, 0.5);
+        }
+    </style>
+
+</head>
+<body>
+
+    <div id="screen">
+        <div id="map"> </div>
+    </div>
+
+    <script>
+        let noSigSvg = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M790-56 414-434q-47 11-87.5 33T254-346l-84-86q32-32 69-56t79-42l-90-90q-41 21-76.5 46.5T84-516L0-602q32-32 66.5-57.5T140-708l-84-84 56-56 736 736-58 56Zm-310-64q-42 0-71-29.5T380-220q0-42 29-71t71-29q42 0 71 29t29 71q0 41-29 70.5T480-120Zm236-238-29-29-29-29-144-144q81 8 151.5 41T790-432l-74 74Zm160-158q-77-77-178.5-120.5T480-680q-21 0-40.5 1.5T400-674L298-776q44-12 89.5-18t92.5-6q142 0 265 53t215 145l-84 86Z"/></svg>';
+        let lst = [];
+
+        /* Mapa */
+        var map = L.map('map', {
+            maxZoom: 15,
+            minZoom: 11,
+        }).setView([-29.61, -50.50], 12); // Posição inicial [latitude, longitude] e zoom
+        // Centro Rolante -29.61, -50.55
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        // RS*
+        adicionaEstacao(-29.565, -50.535, noSigSvg, "04109F675953A131"); // RSRL-BE01
+        adicionaEstacao(-29.590, -50.565, noSigSvg, "9A6EE7B45495BB7F"); // RSRL-GLLS
+        adicionaEstacao(-29.635, -50.545, noSigSvg, "BB45660B199C5677"); // RSRL-RB01
+        adicionaEstacao(-29.650, -50.545, noSigSvg, "5BA69743261D364A"); // RSFP-RB02
+        adicionaEstacao(-29.565, -50.420, noSigSvg, "48B1162D47EC0FE6"); // RSRZ-CH01
+        adicionaEstacao(-29.650, -50.575, noSigSvg, "80500E0214FFDAF4"); // RSRL-CE01
+        // EX*
+        adicionaEstacao(-29.490, -50.570, noSigSvg, "D251E57DD415F69E", 'estEX'); // EXFP-AR01
+        adicionaEstacao(-29.550, -50.570, noSigSvg, "936F7F3769D0B500", 'estEX'); // EXFP-IN01
+        adicionaEstacao(-29.660, -50.625, noSigSvg, "726A95A4D3247CB4", 'estEX'); // EXFP-CP01
+        adicionaEstacao(-29.500, -50.405, noSigSvg, "A954066DFFE75CEB", 'estEX'); // EXFP-RK01
+        adicionaEstacao(-29.650, -50.565, noSigSvg, "91661F2504450922", 'estEX'); // EXRL-BV01
+        adicionaEstacao(-29.590, -50.530, noSigSvg, "CEF2144E84EF82A0", 'estEX'); // EXRL-MG01
+        adicionaEstacao(-29.575, -50.420, noSigSvg, "D01D80E734592AFB", 'estEX'); // EXRZ-CH01
+
+        fetch('/estacoes/ultimos')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(dado => {
+                    let text = `-`;
+                    if (dado.nivelRio === null && dado.temperaturaAr === null) {
+                        text = `?/?`;
+                    } else if (dado.precipitacao10min || dado.precipitacao10min == 0) {
+                        text = `${formatValue(dado.temperaturaAr, 1)}ºC<br>${formatValue(dado.precipitacao10min, 1)}mm`;
+                    } else if (dado.nivelRio === null || dado.nivelRio === undefined) {
+                        text = `${formatValue(dado.temperaturaAr, 1)}ºC`;
+                    } else {
+                        text = `${formatValue(dado.temperaturaAr, 1)}ºC<br>${formatValue(dado.nivelRio, 1)}m`;
+                    }
+                    atualizaEstacao(text, dado.estacao);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar dados das estações:', error);
+            });
+
+        function adicionaEstacao(lat, lng, label, id, aClass) {
+            let baseClass = 'circle-label';
+            if (aClass) baseClass = baseClass + ' ' + aClass;
+            var circle = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: baseClass,
+                    html: label,
+                    iconSize: [55, 55],
+                    iconAnchor: [20, 20] // Centralizar o texto no ponto
+                })
+            }).addTo(map);
+
+            let url = `/live.html?estacao=${id}`
+            if (url !== null) {
+                circle.on('click', function () {
+                    window.open(url, '_blank');
+                });
+            }
+
+            circle.id = `mcE_${id}`;
+            lst.push(circle);
+        }
+        function atualizaEstacao(label, id) {
+            let e = lst.find(el => el.id === `mcE_${id}`);
+            if (e === null || e === undefined) return;
+            e._icon.innerHTML = label;
+        }
+
+    </script>
+</body>
+</html>
