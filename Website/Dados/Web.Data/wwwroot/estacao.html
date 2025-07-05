@@ -79,7 +79,7 @@
                     const tableBody = document.querySelector('#dadosEstacao tbody');
                     tableBody.innerHTML = "";
                     const chartData = [['Data/Hora', 'Temperatura do Ar', 'Umidade do Ar']];
-                    const chartLevelData = [['Data/Hora', 'Nível']];
+                    const chartLevelData = [['Data/Hora', 'Nível', 'Sensor Raw']];
                     const chartRainData = [['Data/Hora', 'Chuva']];
                     const chartPressData = [['Data/Hora', 'Pressão']];
                     const chartBatData = [['Data/Hora', '% Bat', 'v Bat']];
@@ -123,10 +123,10 @@
                             temChuva = true;
                         }
                         if (dado.nivelRio) {
-                            chartLevelData.push([hora, parseFloat(dado.nivelRio.toFixed(2))]);
+                            chartLevelData.push([hora, parseFloat(dado.nivelRio), parseFloat(dado.nivelRio_RAW)]);
                             temNivel = true;
                         }
-                        chartBatData.push([hora, parseFloat(dado.percentBateria), parseFloat(dado.tensaoBateria)])
+                        chartBatData.push([hora, parseFloat(dado.tensaoBateria), parseFloat(dado.percentBateria)])
                         chartPressData.push([hora, parseFloat(dado.pressaoAr)])
                     });
 
@@ -139,14 +139,17 @@
                     google.charts.load('current', { 'packages': ['corechart'] });
                     google.charts.setOnLoadCallback(() => {
                         drawChart(reversedData);
-                        drawChartBat(reversedBatData);
-
+                        drawChartDuplo(reversedBatData, 'Bateria', 'chartBat_div', 'Tensão (v)', 'Percentual', true);
                         drawChartSimples(reversedPressData, 'Pressão (hPa)', 'chartPress_div', false);
 
                         if (temChuva) {
                             drawChartSimples(reversedRainData, 'Chuva (mm)', 'chartLevel_div', false);
                         } else {
-                            if (reversedLevelData.length > 2) drawChartSimples(reversedLevelData, 'Nível', 'chartLevel_div', true);
+                            if (reversedLevelData.length > 2) {
+                                //drawChartSimples(reversedLevelData, 'Nível', 'chartLevel_div', true);
+                                drawChartDuplo(reversedLevelData, 'Nível', 'chartLevel_div', 'Nível (m)', 'Sensor Raw', false);
+
+                            }
                         }
                     });
 
@@ -188,11 +191,12 @@
             const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
             chart.draw(data, options);
         }
-        function drawChartBat(chartData) {
+
+        function drawChartDuplo(chartData, title, id, legend1, legend2, s2Percent) {
             const data = google.visualization.arrayToDataTable(chartData);
 
             const options = {
-                title: 'Bateria',
+                title: title,
                 curveType: 'function',
                 legend: { position: 'bottom' },
                 hAxis: {
@@ -201,22 +205,22 @@
                     gridlines: { count: 15 }  // Ajuste para quantidade de gridlines (opcional)
                 },
                 vAxes: {
-                    0: {
-                        title: 'Percentual',
-                        viewWindow: {
+                    0: { title: legend1 },
+                    1: {
+                        title: legend2,
+                        viewWindow: !s2Percent ? { } : {
                             max: 100,
                             min: 0
-                        },
-                    },
-                    1: { title: 'Tensão (v)' } 
+                        }
+                    }
                 },
                 series: {
-                    0: { targetAxisIndex: 0 },  // Temperatura no eixo esquerdo
-                    1: { targetAxisIndex: 1 }   // Umidade no eixo direito
+                    0: { targetAxisIndex: 0 },
+                    1: { targetAxisIndex: 1 } 
                 }
             };
 
-            const chart = new google.visualization.LineChart(document.getElementById('chartBat_div'));
+            const chart = new google.visualization.LineChart(document.getElementById(id));
             chart.draw(data, options);
         }
 
