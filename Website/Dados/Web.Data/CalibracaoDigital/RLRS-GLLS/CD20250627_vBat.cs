@@ -9,7 +9,7 @@ public class CD20250627_vBat : ICalibracaoDigital
     public string Estacao => "9A6EE7B45495BB7F";
 
     public DateTime ValidadeInicioUTC => new DateTime(2025, 06, 27, 0, 0, 0, DateTimeKind.Utc);
-    public DateTime ValidadeFimUTC => new DateTime(2025, 07, 27, 0, 0, 0, DateTimeKind.Utc);
+    public DateTime ValidadeFimUTC => new DateTime(2025, 07, 04, 0, 0, 0, DateTimeKind.Utc); // Em 04/07 foi corrigido o envio
 
     public bool ProcessaDados(UpController.UploadData d, JsonNode? r)
     {
