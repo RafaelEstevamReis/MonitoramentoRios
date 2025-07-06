@@ -15,18 +15,34 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            color: white;
-            background-color: darkslategray;
+            /*color: white;*/
+            /*background-color: darkslategray;*/
         }
 
         #screen {
             height: 100%;
+            display: flex;
         }
 
         #map {
-            height: 100%;
+            height: 90%;
             width: 100%;
             min-width: 350px;
+        }
+
+        #charts {
+            height: 100%;
+            width: 100%;
+        }
+
+        .left {
+            width: 70%;
+        }
+
+        .right {
+            width: 29%;
+            overflow-y: scroll;
+            overflow-x: hidden;
         }
 
         .circle-label {
@@ -44,9 +60,38 @@
             border: 2px solid #007bff;
             line-height: 0.85;
         }
+
         .estEX {
             border: 2px solid darkslategray;
-            background: rgba(128, 128, 75, 0.5);
+            background: rgba(118, 118, 65, 0.5);
+        }
+
+        .bubble-data {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .legend-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+            flex-direction: row;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 10px;
+            font-size: 0.9em;
+        }
+
+        .legend-color {
+            border-radius: 10px;
+            width: 20px;
+            height: 15px;
+            display: inline-block;
+            margin-right: 5px;
         }
     </style>
 
@@ -54,23 +99,32 @@
 <body>
 
     <div id="screen">
-        <div id="map"> </div>
+        <div class="left">
+            <div id="map"> </div>
+            <div id="legends" class="legend-container"> </div>
+        </div>
+        <div class="right">
+            <div id="charts"> </div>
+        </div>
     </div>
 
     <script>
-        let noSigSvg = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M790-56 414-434q-47 11-87.5 33T254-346l-84-86q32-32 69-56t79-42l-90-90q-41 21-76.5 46.5T84-516L0-602q32-32 66.5-57.5T140-708l-84-84 56-56 736 736-58 56Zm-310-64q-42 0-71-29.5T380-220q0-42 29-71t71-29q42 0 71 29t29 71q0 41-29 70.5T480-120Zm236-238-29-29-29-29-144-144q81 8 151.5 41T790-432l-74 74Zm160-158q-77-77-178.5-120.5T480-680q-21 0-40.5 1.5T400-674L298-776q44-12 89.5-18t92.5-6q142 0 265 53t215 145l-84 86Z"/></svg>';
+        const bubleSize = 60;
+        const noSigSvg = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M790-56 414-434q-47 11-87.5 33T254-346l-84-86q32-32 69-56t79-42l-90-90q-41 21-76.5 46.5T84-516L0-602q32-32 66.5-57.5T140-708l-84-84 56-56 736 736-58 56Zm-310-64q-42 0-71-29.5T380-220q0-42 29-71t71-29q42 0 71 29t29 71q0 41-29 70.5T480-120Zm236-238-29-29-29-29-144-144q81 8 151.5 41T790-432l-74 74Zm160-158q-77-77-178.5-120.5T480-680q-21 0-40.5 1.5T400-674L298-776q44-12 89.5-18t92.5-6q142 0 265 53t215 145l-84 86Z"/></svg>';
         let lst = [];
+        let ids = [];
+        const stationNames = {};
 
         /* Mapa */
         var map = L.map('map', {
             maxZoom: 15,
             minZoom: 11,
-        }).setView([-29.61, -50.50], 12); // Posição inicial [latitude, longitude] e zoom
+        }).setView([-29.60, -50.50], 12); // Posição inicial [latitude, longitude] e zoom
         // Centro Rolante -29.61, -50.55
-
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
+
         // RS*
         adicionaEstacao(-29.565, -50.535, noSigSvg, "04109F675953A131"); // RSRL-BE01
         adicionaEstacao(-29.590, -50.565, noSigSvg, "9A6EE7B45495BB7F"); // RSRL-GLLS
@@ -87,42 +141,48 @@
         adicionaEstacao(-29.590, -50.530, noSigSvg, "CEF2144E84EF82A0", 'estEX'); // EXRL-MG01
         adicionaEstacao(-29.575, -50.420, noSigSvg, "D01D80E734592AFB", 'estEX'); // EXRZ-CH01
 
+        // Puxa dados recentes para todas
         fetch('/estacoes/ultimos')
             .then(response => response.json())
             .then(data => {
                 data.forEach(dado => {
+                    stationNames[dado.estacao] = dado.nomeEstacao;
                     const displayItems = [];
 
                     if (dado.temperaturaAr !== null && dado.temperaturaAr !== undefined) {
-                        displayItems.push(`${formatValue(dado.temperaturaAr, 1)}ºC`);
+                        displayItems.push(`<span>${formatValue(dado.temperaturaAr, 1)}ºC</span>`);
                     }
                     if (dado.pressaoAr !== null && dado.pressaoAr !== undefined) {
-                        displayItems.push(`${formatValue(dado.pressaoAr, 0)}hPa`);
+                        displayItems.push(`<span>${formatValue(dado.pressaoAr, 0)}hPa</span>`);
                     }
                     if (dado.precipitacao10min !== null && dado.precipitacao10min !== undefined) {
-                        displayItems.push(`${formatValue(dado.precipitacao10min, 1)}mm`);
+                        let casas = 1;
+                        if (dado.precipitacao10min >= 10) casas = 0;
+                        displayItems.push(`<span><i class="bi-cloud-rain"></i> ${formatValue(dado.precipitacao10min, casas)}mm</span>`);
                     }
                     if (dado.nivelRio !== null && dado.nivelRio !== undefined) {
-                        displayItems.push(`${formatValue(dado.nivelRio, 1)}m`);
+                        displayItems.push(`<span><i class="bi-water"></i> ${formatValue(dado.nivelRio, 1)}m</span>`);
                     }
 
-                    const text = displayItems.length > 0 ? displayItems.join('<br>') : '-';
-
-                    atualizaEstacao(text, dado.estacao);
+                    const text = displayItems.length > 0 ? displayItems.join(' ') : '-';
+                    atualizaEstacao(`<div class='bubble-data'>${text}<div>`, dado.estacao);
                 });
             })
             .catch(error => {
                 console.error('Erro ao carregar dados das estações:', error);
             });
+        // Gera os gráficos
+        generateStationCharts(ids);
 
         function adicionaEstacao(lat, lng, label, id, aClass) {
+            ids.push(id);
             let baseClass = 'circle-label';
             if (aClass) baseClass = baseClass + ' ' + aClass;
             var circle = L.marker([lat, lng], {
                 icon: L.divIcon({
                     className: baseClass,
                     html: label,
-                    iconSize: [55, 55],
+                    iconSize: [bubleSize, bubleSize],
                     iconAnchor: [20, 20] // Centralizar o texto no ponto
                 })
             }).addTo(map);
@@ -141,6 +201,149 @@
             let e = lst.find(el => el.id === `mcE_${id}`);
             if (e === null || e === undefined) return;
             e._icon.innerHTML = label;
+        }
+
+        async function generateStationCharts(ids) {
+            // Limpar a div charts
+            const chartsDiv = document.getElementById('charts');
+            chartsDiv.innerHTML = '';
+
+            // Fazer fetch para cada estação
+            const fetchPromises = ids.map(id =>
+                fetch(`/estacoes/lastHourly?lastHours=36&estacao=${id}`)
+                    .then(response => response.json())
+                    .then(data => ({ id, data }))
+                    .catch(error => {
+                        console.error(`Erro ao buscar dados da estação ${id}:`, error);
+                        return { id, data: [] };
+                    })
+            );
+
+            // Aguardar todas as requisições
+            const results = await Promise.all(fetchPromises);
+
+            // Organizar dados por HourKey
+            const alignedData = {};
+            results.forEach(result => {
+                result.data.forEach(record => {
+                    const hourKey = record.hourKey;
+                    if (!alignedData[hourKey]) {
+                        alignedData[hourKey] = {
+                            labels: [], // Para armazenar os DateTime
+                            precipitacao: {},
+                            temperatura: {},
+                            umidade: {},
+                            pressao: {},
+                            nivelRio: {}
+                        };
+                    }
+                    alignedData[hourKey].labels.push(new Date(record.dataHoraDadosUTC + 'Z').toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
+                    alignedData[hourKey].precipitacao[result.id] = record.PrecipitacaoTotal_Hora ?? null;
+                    alignedData[hourKey].temperatura[result.id] = record.temperaturaAr_AVG ?? null;
+                    alignedData[hourKey].umidade[result.id] = record.umidadeAr_AVG ?? null;
+                    alignedData[hourKey].pressao[result.id] = record.pressaoAr_AVG ?? null;
+                    alignedData[hourKey].nivelRio[result.id] = record.nivelRio_AVG ?? null;
+                });
+            });
+
+            // Ordenar HourKeys para garantir sequência temporal
+            const sortedHourKeys = Object.keys(alignedData).sort((a, b) => parseInt(a) - parseInt(b));
+
+            // Preparar datasets para cada métrica
+            const metrics = [
+                { name: 'Precipitação (mm)', key: 'precipitacao', unit: 'mm' },
+                { name: 'Temperatura (°C)', key: 'temperatura', unit: '°C' },
+                { name: 'Umidade (%)', key: 'umidade', unit: '%' },
+                { name: 'Pressão (hPa)', key: 'pressao', unit: 'hPa' },
+                { name: 'Nível do Rio (m)', key: 'nivelRio', unit: 'm' }
+            ];
+
+            const colors = [
+                'rgba(255, 99, 132, 0.8)',  // Vermelho
+                'rgba(54, 162, 235, 0.8)',  // Azul
+                'rgba(255, 206, 86, 0.8)',   // Amarelo
+                'rgba(75, 192, 192, 0.8)',   // Ciano
+                'rgba(153, 102, 255, 0.8)',  // Roxo
+                'rgba(255, 159, 64, 0.8)',   // Laranja
+                'rgba(0, 128, 0, 0.8)',      // Verde
+                'rgba(255, 0, 255, 0.8)',    // Magenta
+                'rgba(128, 128, 128, 0.8)',  // Cinza
+                'rgba(0, 255, 255, 0.8)',    // Ciano claro
+                'rgba(255, 99, 71, 0.8)',    // Salmão
+                'rgba(139, 69, 19, 0.8)',    // Marrom
+                'rgba(0, 0, 128, 0.8)',      // Azul escuro
+                'rgba(255, 215, 0, 0.8)',    // Dourado
+                'rgba(128, 0, 128, 0.8)'     // Púrpura
+            ];
+            const colorsCJS = ['#3366CC', '#DC3912', '#FF9900', '#109618', '#990099', '#3B3EAC', '#0099C6', '#D47', '#6A0', '#B82E2E', '#316395', '#949', '#2A9', '#AA1', '#63C', '#E67300', '#8B0707', '#329262', '#5574A6', '#651067']
+
+            // Criar um gráfico para cada métrica
+            metrics.forEach(metric => {
+                const canvas = document.createElement('canvas');
+                chartsDiv.appendChild(canvas);
+
+                const datasets = ids.map((id, index) => ({
+                    label: stationNames[id] || `Estação ${id}`,
+                    data: sortedHourKeys.map(hourKey => alignedData[hourKey][metric.key][id] ?? null),
+                    borderColor: colors[index % colors.length],
+                    backgroundColor: colors[index % colors.length].replace('0.8', '0.2'),
+                    fill: false,
+                    tension: 0.1,
+                    pointRadius: 1,
+                }));
+
+                new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        labels: sortedHourKeys.map(hourKey => alignedData[hourKey].labels[0]),
+                        datasets
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: metric.name
+                            },
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: metric.unit
+                                },
+                                beginAtZero: false
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Hora'
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Cria legenda
+            const legendDiv = document.getElementById('legends');
+            legendDiv.innerHTML = '';
+
+            Object.entries(stationNames).forEach(([id, name], index) => {
+                const color = colors[index % colors.length];
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                const colorBox = document.createElement('span');
+                colorBox.className = 'legend-color';
+                colorBox.style.backgroundColor = color;
+                const label = document.createElement('span');
+                label.textContent = name || `Estação ${id}`;
+                legendItem.appendChild(colorBox);
+                legendItem.appendChild(label);
+                legendDiv.appendChild(legendItem);
+            });
+
         }
 
     </script>
