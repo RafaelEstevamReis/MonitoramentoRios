@@ -131,6 +131,7 @@ public class ExternalArchiver : IHostedService, IDisposable
                         break;
                     case "Rain Rate": // Rain Rate
                         dados.Precipitacao = Math.Round(dVal / 60, 2); // h -> min
+                        dados.Precipitacao10m = Math.Round(dVal / 6, 2); // h -> 10min
                         break;
 
                     case "Wind Speed":
