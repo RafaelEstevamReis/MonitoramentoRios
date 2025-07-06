@@ -21,7 +21,20 @@
 
         #screen {
             height: 100%;
+            width: 100%;
             display: flex;
+        }
+
+        .left {
+            height: 100%;
+            width: 70%;
+            overflow: hidden;
+        }
+
+        .right {
+            width: 29%;
+            overflow-y: scroll;
+            overflow-x: hidden;
         }
 
         #map {
@@ -33,16 +46,6 @@
         #charts {
             height: 100%;
             width: 100%;
-        }
-
-        .left {
-            width: 70%;
-        }
-
-        .right {
-            width: 29%;
-            overflow-y: scroll;
-            overflow-x: hidden;
         }
 
         .circle-label {
@@ -119,7 +122,7 @@
         var map = L.map('map', {
             maxZoom: 15,
             minZoom: 11,
-        }).setView([-29.60, -50.50], 12); // Posição inicial [latitude, longitude] e zoom
+        }).setView([-29.59, -50.51], 12); // Posição inicial [latitude, longitude] e zoom
         // Centro Rolante -29.61, -50.55
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -237,6 +240,10 @@
                             nivelRio: {}
                         };
                     }
+
+                    if (record.nivelRio_AVG && record.nivelRio_AVG < 0) record.nivelRio_AVG = null; // <0m
+                    if (record.umidadeAr_AVG && record.umidadeAr_AVG < 5) record.umidadeAr_AVG = null; // <5%
+
                     alignedData[hourKey].labels.push(new Date(record.dataHoraDadosUTC + 'Z').toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
                     alignedData[hourKey].precipitacao[result.id] = record.PrecipitacaoTotal_Hora ?? null;
                     alignedData[hourKey].temperatura[result.id] = record.temperaturaAr_AVG ?? null;
@@ -251,10 +258,10 @@
 
             // Preparar datasets para cada métrica
             const metrics = [
-                { name: 'Precipitação (mm)', key: 'precipitacao', unit: 'mm' },
                 { name: 'Temperatura (°C)', key: 'temperatura', unit: '°C' },
                 { name: 'Umidade (%)', key: 'umidade', unit: '%' },
                 { name: 'Pressão (hPa)', key: 'pressao', unit: 'hPa' },
+                { name: 'Precipitação (mm)', key: 'precipitacao', unit: 'mm' },
                 { name: 'Nível do Rio (m)', key: 'nivelRio', unit: 'm' }
             ];
 
@@ -317,7 +324,7 @@
                             },
                             x: {
                                 title: {
-                                    display: true,
+                                    display: false,
                                     text: 'Hora'
                                 }
                             }
