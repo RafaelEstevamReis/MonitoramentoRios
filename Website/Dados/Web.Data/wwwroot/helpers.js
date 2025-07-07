@@ -3,6 +3,15 @@ function formatValue(value, decimals = 0) {
     if (isNaN(value)) return '-'; // Verifica null ou undefined
     return decimals === 0 ? Math.round(value) : value.toFixed(decimals);
 }
+function round(value, decimals) {
+    if (value == undefined) return null;
+    if (!value) return value; // NaN, null, zero
+
+    if (decimals == 0) return Math.round(value);
+
+    var exp = Math.pow(10, decimals);
+    return Math.round(value * exp) / exp;
+}
 function formatValueUnit(value, decimals, unit) {
     if (value == null) return '-'; // Verifica null ou undefined
     return (decimals === 0 ? Math.round(value) : value.toFixed(decimals)) +""+ unit;

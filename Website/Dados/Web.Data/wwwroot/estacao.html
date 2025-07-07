@@ -21,14 +21,6 @@
         th {
             background-color: #f2f2f2;
         }
-/*
-        #chart_div, #chartLevel_div, #chartBat_div {
-            width: 100%;
-            height: 400px;
-            margin-top: 20px;
-            max-width: 1250px;
-        }
-*/
     </style>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="helpers.js"></script>
@@ -71,6 +63,8 @@
             let temNivel = false;
             let temChuva = false;
             let temTemp = false;
+            let temPress = false;
+            let temBat = false;
             // Carregar gráfico após carregar os dados
             fetch('/estacoes/dados?limit=300&estacao=' + getQueryParam("estacao"))
                 //fetch('https://monitorarios.xyz/estacoes/dados?estacao=' + getQueryParam("estacao"), { mode: 'no-cors' })
@@ -108,7 +102,7 @@
                         const hora = new Date(dado.dataHoraDadosUTC).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                         if (dado.temperaturaAr || dado.umidadeAr) {
-                            chartData.push([hora, parseFloat(dado.temperaturaAr), parseFloat(dado.umidadeAr)]);
+                            chartData.push([hora, round(dado.temperaturaAr, 1), round(dado.umidadeAr, 0)]);
                             temTemp = true;
                         }
                         if (dado.precipitacao || dado.precipitacao == 0) {
@@ -117,17 +111,23 @@
                             let diff = precAnterior - dado.precipitacaoTotal;
                             if (diff < 0) diff = 0; // reset
 
-                            chartRainData.push([hora, parseFloat(diff.toFixed(2))]);
+                            chartRainData.push([hora, round(diff, 2)]);
 
                             precAnterior = dado.precipitacaoTotal;
                             temChuva = true;
                         }
-                        if (dado.nivelRio) {
-                            chartLevelData.push([hora, parseFloat(dado.nivelRio), parseFloat(dado.nivelRio_RAW)]);
+                        if (dado.nivelRio || dado.nivelRio_RAW) {
+                            chartLevelData.push([hora, round(dado.nivelRio, 2), round(dado.nivelRio_RAW, 2)]);
                             temNivel = true;
                         }
-                        chartBatData.push([hora, parseFloat(dado.tensaoBateria), parseFloat(dado.percentBateria)])
-                        chartPressData.push([hora, parseFloat(dado.pressaoAr)])
+                        if (dado.tensaoBateria || dado.tensaoBateria == 0) {
+                            chartBatData.push([hora, round(dado.tensaoBateria, 2), round(dado.percentBateria, 0)]);
+                            temBat = true;
+                        }
+                        if (dado.pressaoAr) {
+                            chartPressData.push([hora, round(dado.pressaoAr, 0)]);
+                            temPress = true;
+                        }
                     });
 
                     const reversedData = [chartData[0]].concat(chartData.slice(1).reverse());
@@ -138,22 +138,20 @@
                     // Desenhar o gráfico
                     google.charts.load('current', { 'packages': ['corechart'] });
                     google.charts.setOnLoadCallback(() => {
-                        drawChart(reversedData);
-                        drawChartDuplo(reversedBatData, 'Bateria', 'chartBat_div', 'Tensão (v)', 'Percentual', true);
-                        drawChartSimples(reversedPressData, 'Pressão (hPa)', 'chartPress_div', false);
+                        if (temTemp) drawChart(reversedData);
+                        if (temBat) drawChartDuplo(reversedBatData, 'Bateria', 'chartBat_div', 'Tensão (v)', 'Percentual', true);
+                        if (temPress) drawChartSimples(reversedPressData, 'Pressão (hPa)', 'chartPress_div', false);
 
                         if (temChuva) {
                             drawChartSimples(reversedRainData, 'Chuva (mm)', 'chartLevel_div', false);
                         } else {
                             if (reversedLevelData.length > 2) {
-                                //drawChartSimples(reversedLevelData, 'Nível', 'chartLevel_div', true);
                                 drawChartDuplo(reversedLevelData, 'Nível', 'chartLevel_div', 'Nível (m)', 'Sensor Raw', false);
 
                             }
                         }
                     });
 
-                    if (!temTemp) document.getElementById("chart_div").hidden = true;
                     if (!temNivel && !temChuva) document.getElementById("chartLevel_div").hidden = true;
                 })
                 .catch(error => {
@@ -208,7 +206,7 @@
                     0: { title: legend1 },
                     1: {
                         title: legend2,
-                        viewWindow: !s2Percent ? { } : {
+                        viewWindow: !s2Percent ? {} : {
                             max: 100,
                             min: 0
                         }
@@ -216,7 +214,7 @@
                 },
                 series: {
                     0: { targetAxisIndex: 0 },
-                    1: { targetAxisIndex: 1 } 
+                    1: { targetAxisIndex: 1 }
                 }
             };
 
