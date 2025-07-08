@@ -469,9 +469,9 @@
         function iconeBateria(perc) {
             if (!perc) return 'bi-battery';
 
-            if (perc < 10) return 'bi-battery';
-            if (perc < 30) return 'bi-battery-low';
-            if (perc < 70) return 'bi-battery-half';
+            if (perc < 20) return 'bi-battery';
+            if (perc < 40) return 'bi-battery-low';
+            if (perc < 80) return 'bi-battery-half';
             return 'bi-battery-full'; // >70
         }
         /* Gráficos */
