@@ -72,7 +72,14 @@
                 .then(data => {
                     const tableBody = document.querySelector('#dadosEstacao tbody');
                     tableBody.innerHTML = "";
-                    const chartData = [['Data/Hora', 'Temperatura do Ar', 'Umidade do Ar']];
+                    const chartData = [
+                        //['Data/Hora', 'Temperatura do Ar', 'Umidade do Ar']
+                        [
+                            { label: 'Data/Hora', type: 'string' },
+                            { label: 'Temperatura do Ar', type: 'number' },
+                            { label: 'Umidade do Ar', type: 'number' },
+                        ]
+                    ];
                     const chartLevelData = [['Data/Hora', 'Nível', 'Sensor Raw']];
                     const chartRainData = [['Data/Hora', 'Chuva']];
                     const chartPressData = [['Data/Hora', 'Pressão']];
