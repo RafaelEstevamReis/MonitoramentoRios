@@ -1,10 +1,11 @@
 $fn = 64;
 
-tub_diameter = 22;
+tub_diameter = 23;
 tub_length = 25;
 tub_wall_thickness = 4;
 sensor_diameter = 23;
 wire_diameter = 3.5;
+pin_diameter = 2;
 // calculated
 housing_diameter = 40;
 
@@ -30,5 +31,9 @@ difference() {
         // sensor
         translate([0, 0, -tub_diameter/2-1]) 
             cylinder(h = tub_diameter, d = sensor_diameter);
+    }
+    if(pin_diameter > 0){
+      translate([0, tub_length-2, 0])rotate([0,90,0]) 
+        #cylinder(h = tub_diameter*1.1, d = pin_diameter, center=true);
     }
 }
