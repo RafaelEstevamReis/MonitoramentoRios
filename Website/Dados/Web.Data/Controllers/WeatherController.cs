@@ -2,6 +2,8 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using System;
+using System.Linq;
 using Web.Data.DAO;
 
 [ApiController]
@@ -10,6 +12,10 @@ public class WeatherController : ControllerBase
 {
     private readonly DB db;
     private readonly ILogger log;
+
+    static int currHourCache = -1;
+    static DAO.DBModels.TBWeather[] wcache = [];
+
 
     public WeatherController(DB db, ILogger log)
     {
@@ -20,13 +26,21 @@ public class WeatherController : ControllerBase
     [HttpGet]
     public IActionResult Obter()
     {
-        return Ok(db.ObterWeatherProximasHoras());
+        var hora = DateTime.UtcNow.Hour;
+
+        if (hora != currHourCache || wcache.Length == 0)
+        {
+            wcache = db.ObterWeatherProximasHoras().ToArray();
+            currHourCache = hora;
+        }
+
+        return Ok(wcache);
     }
 
-    [HttpGet("dia")]
-    public IActionResult ObterHourKey([FromQuery] int hourKey)
+    [HttpGet("ext")]
+    public IActionResult ObterExtendido()
     {
-        return Ok(db.ObterWeatherDia(hourKey));
+        return Ok(db.ObterWeatherProximasHoras(hour: 96));
     }
 
 }

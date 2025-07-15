@@ -438,13 +438,13 @@ public class DB
         using var cnn = db.GetConnection();
         cnn.BulkInsert(data, OnConflict.Ignore);
     }
-    public IEnumerable<DBModels.TBWeather> ObterWeatherProximasHoras()
+    public IEnumerable<DBModels.TBWeather> ObterWeatherProximasHoras(int hour = 12)
     {
         using var cnn = db.GetConnection();
-        var d = cnn.Query<DBModels.TBWeather>("SELECT * FROM TBWeather WHERE ForecastUTC BETWEEN @inicio AND @fim ORDER BY ColetaUTC DESC, ForecastUTC ASC LIMIT 0,36", new
+        var d = cnn.Query<DBModels.TBWeather>("SELECT * FROM TBWeather WHERE ForecastUTC BETWEEN @inicio AND @fim ORDER BY ColetaUTC DESC, ForecastUTC ASC LIMIT 0,100", new
         {
             inicio = DateTime.UtcNow.AddHours(-1),
-            fim = DateTime.UtcNow.AddHours(12),
+            fim = DateTime.UtcNow.AddHours(hour),
         });
 
         // Garante que não tem duplicata e está ordenado
@@ -453,20 +453,7 @@ public class DB
                 .Where(o => o is not null) // Não nulos
                 .Cast<DBModels.TBWeather>() // Arruma retorno
                 .OrderBy(o => o.ForecastUTC)
-                .Take(12)
-                ;
-    }
-    public IEnumerable<DBModels.TBWeather> ObterWeatherDia(int hourKey)
-    {
-        using var cnn = db.GetConnection();
-        var d = cnn.Query<DBModels.TBWeather>("SELECT * FROM TBWeather WHERE ForecastUTC", new
-        {
-            inicio = DateTime.UtcNow.AddHours(-2),
-            fim = DateTime.UtcNow.AddHours(12),
-        });
-
-        // Garante que não tem duplicata e está ordenado
-        return d.OrderBy(o => o.ColetaUTC)
+                .Take(hour)
                 ;
     }
 
