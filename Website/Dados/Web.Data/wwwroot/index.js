@@ -11,7 +11,6 @@ function montaTabelaEstacoes(lst) {
                 if (dado.nomeEstacao.startsWith('EX')) return;
 
                 // Bloco Tabela
-                let sig = dado.source == 3 ? loraIcon : `<i class="${iconeWifi(wifiSigPerc)}"></i>`;
                 if (dado.source == 3 && !dado.percentBateria && dado.tensaoBateria) { // LORA
                     if (dado.tensaoBateria < 3.2) dado.percentBateria = 0;
                     else if (dado.tensaoBateria < 3.4) dado.percentBateria = 10;
@@ -22,6 +21,7 @@ function montaTabelaEstacoes(lst) {
                 }
                 let bat = (dado.percentBateria || dado.percentBateria == 0) ? `<i class="bi ${iconeBateria(dado.percentBateria)}"></i>` : '';
                 let wifiSigPerc = wifiSignalToPercent(dado.forcaSinal);
+                let sig = dado.source == 3 ? loraIcon : `<i class="${iconeWifi(wifiSigPerc)}"></i>`;
 
                 let temp = dado.temperaturaAr ? `<i class="bi-thermometer"></i> ${formatValue(dado.temperaturaAr, 1)}ºC` : ''
                 let humd = dado.umidadeAr ? `<i class="bi-droplet"></i> ${formatValue(dado.umidadeAr, 0)}%` : ''
