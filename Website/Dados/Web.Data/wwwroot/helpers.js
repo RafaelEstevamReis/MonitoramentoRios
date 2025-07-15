@@ -39,6 +39,37 @@ function timeSince(date) {
     return 'agora';
 }
 
+function generateHourlyLabels(start, end) {
+    const labels = [];
+    let current = start;
+    const endDate = end;
+
+    while (current <= endDate) {
+        const label = getDateTimeForTimezone(current, -3);
+        labels.push(label);
+        current.setHours(current.getHours() + 1); // Incrementa 1 hora
+    }
+    return labels;
+}
+
+function getDateTimeForTimezone(current, tz) {
+    // Ajustar o horário para o timezone especificado (tz é em horas)
+    const offsetMs = tz * 60 * 60 * 1000; // Converte horas para milissegundos
+    const adjustedTime = new Date(current.getTime() + offsetMs);
+
+    // Extrair componentes da data e hora em UTC e ajustar manualmente
+    const year = adjustedTime.getUTCFullYear();
+    const month = parseInt(adjustedTime.getUTCMonth());
+    const day = String(adjustedTime.getUTCDate()).padStart(2, '0');
+    const hours = String(adjustedTime.getUTCHours()).padStart(2, '0');
+
+    const meses = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+
+    // Formatar como "YYYY-MM-DD HHh" (sem minutos)
+    const formattedDateTime = `${day}/${meses[month]} ${hours}h`;
+
+    return formattedDateTime;
+}
 function getDateTimeForTimezoneHour(currentString, tz) {
     // Ajustar o horário para o timezone especificado (tz é em horas)
     const offsetMs = tz * 60 * 60 * 1000; // Converte horas para milissegundos
@@ -76,6 +107,23 @@ function wifiSignalToPercent(signal) {
     // Converte o nível para percentual
     const percent = ((clampedSignal - MIN_SIGNAL) / (MAX_SIGNAL - MIN_SIGNAL)) * 100;
     return Math.round(percent) + '%';
+}
+function iconeWifi(forcaSinalStr) {
+    if (forcaSinalStr == "-") return 'bi-wifi-off';
+
+    const perc = parseInt(forcaSinalStr.replace('%', ''));
+    if (perc < 15) return 'bi-wifi-off';
+    if (perc < 30) return 'bi-wifi-1';
+    if (perc < 70) return 'bi-wifi-2';
+    return 'bi-wifi'; // >70
+}
+function iconeBateria(perc) {
+    if (!perc) return 'bi-battery';
+
+    if (perc < 20) return 'bi-battery';
+    if (perc < 40) return 'bi-battery-low';
+    if (perc < 80) return 'bi-battery-half';
+    return 'bi-battery-full'; // >70
 }
 
 function getQueryParam(name) {

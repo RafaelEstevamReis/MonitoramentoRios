@@ -1,0 +1,156 @@
+﻿html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    color: white;
+    background-color: darkslategray;
+}
+
+#screen {
+    height: 100%;
+}
+
+#top {
+    display: flex;
+    flex-direction: row;
+    height: 400px;
+}
+
+#topTable {
+    height: 100%;
+    width: 50%;
+}
+
+#map {
+    height: 100%;
+    width: 50%;
+    min-width: 350px;
+}
+
+#ultimasLeituras {
+    width: 100%;
+}
+
+#divSobre {
+    text-align: center;
+}
+
+#previsaoTempo {
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+#previsaoCards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+h1 {
+    text-align: center;
+}
+
+h2 {
+    text-align: center;
+    padding: 5px;
+}
+
+h3 {
+    padding: 5px;
+}
+
+td {
+    text-align: center;
+}
+
+    td > span {
+        white-space: nowrap;
+    }
+
+.cdvChart {
+    max-height: 300px;
+    padding-top: 20px;
+    padding-bottom: 80px;
+}
+
+.btn, .btn:visited {
+    color: white;
+    text-decoration: none;
+    background-color: lightslategrey;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    padding: 8px 10px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.circle-label {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 123, 255, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+    border: 2px solid #007bff;
+    line-height: 0.85;
+}
+
+.ribbon {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: auto;
+    background-color: #ff4757; /* Cor de fundo do ribbon */
+    color: #fff; /* Cor do texto */
+    text-align: center;
+    padding: 4px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    transform: rotate(-45deg) translate(-18px, -10px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Garante que o ribbon fique acima de outros elementos */
+}
+
+a, a:visited {
+    color: white;
+}
+
+@media(max-width: 850px) {
+    #map {
+        height: 600px;
+        width: 100%;
+        min-width: 300px;
+    }
+
+    #top {
+        display: flex;
+        flex-direction: column-reverse;
+        background-color: darkslategray;
+        min-height: 600px;
+        overflow: auto;
+    }
+
+    #topTable {
+        height: auto;
+        width: 100%;
+    }
+
+    .btn, .btn:visited {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+
+    .ribbon {
+        left: auto;
+        right: 0;
+        transform: rotate(45deg) translate(18px, -8px);
+    }
+}
