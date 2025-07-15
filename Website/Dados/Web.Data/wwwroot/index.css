@@ -84,7 +84,7 @@ td {
     padding: 8px 10px;
     text-align: center;
     display: inline-block;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .circle-label {
@@ -125,7 +125,7 @@ a, a:visited {
 
 @media(max-width: 850px) {
     #map {
-        height: 600px;
+        height: 400px;
         width: 100%;
         min-width: 300px;
     }
@@ -135,6 +135,7 @@ a, a:visited {
         flex-direction: column-reverse;
         background-color: darkslategray;
         min-height: 600px;
+        height: auto; /* Desfaz o height fixo */
         overflow: auto;
     }
 
