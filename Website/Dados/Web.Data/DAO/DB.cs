@@ -178,7 +178,10 @@ public class DB
                 LastDataRow = 0,
             };
             // Salva db, exceto se for hora corrente
-            if (horaAgora != hourSpan) cnn.Insert(horaVazia, OnConflict.Replace);
+            if (horaAgora != hourSpan)
+            {
+                horaVazia.Id = cnn.Insert(horaVazia, OnConflict.Replace);
+            }
 
             return horaVazia;
         }
