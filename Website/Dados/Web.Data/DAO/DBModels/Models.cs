@@ -190,6 +190,7 @@ public class TBWeather
     public int VentoDirecao { get; set; }
     public decimal PrecipitacaoProb { get; set; }
     public decimal Precipitacao { get; set; }
+    public int PictoCode { get; set; }
 
     public decimal Lat {  get; set; }
     public decimal Lon {  get; set; }
