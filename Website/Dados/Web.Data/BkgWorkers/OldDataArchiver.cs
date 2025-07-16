@@ -27,7 +27,7 @@ public class OldDataArchiver : IHostedService, IDisposable
     public Task StartAsync(CancellationToken cancellationToken)
     {
         logger.Information("[OldDataArchiver] Iniciando serviço de limpeza de dados...");
-        _timer = new Timer(executaVerificacaoAsync, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(20));
+        _timer = new Timer(executaVerificacaoAsync, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(90));
 
         return Task.CompletedTask;
     }
@@ -43,6 +43,8 @@ public class OldDataArchiver : IHostedService, IDisposable
         {
             // Task 1 - Remover dados brutos +3Mo
             removerLinhas90d();
+            // Força geração de dados agrupados para todas as estações
+            forcaGeracaoDadosAgrupados();
         }
         catch (Exception ex)
         {
@@ -53,7 +55,7 @@ public class OldDataArchiver : IHostedService, IDisposable
     private void removerLinhas90d()
     {
         var antigos = db.ListarAntigos(limit: 5000)
-                        .Where(o => (DateTime.UtcNow - o.RecebidoUTC) .TotalDays > 90)
+                        .Where(o => (DateTime.UtcNow - o.RecebidoUTC).TotalDays > 90)
                         .ToArray();
 
         if (antigos.Length == 0)
@@ -66,7 +68,7 @@ public class OldDataArchiver : IHostedService, IDisposable
         var gmes = antigos.GroupBy(o => o.RecebidoUTC.ToString("yyyyMM"))
                           .ToArray();
 
-        foreach(var grupoMes in gmes)
+        foreach (var grupoMes in gmes)
         {
             var itens = grupoMes.ToArray();
             using var cnn = ConnectionFactory.CreateConnection($"data/dbOld_{grupoMes.Key}.db");
@@ -81,4 +83,26 @@ public class OldDataArchiver : IHostedService, IDisposable
         }
 
     }
+
+    private void forcaGeracaoDadosAgrupados()
+    {
+        int acumRows = 0;
+        int lastHours = 6;
+        var horaAgora = (int)(DateTime.UtcNow - DateTime.UnixEpoch).TotalHours;
+        var range = Enumerable.Range(horaAgora - lastHours, lastHours - 2).ToArray();
+        // Lista todas as estações
+
+        var listagem = db.ListarEstacoes().ToArray();
+        foreach (var e in listagem)
+        {
+            var resp = db.AgregadoHoraRange(e.Estacao, range)
+                         .Where(o => o.DataCount > 0)
+                         .ToArray()
+                         ;
+            acumRows += resp.Length;
+        }
+        logger.Information("[OldDataArchiver] Read Hourly For: {e} Total: {t}", listagem.Length, acumRows);
+
+    }
+
 }
