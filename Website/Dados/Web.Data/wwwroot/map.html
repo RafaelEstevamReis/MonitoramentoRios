@@ -246,7 +246,9 @@
                     if (record.nivelRio_AVG && record.nivelRio_AVG < 0) record.nivelRio_AVG = null; // <0m
                     if (record.umidadeAr_AVG && record.umidadeAr_AVG < 5) record.umidadeAr_AVG = null; // <5%
 
-                    alignedData[hourKey].labels.push(new Date(record.dataHoraDadosUTC + 'Z').toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
+                    if (!record.dataHoraDadosUTC.endsWith('Z')) record.dataHoraDadosUTC = record.dataHoraDadosUTC + 'Z';
+
+                    alignedData[hourKey].labels.push(new Date(record.dataHoraDadosUTC).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
                     alignedData[hourKey].precipitacao[result.id] = record.PrecipitacaoTotal_Hora ?? null;
                     alignedData[hourKey].temperatura[result.id] = record.temperaturaAr_AVG ?? null;
                     alignedData[hourKey].umidade[result.id] = record.umidadeAr_AVG ?? null;

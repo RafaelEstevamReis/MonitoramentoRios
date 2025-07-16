@@ -110,7 +110,9 @@ function carregaHistoricoGrafico(idEstacao, canvasId, nivelNormal, nivelAlerta) 
             // Criar um mapa dos dados existentes para facilitar a busca
             const dataMap = new Map();
             validData.forEach(dado => {
-                const current = new Date(dado.dataHoraDadosUTC + 'Z');
+
+                if (!dado.dataHoraDadosUTC.endsWith('Z')) dado.dataHoraDadosUTC = dado.dataHoraDadosUTC + 'Z';
+                const current = new Date(dado.dataHoraDadosUTC);
                 const label = getDateTimeForTimezone(current, -3);
                 dataMap.set(label, dado);
             });
