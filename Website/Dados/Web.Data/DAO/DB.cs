@@ -5,6 +5,7 @@ using Simple.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 public class DB
 {
@@ -136,6 +137,12 @@ public class DB
     }
     private DBModels.TBDadosEstacoesHora? _agregadoHora(ISqliteConnection cnn, string estacao, int hourSpan)
     {
+        //5BA69743261D364A
+        if(estacao == "5BA69743261D364A" && hourSpan == 486879)
+        {
+            // Averiguar
+        }
+
         if (string.IsNullOrEmpty(estacao)) return null;
 
         var qhora = cnn.Query<DBModels.TBDadosEstacoesHora>($"SELECT * FROM {nameof(DBModels.TBDadosEstacoesHora)} WHERE Estacao = @estacao AND HourKey = @hourSpan ", new
@@ -300,15 +307,25 @@ public class DB
         if (notNulls.Length == 0) return null; // Não sei
         if (notNulls.Length == 1) return null; // Não sei
 
-        var first = notNulls[0];
-        var last = notNulls[^1];
-
-        if (last < first && last < 1000) // resetou, mas 1000mm em uma hora é muito
+        decimal acum = 0;
+        var last = notNulls[0]; // Teria que pegar o da hora anterior
+        for (int i = 1; i < notNulls.Length; i++)
         {
-            return last; // Voltou no zero, pega o valor como está
-        }
+            var curr = notNulls[i];
 
-        return last - first;
+            // Teve reset?
+            if (curr < last) // Resetou para zero
+            {
+                acum += curr;
+            }
+            else
+            {
+                var diff = curr - last;
+                acum += diff;
+            }
+            last = curr;
+        }
+        return acum;
     }
 
     public void RemoverDadosAgregados(int hourKey)
