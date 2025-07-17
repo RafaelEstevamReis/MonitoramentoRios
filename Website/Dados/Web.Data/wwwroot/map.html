@@ -249,7 +249,7 @@
                     if (!record.dataHoraDadosUTC.endsWith('Z')) record.dataHoraDadosUTC = record.dataHoraDadosUTC + 'Z';
 
                     alignedData[hourKey].labels.push(new Date(record.dataHoraDadosUTC).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
-                    alignedData[hourKey].precipitacao[result.id] = record.PrecipitacaoTotal_Hora ?? null;
+                    alignedData[hourKey].precipitacao[result.id] = record.precipitacaoTotal_Hora ?? null;
                     alignedData[hourKey].temperatura[result.id] = record.temperaturaAr_AVG ?? null;
                     alignedData[hourKey].umidade[result.id] = record.umidadeAr_AVG ?? null;
                     alignedData[hourKey].pressao[result.id] = record.pressaoAr_AVG ?? null;
