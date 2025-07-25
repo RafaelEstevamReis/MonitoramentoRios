@@ -29,6 +29,15 @@ public class UpController : ControllerBase
 
         calibracoes = tCal.Select(o => (CalibracaoDigital.ICalibracaoDigital)(Activator.CreateInstance(o) ?? throw new InvalidOperationException()))
                           .ToArray();
+
+        Log.Logger.Information("Calibrações Carregadas: {qtd} {lista}",
+                               calibracoes.Length,
+                               string.Join(", ", calibracoes.Select(ajustaNomeLog))
+                               );
+    }
+    static string ajustaNomeLog(CalibracaoDigital.ICalibracaoDigital o)
+    {
+        return o.GetType().FullName?.Replace("Web.Data.CalibracaoDigital.", "") ?? o.GetType().Name;
     }
 
     private readonly DB db;
@@ -126,9 +135,9 @@ public class UpController : ControllerBase
         if (dados.ForcaSinal == 0) dados.ForcaSinal = null;
         if (dados.PercentBateria > 100) dados.PercentBateria = 100;
         // Se tem Temp2 e Temp1 não veio, utiliza ele
-        if(dados.TemperaturaAr == null)
+        if (dados.TemperaturaAr == null)
         {
-            if(roj?["Temperatura2"] != null)
+            if (roj?["Temperatura2"] != null)
             {
                 dados.TemperaturaAr = (decimal?)roj["Temperatura2"];
             }
