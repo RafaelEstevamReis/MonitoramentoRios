@@ -56,6 +56,14 @@
                     </h3>
                     <canvas id="chtGLLS"></canvas>
                 </div>
+                <div class="cdvChart">
+                    <h3>
+                        <span onclick="abrirEstacao('04109F675953A131')">
+                            <i class="bi-water"></i> Boa Esperança - Arroio Boa Esperança, Rolante-RS
+                        </span>
+                    </h3>
+                    <canvas id="chtBE01"></canvas>
+                </div>
 
                 <div class="cdvChart">
                     <h3>
@@ -67,17 +75,9 @@
                 </div>
 
                 <!--<div class="cdvChart">
-                    <h3>
-                        <span onclick="abrirEstacao('04109F675953A131')">
-                            <i class="bi-water"></i> Boa Esperança - Arroio Boa Esperança, Rolante-RS
-                        </span>
-                    </h3>
-                    <canvas id="chtBE01"></canvas>
-                </div>-->
-                <!--<div class="cdvChart">
-                    <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-water"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
-                    <canvas id="chtCH01"></canvas>
-                </div>-->
+        <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-water"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
+        <canvas id="chtCH01"></canvas>
+    </div>-->
 
             </div>
             <hr />
@@ -149,7 +149,7 @@
         carregaPrevisao(false);
         montaTabelaEstacoes(lst); // Atualiza Bolha no mapa
         /* Gráficos */
-        carregaHistoricoGrafico('04109F675953A131', 'chtBE01', null, null);
+        carregaHistoricoGrafico('04109F675953A131', 'chtBE01', 0.09, 0.5);
         carregaHistoricoGrafico('9A6EE7B45495BB7F', 'chtGLLS', 0.15, 2.0);
         carregaHistoricoGrafico('48B1162D47EC0FE6', 'chtCH01', null, 1.5);
         carregaHistoricoGrafico('5BA69743261D364A', 'chtRK01', null, 120.0);
