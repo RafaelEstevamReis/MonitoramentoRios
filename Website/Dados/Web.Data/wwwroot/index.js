@@ -370,7 +370,8 @@ function carregaPrevisao(extended) {
                     // Limpa card
                     cardsContainer.innerHTML = 'Consultando previsão extendida, aguarde ...';
                     setTimeout(function () {
-                        carregaPrevisao(true);
+                        /*carregaPrevisao(true);*/
+                        window.location = "/tempo.html"
                     }, 5000); // Wait
                 };
                 cardsContainer.appendChild(btn);
