@@ -476,5 +476,11 @@ public class DB
                 .Take(hour)
                 ;
     }
+    public IEnumerable<DBModels.TBWeather> ObterWeatherEstendido()
+    {
+        using var cnn = db.GetConnection();
+        var d = cnn.Query<DBModels.TBWeather>("SELECT * FROM TBWeather WHERE ColetaUTC IN (SELECT MAX(ColetaUTC) FROM TBWeather) ORDER BY ForecastUTC ASC LIMIT 0,96");
+        return d;
+    }
 
 }

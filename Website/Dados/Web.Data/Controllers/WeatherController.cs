@@ -40,7 +40,7 @@ public class WeatherController : ControllerBase
     [HttpGet("ext")]
     public IActionResult ObterExtendido()
     {
-        return Ok(db.ObterWeatherProximasHoras(hour: 96));
+        return Ok(db.ObterWeatherEstendido());
     }
 
 }
