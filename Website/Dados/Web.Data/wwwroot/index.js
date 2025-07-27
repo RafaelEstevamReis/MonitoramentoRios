@@ -249,7 +249,7 @@ function carregaHistoricoGrafico(idEstacao, canvasId, nivelNormal, nivelAlerta) 
                     scales: {
                         x: {
                             title: {
-                                display: true,
+                                display: false,
                                 text: 'Hora',
                                 color: 'white'
                             },
