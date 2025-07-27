@@ -287,8 +287,8 @@ function carregaChuvaEstacao(estacao, id) {
             span.innerHTML = `${formatValue(data.precipitacaoTotal_Hora / 2, 1) || '-'}mm/h`; // Em 4h
         });
 }
-function carregaPrevisao(extended) {
-    fetch('/weather' + (extended ? '/ext' : ''))
+function carregaPrevisao() {
+    fetch('/weather')
         .then(response => response.json())
         .then(data => {
             // Criar cards visuais
@@ -314,21 +314,10 @@ function carregaPrevisao(extended) {
                         box-shadow: 4px 2px 5px rgba(0,0,0,0.9);
                         font-size: 1.1em;
                     `;
-                let dataHora;
-                if (extended) {
-                    dataHora = new Date(item.forecastUTC + 'Z').toLocaleString('pt-BR', {
-                        //day: '2-digit',
-                        weekday: 'long',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                    dataHora = dataHora.replace("-feira", "");
-                } else {
-                    dataHora = new Date(item.forecastUTC + 'Z').toLocaleString('pt-BR', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                }
+                let dataHora = new Date(item.forecastUTC + 'Z').toLocaleString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
 
                 let iconRain = 'bi-cloud-slash';
                 if (item.precipitacao > 0.1) iconRain = 'bi-cloud';
@@ -363,19 +352,17 @@ function carregaPrevisao(extended) {
                 cardsContainer.appendChild(card);
             });
 
-            if (!extended) {
-                const btn = document.createElement('button');
-                btn.textContent = "Carregar mais";
-                btn.onclick = () => {
-                    // Limpa card
-                    cardsContainer.innerHTML = 'Consultando previsão extendida, aguarde ...';
-                    setTimeout(function () {
-                        /*carregaPrevisao(true);*/
-                        window.location = "/tempo.html"
-                    }, 5000); // Wait
-                };
-                cardsContainer.appendChild(btn);
-            }
+            const btn = document.createElement('button');
+            btn.textContent = "Carregar mais";
+            btn.onclick = () => {
+                // Limpa card
+                cardsContainer.innerHTML = 'Consultando previsão estendida, aguarde ...';
+                setTimeout(function () {
+                    /*carregaPrevisao(true);*/
+                    window.location = "/tempo.html"
+                }, 5000); // Wait
+            };
+            cardsContainer.appendChild(btn);
         })
         .catch(error => {
             console.error('Erro ao buscar previsão:', error);
