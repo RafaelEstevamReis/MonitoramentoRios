@@ -40,6 +40,15 @@
                 background-color: transparent;
             }
 
+        .isDay {
+        }
+
+        .isNight {
+        }
+
+        .isTransition {
+        }
+
         .mini-card {
             width: 40px;
             text-align: center;
@@ -54,10 +63,8 @@
                 font-size: unset;
             }
 
-        @media(max-width: 900px) {
-            .mini-card .time {
-                font-size: large;
-            }
+        .time.isNight {
+            color: white;
         }
 
         .mini-card .temp {
@@ -66,10 +73,22 @@
             margin: 4px 0;
         }
 
+        .temp.isNight {
+            color: #d9534f;
+        }
+
+        .temp.isTransition {
+            color: coral;
+        }
+
+
         .mini-card .wind {
             margin: 2px 0;
-            color: teal;
+            color: darkgreen;
         }
+            .wind.isNight {
+                color: darkseagreen;
+            }
 
             .mini-card .wind.red {
                 color: red;
@@ -80,9 +99,8 @@
             color: navy;
         }
 
-        .mini-card .precip-prob {
-            color: lightblue;
-            font-size: 0.75em;
+        .precip.isNight {
+            color: cornflowerblue;
         }
 
         .mini-card img {
@@ -90,24 +108,11 @@
             margin: 4px 0;
         }
 
-        .isDay {
-        }
-
-        .isNight {
-            color: white;
-        }
-
-            .isNight .temp {
-                color: #d9534f;
+        @media(max-width: 900px) {
+            .mini-card .time {
+                font-size: large;
             }
-
-        .isTransition {
-            color: white;
         }
-
-            .isTransition .temp {
-                color: coral;
-            }
     </style>
 </head>
 <body>
@@ -158,7 +163,7 @@
 
                         // Criar mini-cards para cada hora
                         groupedByDay[day].forEach((item, index) => {
-                            
+
                             const miniCard = document.createElement('div');
                             miniCard.className = 'mini-card';
 
@@ -202,20 +207,9 @@
                             miniCard.style.background = backgroundStyle;
                             miniCard.classList.add(classDayNight);
 
-
-                            // Ícone de chuva
-                            let iconRain = 'bi-cloud-slash';
-                            if (item.precipitacao > 0.1) iconRain = 'bi-cloud';
-                            if (item.precipitacao > 0.5) iconRain = 'bi-cloud-drizzle';
-                            if (item.precipitacao > 4) iconRain = 'bi-cloud-rain';
-                            if (item.precipitacao > 9) iconRain = 'bi-cloud-rain-heavy';
-
-                            const strPrec = item.precipitacao > 0 ? `<span class="precip"><i class="bi ${iconRain}"></i> ${item.precipitacao.toFixed(1)} mm</span>` : '';
-                            const tagProb = item.precipitacao > 0.5 ? `<span class="precip-prob">(${item.precipitacaoProb.toFixed(0)}%)</span>` : '';
-
                             // Vento
                             const corVento = item.ventoVelocidade > 30 ? 'red' : 'teal';
-                            const tagVento = item.ventoVelocidade > 6 ? `<div class="wind ${corVento}"><i class="bi bi-wind"></i> ${item.ventoVelocidade.toFixed(0)} km/h</div>` : '';
+                            const tagVento = item.ventoVelocidade > 6 ? `<div class="wind ${corVento} ${classDayNight}"><i class="bi bi-wind"></i> ${item.ventoVelocidade.toFixed(0)} km/h</div>` : '';
 
                             // Temperatura
                             const strTemp = item.temperatura < 10 ? item.temperatura.toFixed(1) : item.temperatura.toFixed(0);
@@ -228,12 +222,12 @@
                             }
 
                             miniCard.innerHTML = `
-                                <div class="time">${dataHora}</div>
-                                ${pictoPic}
-                                <div class="temp">${strTemp}°C</div>
-                                ${tagVento}
-                                <div>${strPrec}</div>
-                            `;
+                                                    <div class="time ${classDayNight}">${dataHora}</div>
+                                                    ${pictoPic}
+                                                    <div class="temp ${classDayNight}">${strTemp}°C</div>
+                                                    <div class="precip ${classDayNight}">${item.precipitacao.toFixed(1)} mm</div>
+                                                    ${tagVento}
+                                                `;
                             miniCardsContainer.appendChild(miniCard);
                         });
 
