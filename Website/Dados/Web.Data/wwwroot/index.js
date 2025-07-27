@@ -346,7 +346,7 @@ function carregaPrevisao() {
                         ${tagVento}
                         <div style="margin: 5px 0;">
                             <span style="color: navy;"><i class="bi ${iconRain}"></i> ${item.precipitacao.toFixed(1)} mm</span>
-                            ${tagProb}
+                            <!-- ${tagProb} -->
                         </div>
                     `;
                 cardsContainer.appendChild(card);
