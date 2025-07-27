@@ -14,6 +14,9 @@ using Web.Data.DAO;
 public class WeatherMeteoBlue : IHostedService, IDisposable
 {
     internal static string API_KEY = string.Empty;
+    const int HOURS_SECO = 13;
+    const int HOURS_CHUVA = 5;
+
 
     private readonly ILogger logger;
     private readonly DB db;
@@ -32,6 +35,11 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        TimeSpan tsPrimeira = TimeSpan.FromMinutes(15);
+#if DEBUG
+        tsPrimeira = TimeSpan.FromSeconds(15);
+#endif
+
         if (string.IsNullOrWhiteSpace(API_KEY))
         {
             logger.Information("[WeatherMeteoBlue] Não há API KEY, encerrando serviço");
@@ -39,7 +47,11 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
         }
 
         logger.Information("[WeatherMeteoBlue] Iniciando serviço de meteorologia MeteoBlue...");
-        _timer = new Timer(executaVerificacaoAsync, null, TimeSpan.FromMinutes(15), TimeSpan.FromHours(13));
+        _timer = new Timer(executaVerificacaoAsync,
+                           null,
+                           tsPrimeira,
+                           TimeSpan.FromHours(2) // Executa a cada duas horas, mas ignora se os dados forem recentes
+                           );
 
         await Task.CompletedTask;
     }
@@ -52,11 +64,12 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
     private async void executaVerificacaoAsync(object? state)
     {
         // Chega última
-        if (temRecente())
+        if (temRecente(out TimeSpan recenteAge, out bool recenteTemChuva))
         {
-            logger.Information("[WeatherMeteoBlue] Tem recente, SKIP");
+            logger.Information("[WeatherMeteoBlue] Tem recente, SKIP | Hours: {h:N1} | Chuva: {bChuva}", recenteAge.TotalHours, recenteTemChuva);
             return;
         }
+        logger.Information("[WeatherMeteoBlue] Atualiza Dados | Hours: {h:N1} | Chuva: {bChuva}", recenteAge.TotalHours, recenteTemChuva);
 
         try
         {
@@ -98,22 +111,36 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
             logger.Error(ex, "[WeatherMeteoBlue] Error {msg}", ex.Message);
         }
     }
-    private bool temRecente()
+    private bool temRecente(out TimeSpan age, out bool temChuva)
     {
-        var lista = db.ObterWeatherProximasHoras().ToArray();
-        if (lista.Length == 0) return false; // Nunca teve
+        var lista = db.ObterWeatherProximasHoras(hour: 6).ToArray();
+        if (lista.Length == 0)
+        {
+            age = TimeSpan.FromDays(7);
+            temChuva = false;
+            return false; // Nunca teve
+        }
 
         var coletaMax = lista.Max(o => o.ColetaUTC);
-        var age = DateTime.UtcNow - coletaMax;
+        age = DateTime.UtcNow - coletaMax;
 
-        return age.TotalHours < 4; // Não mais rápido que 4h
+        if (lista.Any(o => o.Precipitacao > 0.1M)) // vai ter chuva
+        {
+            temChuva = true;
+            return age.TotalHours < HOURS_CHUVA;
+        }
+        else
+        {
+            temChuva = false;
+            return age.TotalHours < HOURS_SECO;
+        }
     }
     private DateTime pegaData(string strDate, int tz)
     {
         var dt = DateTime.Parse(strDate, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal)
                          .ToUniversalTime()
                          .AddHours(tz) // Ajusta manualmente a tz
-                         ; 
+                         ;
         return dt;
     }
     private string montaUrl()
