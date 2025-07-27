@@ -83,13 +83,18 @@
             margin: 2px 0;
             color: darkgreen;
         }
-            .wind.isNight {
-                color: darkseagreen;
-            }
 
-            .mini-card .wind.red {
-                color: red;
-            }
+        .wind.isNight {
+            color: darkseagreen;
+        }
+
+        .wind.isTransition {
+            color: palegreen;
+        }
+
+        .mini-card .wind.red {
+            color: red;
+        }
 
         .mini-card .precip {
             margin: 2px 0;
@@ -115,6 +120,12 @@
 <body>
     <script>
         carregaWeather();
+
+        window.screen.orientation.onchange = displayOrientation;
+        function displayOrientation() {
+            // girou a tela, recarrega pois tem mais espaço
+            carregaWeather();
+        }
 
         function carregaWeather() {
             fetch('/weather/ext')
@@ -169,8 +180,13 @@
                             if (bigScreen) {
                                 miniCard.style = 'width:' + ((self.innerWidth / 24) - 2) + 'px';
                             } else {
-                                if (index % 2 == 1) return;
-                                miniCard.style = 'width:' + ((self.innerWidth / 12) - 3) + 'px';
+                                if (self.innerWidth < 400) {
+                                    if (index % 3 == 1) return; // 2/3
+                                    miniCard.style = 'width:' + ((self.innerWidth / 8) - 3) + 'px';
+                                } else {
+                                    if (index % 2 == 1) return;
+                                    miniCard.style = 'width:' + ((self.innerWidth / 12) - 3) + 'px';
+                                }
                             }
 
 
@@ -204,6 +220,7 @@
                             miniCard.style.background = backgroundStyle;
                             miniCard.classList.add(classDayNight);
 
+                            item.ventoVelocidade = 7;
                             // Vento
                             const corVento = item.ventoVelocidade > 30 ? 'red' : 'teal';
                             const tagVento = item.ventoVelocidade > 6 ? `<div class="wind ${corVento} ${classDayNight}"><i class="bi bi-wind"></i> ${item.ventoVelocidade.toFixed(0)} km/h</div>` : '';
@@ -219,12 +236,12 @@
                             }
 
                             miniCard.innerHTML = `
-                                                    <div class="time ${classDayNight}">${dataHora}</div>
-                                                    ${pictoPic}
-                                                    <div class="temp ${classDayNight}">${strTemp}°C</div>
-                                                    <div class="precip ${classDayNight}">${item.precipitacao.toFixed(1)} mm</div>
-                                                    ${tagVento}
-                                                `;
+                                                            <div class="time ${classDayNight}">${dataHora}</div>
+                                                            ${pictoPic}
+                                                            <div class="temp ${classDayNight}">${strTemp}°C</div>
+                                                            <div class="precip ${classDayNight}">${item.precipitacao.toFixed(1)} mm</div>
+                                                            ${tagVento}
+                                                        `;
                             miniCardsContainer.appendChild(miniCard);
                         });
 
