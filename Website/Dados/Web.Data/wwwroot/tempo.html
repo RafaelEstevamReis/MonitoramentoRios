@@ -17,7 +17,6 @@
         }
 
         .date-card {
-            /*margin-bottom: 12px;*/
             font-size: 14px;
         }
 
@@ -53,8 +52,6 @@
             width: 40px;
             text-align: center;
             font-size: 0.85em;
-            flex-shrink: 0;
-            transition: background-color 0.3s ease;
         }
 
             .mini-card .time {
@@ -130,7 +127,7 @@
                     if (data.length > 0) {
                         const dataHora = new Date(data[0].coletaUTC + 'Z').toLocaleString('pt-BR');
                         const spanDH = document.querySelector('#dataHoraColetaPrevisao');
-                        spanDH.textContent = `Coleta dos Dados: ${dataHora}`;
+                        spanDH.textContent = `Coleta dos Dados: ${dataHora} | Latitude: ${data[0].lat} / Longitude: ${data[0].lon}`;
                     }
 
                     // Agrupar dados por dia
