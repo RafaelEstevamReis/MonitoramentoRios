@@ -220,7 +220,6 @@
                             miniCard.style.background = backgroundStyle;
                             miniCard.classList.add(classDayNight);
 
-                            item.ventoVelocidade = 7;
                             // Vento
                             const corVento = item.ventoVelocidade > 30 ? 'red' : 'teal';
                             const tagVento = item.ventoVelocidade > 6 ? `<div class="wind ${corVento} ${classDayNight}"><i class="bi bi-wind"></i> ${item.ventoVelocidade.toFixed(0)} km/h</div>` : '';
