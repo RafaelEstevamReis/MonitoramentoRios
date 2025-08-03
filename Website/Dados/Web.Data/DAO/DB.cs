@@ -138,7 +138,7 @@ public class DB
     private DBModels.TBDadosEstacoesHora? _agregadoHora(ISqliteConnection cnn, string estacao, int hourSpan)
     {
         //5BA69743261D364A
-        if(estacao == "5BA69743261D364A" && hourSpan == 486879)
+        if (estacao == "5BA69743261D364A" && hourSpan == 486879)
         {
             // Averiguar
         }
@@ -184,7 +184,7 @@ public class DB
                 FirstDataRow = 0,
                 LastDataRow = 0,
             };
-            // Salva db, exceto se for hora corrente
+            // Salva db, exceto se for hora corrente (parcial)
             if (horaAgora != hourSpan)
             {
                 horaVazia.Id = cnn.Insert(horaVazia, OnConflict.Replace);
@@ -280,7 +280,7 @@ public class DB
             NivelRio_Trend = nivelRio.Trend,
         };
 
-        // Salva db, exceto se for hora corrente
+        // Salva db, exceto se for hora corrente (parcial)
         if (horaAgora != hourSpan)
         {
             // Seta Id
