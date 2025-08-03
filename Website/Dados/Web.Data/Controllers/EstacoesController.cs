@@ -189,11 +189,14 @@ public class EstacoesController : ControllerBase
     public IActionResult FaixaHora(string estacao, int lastHours = 8)
     {
         var horaAgora = (int)(DateTime.UtcNow - DateTime.UnixEpoch).TotalHours;
-
+        // 16:15Z | 487288 | 13h15 BRT
         var range = Enumerable.Range(horaAgora - lastHours, lastHours).ToArray();
         var resp = db.AgregadoHoraRange(estacao, range)
                      .Where(o => o.DataCount > 0);
-        return Ok(resp);
+
+        // Pega o parcial da Hora Atual
+        var atual = db.AgregadoHora(estacao, horaAgora);
+        return Ok(resp.Union([atual]));
     }
 
     private static void atualizaEstacoes(DB db)
