@@ -29,10 +29,10 @@ function montaTabelaEstacoes(lst) {
 
                 let nivel = dado.nivelRio || dado.nivelRio == 0 ? `<i class="bi-water"></i> ${formatValueUnit(dado.nivelRio, 1, 'm')}` : '';
                 let chuva = '';
+                let idCh = `ch_${dado.estacao}`;
 
                 if (dado.precipitacao10min || dado.precipitacao10min == 0) {
-                    let idCh = `ch_${dado.estacao}`;
-                    chuva = `<i class="${dado.precipitacao10min && dado.precipitacao10min > 0 ? 'bi-cloud-rain' : 'bi-cloud'}"></i> <span id='${idCh}'>${formatValueUnit(dado.precipitacao10min, 1, 'mm/min')}</span>`;
+                    chuva = `<i class="${dado.precipitacao10min && dado.precipitacao10min > 0 ? 'bi-cloud-rain' : 'bi-cloud'}"></i> <span>${formatValueUnit(dado.precipitacao10min, 1, 'mm/min')}</span>`;
                     carregaChuvaEstacao(dado.estacao, idCh);
                 }
 
@@ -41,7 +41,7 @@ function montaTabelaEstacoes(lst) {
                                         <td style='text-align: left; width: 90px'>${dado.nomeEstacao || dado.estacao}</td>
                                         <td style='text-align: left;'><span title="WiFi: ${wifiSigPerc}">${sig}</span> <span title="Bateria: ${(dado.percentBateria ?? 0).toFixed(0)}%">${bat}</span></td>
                                         <td><span>${humd}</span> <span>${temp}</span> <span>${prss}</span></td>
-                                        <td><span>${nivel}</span> <span>${chuva}</span></td>
+                                        <td><span>${nivel}</span> <span id='${idCh}'>${chuva}</span></td>
                                         <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
                                      `;
                 tableBody.appendChild(row);
@@ -103,7 +103,8 @@ function carregaHistoricoGrafico(idEstacao, canvasId, nivelNormal, nivelAlerta) 
 
             // Gerar todos os horários entre o primeiro e o último
             const now = new Date(); // Horário atual
-            const endDate = new Date(now.getTime() - 1 * 60 * 60 * 1000); // Retira 1h
+            //const endDate = new Date(now.getTime() - 1 * 60 * 60 * 1000); // Retira 1h
+            const endDate = new Date(now.getTime() ); 
             const startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000); // 24 horas atrás
             const allLabels = generateHourlyLabels(startDate, endDate);
 
@@ -283,8 +284,14 @@ function carregaChuvaEstacao(estacao, id) {
         .then(response => response.json())
         .then(data => {
             data = data;
-            const span = document.querySelector('#' + id);
-            span.innerHTML = `${formatValue(data.precipitacaoTotal_Hora / 2, 1) || '-'}mm/h`; // Em 4h
+            let idCh = `ch_${estacao}`;
+            const span = document.querySelector('#' + idCh);
+
+            // chuva = `<i class="${dado.precipitacao10min && dado.precipitacao10min > 0 ? 'bi-cloud-rain' : 'bi-cloud'}"></i> <span id='${idCh}'>${formatValueUnit(dado.precipitacao10min, 1, 'mm/min')}</span>`;
+
+            //span.innerHTML = `${|| '-'}mm/h`; // Em 4h
+            let prec = formatValue(data.precipitacaoTotal_Hora / 2, 1);
+            span.innerHTML = `<i class="${data.precipitacaoTotal_Hora && data.precipitacaoTotal_Hora > 0 ? 'bi-cloud-rain' : 'bi-cloud'}"></i> <span >${prec}</span>`;
         });
 }
 function carregaPrevisao() {
