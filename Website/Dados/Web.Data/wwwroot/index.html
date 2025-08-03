@@ -1,8 +1,8 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <link rel="preload" href="index.css" as="style" />
-    <link rel="preload" href="index.js?r=3" as="script" /> <!-- REVISION ID -->
+    <link rel="preload" href="index.css?r=2" as="style" /> <!-- REVISION ID -->
+    <link rel="preload" href="index.js?r=4" as="script" /> <!-- REVISION ID -->
     <link rel="preload" href="helpers.js?r=1" as="script" /> <!-- REVISION ID -->
 
     <meta charset="UTF-8">
@@ -12,11 +12,11 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="index.css?r=2" /> <!-- REVISION ID -->
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script type="text/javascript" src="chart.js"></script>
-    <script type="text/javascript" src="index.js?r=3"></script> <!-- REVISION ID -->
+    <script type="text/javascript" src="index.js?r=4"></script> <!-- REVISION ID -->
     <script type="text/javascript" src="helpers.js?r=1"></script> <!-- REVISION ID -->
 </head>
 <body>
@@ -48,23 +48,16 @@
         </div>
         <hr style="margin-top: 0px;" />
         <div id="bottom">
+
+            <h2> Previsão do Tempo para as Próximas Horas </h2>
+            <div id="previsaoTempo">
+                <div id="previsaoCards"></div>
+                <div style="text-align: center; margin-top:10px"> <small id="dataHoraColetaPrevisao"></small> <button onclick="carregaPrevisaoEstendida()">Carregar mais</button> </div>
+            </div>
+
+            <hr />
+
             <div id="dvTodas">
-                <div class="cdvChart">
-                    <h3>
-                        <span onclick="abrirEstacao('9A6EE7B45495BB7F')">
-                            <i class="bi-water"></i> Arroio da Areia - Alto Areia, Rolante-RS
-                        </span>
-                    </h3>
-                    <canvas id="chtGLLS"></canvas>
-                </div>
-                <div class="cdvChart">
-                    <h3>
-                        <span onclick="abrirEstacao('04109F675953A131')">
-                            <i class="bi-water"></i> Boa Esperança - Arroio Boa Esperança, Rolante-RS
-                        </span>
-                    </h3>
-                    <canvas id="chtBE01"></canvas>
-                </div>
 
                 <div class="cdvChart">
                     <h3>
@@ -75,21 +68,33 @@
                     <canvas id="chtRK01"></canvas>
                 </div>
 
+                <div class="cdvChart">
+                    <h3>
+                        <span onclick="abrirEstacao('9A6EE7B45495BB7F')">
+                            <i class="bi-water"></i> Arroio da Areia - Alto Areia, Rolante-RS
+                        </span>
+                    </h3>
+                    <canvas id="chtGLLS"></canvas>
+                </div>
+
+                <div class="cdvChart">
+                    <h3>
+                        <span onclick="abrirEstacao('04109F675953A131')">
+                            <i class="bi-water"></i> Boa Esperança - Arroio Boa Esperança, Rolante-RS
+                        </span>
+                    </h3>
+                    <canvas id="chtBE01"></canvas>
+                </div>
+
                 <!--<div class="cdvChart">
-        <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-water"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
-        <canvas id="chtCH01"></canvas>
-    </div>-->
+            <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-water"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
+            <canvas id="chtCH01"></canvas>
+        </div>-->
 
-            </div>
-            <hr />
-
-            <h2> Previsão do Tempo para as Próximas Horas </h2>
-            <div id="previsaoTempo">
-                <div id="previsaoCards" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;"></div>
-                <div style="text-align: center; margin-top:10px"> <small id="dataHoraColetaPrevisao"></small> </div>
             </div>
 
             <hr />
+
             <div id="divSobre">
                 <h2> Sobre o Sistema </h2>
                 <p>O sistema de monitoramento dos rios é uma iniciativa do <strong>Projeto ₿itcoin é Aqui de Rolante-RS</strong></p>

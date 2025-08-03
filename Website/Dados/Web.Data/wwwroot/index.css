@@ -154,4 +154,12 @@ a, a:visited {
         right: 0;
         transform: rotate(45deg) translate(18px, -8px);
     }
+
+    #previsaoCards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
 }

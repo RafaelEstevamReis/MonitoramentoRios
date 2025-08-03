@@ -159,6 +159,7 @@ function carregaHistoricoGrafico(idEstacao, canvasId, nivelNormal, nivelAlerta) 
                     type: modoNivel ? 'line' : 'bar',
                     pointStyle: modoNivel ? 'circle' : 'rect',
                     label: modoNivel ? 'Nível do Rio (m)' : 'Chuva (mm/h)',
+                    fill: modoNivel ? 'origin' : false,
                     data: nivelRioData, // Usar os dados preparados
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -314,9 +315,9 @@ function carregaPrevisao() {
                         background-color: whitesmoke;
                         border: 2px solid white;
                         border-radius: 10px;
-                        padding: 10px;
-                        width: 90px;
-                        min-height: 110px;
+                        padding: 7px;
+                        width: 85px;
+                        min-height: 100px;
                         text-align: center;
                         box-shadow: 4px 2px 5px rgba(0,0,0,0.9);
                         font-size: 1.1em;
@@ -358,24 +359,22 @@ function carregaPrevisao() {
                     `;
                 cardsContainer.appendChild(card);
             });
-
-            const btn = document.createElement('button');
-            btn.textContent = "Carregar mais";
-            btn.onclick = () => {
-                // Limpa card
-                cardsContainer.innerHTML = 'Consultando previsão estendida, aguarde ...';
-                setTimeout(function () {
-                    /*carregaPrevisao(true);*/
-                    window.location = "/tempo.html"
-                }, 5000); // Wait
-            };
-            cardsContainer.appendChild(btn);
         })
         .catch(error => {
             console.error('Erro ao buscar previsão:', error);
             document.querySelector('#previsaoTempo').innerHTML = '<p style="text-align: center; color: red; font-size: 1.2em;">Erro ao carregar previsão do tempo.</p>';
         });
 }
+function carregaPrevisaoEstendida() {
+    // Limpa card
+    const cardsContainer = document.querySelector('#previsaoCards');
+    cardsContainer.innerHTML = 'Consultando previsão estendida, aguarde ...';
+    setTimeout(function () {
+        /*carregaPrevisao(true);*/
+        window.location = "/tempo.html"
+    }, 5000); // Wait
+};
+
 
 function adicionaEstacao(lst, lat, lng, label, id) {
     let e = addCircleLabel(lat, lng, label, `/live.html?estacao=${id}`);
