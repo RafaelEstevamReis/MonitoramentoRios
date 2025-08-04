@@ -7,6 +7,15 @@ function montaTabelaEstacoes(lst) {
         .then(data => {
             const tableBody = document.querySelector('#ultimasLeituras tbody');
             tableBody.innerHTML = "";
+
+            // Ordena:
+            // 1. 5BA69743261D364A // Tem chuva
+            // 2. CF98FCFA7E9EE7C1, 9A6EE7B45495BB7F, 04109F675953A131, 48B1162D47EC0FE6 // Tem Nível
+            // 3. 2CAED8D9CB62CEB5, BB45660B199C5677 // Resto com ordem
+            // 4. Resto/Resto
+            data = ordenaEstacoes(data);
+
+            // exibe
             data.forEach(dado => {
                 if (dado.nomeEstacao.startsWith('EX')) return;
 
@@ -63,6 +72,30 @@ function montaTabelaEstacoes(lst) {
         .catch(error => {
             console.error('Erro ao carregar dados das estações:', error);
         });
+}
+function ordenaEstacoes(data) {
+    // Definindo as prioridades e ordem interna
+    const prioridades = {
+        // Grupo 1 (Prioridade 1)
+        '5BA69743261D364A': 1,
+        // Grupo 2 (Prioridade 2, subprioridades 11, 12, 13, 14)
+        'CF98FCFA7E9EE7C1': 11,
+        '9A6EE7B45495BB7F': 12,
+        '04109F675953A131': 13,
+        '48B1162D47EC0FE6': 14,
+        // Grupo 3 (Prioridade 3, subprioridades 21, 22)
+        '2CAED8D9CB62CEB5': 21,
+        'BB45660B199C5677': 22
+    };
+
+    return data.sort((a, b) => {
+        // Obtém a prioridade de cada estação, default 999 para as não listadas
+        const prioridadeA = prioridades[a.estacao] || 999;
+        const prioridadeB = prioridades[b.estacao] || 999;
+
+        // Compara prioridades
+        return prioridadeA - prioridadeB;
+    });
 }
 function carregaHistoricoGrafico(idEstacao, canvasId, nivelNormal, nivelAlerta) {
     const canvas = document.getElementById(canvasId);
