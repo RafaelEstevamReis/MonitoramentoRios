@@ -137,6 +137,7 @@
         adicionaEstacao(-29.565, -50.420, noSigSvg, "48B1162D47EC0FE6"); // RSRZ-CH01
         adicionaEstacao(-29.650, -50.575, noSigSvg, "80500E0214FFDAF4"); // RSRL-CE01
         adicionaEstacao(-29.640, -50.530, noSigSvg, "CF98FCFA7E9EE7C1"); // RSRL-AR01
+        adicionaEstacao(-29.640, -50.560, noSigSvg, "2CAED8D9CB62CEB5"); // RSRL-BV01
         // EX*
         adicionaEstacao(-29.490, -50.570, noSigSvg, "D251E57DD415F69E", 'estEX'); // EXFP-AR01
         adicionaEstacao(-29.550, -50.570, noSigSvg, "936F7F3769D0B500", 'estEX'); // EXFP-IN01
@@ -231,6 +232,7 @@
             const alignedData = {};
             results.forEach(result => {
                 result.data.forEach(record => {
+                    if (!record) return;
                     const hourKey = record.hourKey;
                     if (!alignedData[hourKey]) {
                         alignedData[hourKey] = {
