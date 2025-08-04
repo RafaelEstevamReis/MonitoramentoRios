@@ -225,7 +225,6 @@ function carregaHistoricoGrafico(idEstacao, canvasId, nivelNormal, nivelAlerta) 
                     pointRadius: 1,
                     pointBackgroundColor: 'yellow',
                     pointBorderColor: '#fff',
-                    hidden: modoNivel ? maiorNivel < (nivelAlerta / 3) : maiorAcumulado < (nivelAlerta / 3), // Se chuva: Apenas se passar de 1/3
                 });
             }
 
