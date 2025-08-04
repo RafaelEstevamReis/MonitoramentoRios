@@ -2,7 +2,7 @@
 <html>
 <head>
     <link rel="preload" href="index.css?r=2" as="style" /> <!-- REVISION ID -->
-    <link rel="preload" href="index.js?r=4" as="script" /> <!-- REVISION ID -->
+    <link rel="preload" href="index.js?r=5" as="script" /> <!-- REVISION ID -->
     <link rel="preload" href="helpers.js?r=1" as="script" /> <!-- REVISION ID -->
 
     <meta charset="UTF-8">
@@ -16,7 +16,7 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script type="text/javascript" src="chart.js"></script>
-    <script type="text/javascript" src="index.js?r=4"></script> <!-- REVISION ID -->
+    <script type="text/javascript" src="index.js?r=5"></script> <!-- REVISION ID -->
     <script type="text/javascript" src="helpers.js?r=1"></script> <!-- REVISION ID -->
 </head>
 <body>
@@ -87,9 +87,9 @@
                 </div>
 
                 <!--<div class="cdvChart">
-            <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-water"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
-            <canvas id="chtCH01"></canvas>
-        </div>-->
+                    <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-water"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
+                    <canvas id="chtCH01"></canvas>
+                </div>-->
 
             </div>
 
@@ -137,7 +137,7 @@
         var map = L.map('map', {
             maxZoom: 13,
             minZoom: 11,
-        }).setView([-29.61, -50.52], 12); // Posição inicial [latitude, longitude] e zoom        
+        }).setView([-29.61, -50.52], 12); // Posição inicial [latitude, longitude] e zoom
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
