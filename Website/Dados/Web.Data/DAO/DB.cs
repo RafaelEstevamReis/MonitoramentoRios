@@ -11,6 +11,7 @@ public class DB
 {
     private ConnectionFactory db;
     HashSet<string> apiKeys = [];
+    Dictionary<string, List<int>> dicRecentNonces = [];
 
     public DB(string path)
     {
@@ -395,6 +396,22 @@ public class DB
             estacao = d.Estacao,
         });
 
+
+        if (d.Nonce > 0)
+        {
+            if (!dicRecentNonces.ContainsKey(d.Estacao)) dicRecentNonces[d.Estacao] = [];
+            dicRecentNonces[d.Estacao].Add(d.Nonce);
+
+            for (int i = 0; i < 5; i++) // remove até 5
+            {
+                if (dicRecentNonces[d.Estacao].Count > 5)
+                {
+                    dicRecentNonces[d.Estacao].RemoveAt(0);
+                }
+                else break;
+            }
+        }
+
         return id;
     }
     public void NovaEstacao(DBModels.TBEstacoes estacao)
@@ -417,6 +434,15 @@ public class DB
         // Gera cache de Keys
         var allKeys = cnn.Query<string>($"SELECT {nameof(DBModels.TBEstacoes.ApiKEY)} FROM {nameof(DBModels.TBEstacoes)}");
         foreach (var k in allKeys) apiKeys.Add(k);
+    }
+
+    /// <summary>
+    /// Lista com base em dicionário em memória
+    /// </summary>
+    public int[] ListarNoncesRecentes(string estacao)
+    {
+        if (!dicRecentNonces.TryGetValue(estacao, out List<int> lst)) return [];
+        return lst.ToArray(); // Copia
     }
 
     public void AtualizaEstacao(string estacao, string mac, string ipOrigem)

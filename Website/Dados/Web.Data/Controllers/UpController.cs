@@ -95,6 +95,16 @@ public class UpController : ControllerBase
         => sFinalizaGravacaoDados(db, log, dados, rawJson, ipOrigem, estacao);
     internal static void sFinalizaGravacaoDados(DB db, ILogger log, UploadData dados, string rawJson, string ipOrigem, string estacao)
     {
+        if (dados.nonce.HasValue && dados.nonce > 0)
+        {
+            var noncesRecentes = db.ListarNoncesRecentes(estacao);
+            if(noncesRecentes.Contains(dados.nonce.Value))
+            {
+                log.Information("[CTRL] NonceSkip {estacao} r={nonce} ", estacao, dados.nonce);
+                return;
+            }
+        }
+
         var roj = JsonNode.Parse(rawJson) ?? JsonNode.Parse("{}");
         List<string> lstCal = [];
         try
@@ -142,7 +152,6 @@ public class UpController : ControllerBase
                 dados.TemperaturaAr = (decimal?)roj["Temperatura2"];
             }
         }
-
 
         string? imgPath = null;
         if (dados.pic_b64 != null)
