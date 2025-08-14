@@ -30,6 +30,7 @@ public class TBDadosEstacoes
 
         LoraMQTT = 3,
         Externo = 5,
+        Sync = 9,
     }
 
     [PrimaryKey]
