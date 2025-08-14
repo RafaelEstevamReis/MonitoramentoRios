@@ -51,6 +51,12 @@ builder.Services.AddHostedService(i =>
     var pass = builder.Configuration["mqtt_pass"];
     return new Web.Data.BkgWorkers.MqttWorker(i.GetService<ILogger>(), i.GetService<Web.Data.DAO.DB>(), host, user, pass);
 });
+builder.Services.AddHostedService(i =>
+{
+    var host = builder.Configuration["sync_host"];
+    var key = builder.Configuration["sync_key"];
+    return new Web.Data.BkgWorkers.MultiServerSync(i.GetService<ILogger>(), i.GetService<Web.Data.DAO.DB>(), host ?? "", key ?? "");
+});
 Web.Data.Controllers.Maintenance.ApiKey = builder.Configuration["maintenance-key"] ?? string.Empty;
 
 Web.Data.BkgWorkers.WeatherMeteoBlue.API_KEY = builder.Configuration["meteoblue_key"] ?? string.Empty;
