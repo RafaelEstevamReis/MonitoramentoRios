@@ -98,7 +98,10 @@ app.UseCors("AllowGetMethod");
 
 app.UseResponseCompression();
 app.UseDefaultFiles();
-app.UseStaticFiles();
+if (!Web.Data.Controllers.HomeController.VERSION.IsAZ)
+{
+    app.UseStaticFiles();
+}
 app.UseAuthorization();
 app.MapControllers();
 
