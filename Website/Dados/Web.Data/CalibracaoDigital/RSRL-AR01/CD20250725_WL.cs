@@ -9,7 +9,7 @@ public class CD20250725_WL : ICalibracaoDigital
     public string Estacao => "CF98FCFA7E9EE7C1";
 
     public DateTime ValidadeInicioUTC => new DateTime(2025, 07, 25, 0, 0, 0, DateTimeKind.Utc);
-    public DateTime ValidadeFimUTC => new DateTime(2025, 08, 25, 0, 0, 0, DateTimeKind.Utc); // Em 04/07 foi corrigido o envio
+    public DateTime ValidadeFimUTC => new DateTime(2025, 08, 13, 0, 0, 0, DateTimeKind.Utc); // Em 04/07 foi corrigido o envio
 
     public bool ProcessaDados(UpController.UploadData d, JsonNode? r)
     {
