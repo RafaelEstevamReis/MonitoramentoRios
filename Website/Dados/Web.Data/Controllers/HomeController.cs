@@ -55,7 +55,7 @@ public class HomeController : ControllerBase
         {
             var procName = Process.GetCurrentProcess().ProcessName;
             Log.Logger.Warning("[INT] Process: {name} ", procName);
-            return procName switch
+            return procName.Replace(".exe", "") switch
             {
                 "w3wp.exe" => "I6", // IIS6
                 "iisexpress.exe" => "IEX", // IISExpress
