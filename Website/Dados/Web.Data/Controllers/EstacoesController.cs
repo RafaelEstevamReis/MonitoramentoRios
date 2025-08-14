@@ -255,6 +255,7 @@ public class EstacoesController : ControllerBase
         public decimal? NivelRio { get; set; }
         public decimal? NivelRio_RAW { get; set; }
         public string? RawData { get; set; } = string.Empty;
+        public int Nonce { get; set; }
     }
     public class DadosEstacao
     {
