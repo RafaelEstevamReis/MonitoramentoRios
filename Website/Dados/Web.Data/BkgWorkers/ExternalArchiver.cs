@@ -45,7 +45,7 @@ public class ExternalArchiver : IHostedService, IDisposable
 #endif
 
         logger.Information("[ExternalArchiver] Iniciando serviço de Archive Externo de dados...");
-        _timer = new Timer(executaVerificacaoAsync, null, start, TimeSpan.FromMinutes(12)); // 5/h
+        _timer = new Timer(executaVerificacaoAsync, null, start, TimeSpan.FromMinutes(12));
 
         return Task.CompletedTask;
     }
