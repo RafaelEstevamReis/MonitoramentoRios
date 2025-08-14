@@ -55,12 +55,12 @@ public class HomeController : ControllerBase
         {
             var procName = Process.GetCurrentProcess().ProcessName;
             Log.Logger.Warning("[INT] Process: {name} ", procName);
-            return procName.Replace(".exe", "") switch
+            return procName.Replace(".exe", "").ToLower() switch
             {
-                "w3wp.exe" => "I6", // IIS6
-                "iisexpress.exe" => "IEX", // IISExpress
-                "dotnet.exe" => "Kestrel",
-                "Web.Data" => "http",
+                "w3wp" => "I6", // IIS6
+                "iisexpress" => "IEX", // IISExpress
+                "dotnet" => "Kestrel",
+                "web.data" => "http",
                 _ => "UNK",
             };
         }
