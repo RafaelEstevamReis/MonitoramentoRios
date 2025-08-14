@@ -28,6 +28,12 @@ public class MqttWorker : IHostedService, IDisposable
         tokenSrc = new CancellationTokenSource();
         token = tokenSrc.Token;
 
+        if(host == null)
+        {
+            logger.Warning("[LoRaMQTT] NO-HOST | Unable to configure service");
+            return;
+        }
+
         mqttClientOptions = new MqttClientOptionsBuilder()
             .WithTcpServer(host)
             .WithCredentials(user, pass)
@@ -35,6 +41,12 @@ public class MqttWorker : IHostedService, IDisposable
     }
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        if(mqttClientOptions == null)
+        {
+            logger.Warning("[LoRaMQTT] Disabled");
+            return;
+        }
+
         _ = Task.Run(async () =>
         {
             var mqttFactory = new MqttClientFactory();
