@@ -18,4 +18,11 @@
 		<PackageReference Include="MQTTnet" Version="5.0.1.1416" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<!-- Exclude specific appsettings files from publishing -->
+		<Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
+		<Content Update="appsettings.Staging.json" CopyToPublishDirectory="Never" />
+		<Content Update="appsettings.json" CopyToPublishDirectory="Never" />
+	</ItemGroup>
+	
 </Project>
