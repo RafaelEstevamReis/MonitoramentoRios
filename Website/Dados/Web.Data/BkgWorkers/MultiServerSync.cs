@@ -40,11 +40,7 @@ public class MultiServerSync : IHostedService, IDisposable
         }
 
         TimeSpan start;
-#if DEBUG
-        start = TimeSpan.FromSeconds(12);
-#else
-        start = TimeSpan.FromMinutes(30);
-#endif
+        start = TimeSpan.FromSeconds(30);
 
         logger.Information("[MultiServerSync] Iniciando serviço sincronia...");
         _timer = new Timer(executaVerificacaoAsync, null, start, TimeSpan.FromMinutes(12));
@@ -71,6 +67,7 @@ public class MultiServerSync : IHostedService, IDisposable
             var ultimoAge = DateTime.UtcNow - remota.UltimoEnvio.DataHoraDadosUTC;
             if (ultimoAge.TotalHours > 24) continue; // Muito velho
 
+            await Task.Delay(1000);
             // Solicita últimos
             logger.Information("[MultiServerSync] Solicitando dados para: {e}/{n}", remota.Estacao, remota.NomeEstacao);
             var eventos = await client.GetAsync<Controllers.EstacoesController.DadosColetados[]>("/estacoes/dados", new
@@ -134,39 +131,36 @@ public class MultiServerSync : IHostedService, IDisposable
             }
         }
 
-        if (eventosParaAdicionar.Count > 0)
+        // Adiciona os eventos não duplicados ao banco de dados
+        foreach (var evento in eventosParaAdicionar)
         {
-            // Adiciona os eventos não duplicados ao banco de dados
-            foreach (var evento in eventosParaAdicionar)
+            //db.InserirDados(evento); // Método fictício para inserir no banco
+            db.Registra(new DAO.DBModels.TBDadosEstacoes
             {
-                //db.InserirDados(evento); // Método fictício para inserir no banco
-                db.Registra(new DAO.DBModels.TBDadosEstacoes
-                {
-                    Id = 0, // NOVO
-                    RecebidoUTC = evento.RecebidoUTC,
-                    Estacao = remota.Estacao,
-                    type = evento.type,
-                    DataHoraDadosUTC = evento.DataHoraDadosUTC,
-                    ForcaSinal = evento.ForcaSinal,
-                    TemperaturaInterna = evento.TemperaturaInterna,
-                    TensaoBateria = evento.TensaoBateria,
-                    PercentBateria = evento.PercentBateria,
-                    TemperaturaAr = evento.TemperaturaAr,
-                    UmidadeAr = evento.UmidadeAr,
-                    PressaoAr = evento.PressaoAr,
-                    Precipitacao = evento.Precipitacao,
-                    Precipitacao10min = evento.Precipitacao10min,
-                    PrecipitacaoTotal = evento.PrecipitacaoTotal,
-                    NivelRio = evento.NivelRio,
-                    NivelRio_RAW = evento.NivelRio_RAW,
-                    //RawData = evento.RawData,
-                    //IP_Origem
-                    Nonce = evento.Nonce,
-                    Source = DAO.DBModels.TBDadosEstacoes.DataSource.Sync,
-                });
-            }
-            logger.Information("[MultiServerSync] {e}/{n} Novos Registros: {qtd}", remota.Estacao, remota.NomeEstacao, eventosParaAdicionar.Count);
+                Id = 0, // NOVO
+                RecebidoUTC = evento.RecebidoUTC,
+                Estacao = remota.Estacao,
+                type = evento.type,
+                DataHoraDadosUTC = evento.DataHoraDadosUTC,
+                ForcaSinal = evento.ForcaSinal,
+                TemperaturaInterna = evento.TemperaturaInterna,
+                TensaoBateria = evento.TensaoBateria,
+                PercentBateria = evento.PercentBateria,
+                TemperaturaAr = evento.TemperaturaAr,
+                UmidadeAr = evento.UmidadeAr,
+                PressaoAr = evento.PressaoAr,
+                Precipitacao = evento.Precipitacao,
+                Precipitacao10min = evento.Precipitacao10min,
+                PrecipitacaoTotal = evento.PrecipitacaoTotal,
+                NivelRio = evento.NivelRio,
+                NivelRio_RAW = evento.NivelRio_RAW,
+                //RawData = evento.RawData,
+                //IP_Origem
+                Nonce = evento.Nonce,
+                Source = DAO.DBModels.TBDadosEstacoes.DataSource.Sync,
+            });
         }
+        logger.Information("[MultiServerSync] {e}/{n} Novos Registros: {qtd}/{qEx}", remota.Estacao, remota.NomeEstacao, eventosParaAdicionar.Count, eventosRemoto.Length);
     }
 
 }
