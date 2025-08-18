@@ -28,7 +28,8 @@ public class CD20250814_WL : ICalibracaoDigital
             return true;
         }
 
-        d.NivelRio = d.NivelRio_RAW - 4.5M;
+        //d.NivelRio = d.NivelRio_RAW - 4.5M;
+        d.NivelRio = 5.5M - d.NivelRio_RAW;
 
         return true;
     }
