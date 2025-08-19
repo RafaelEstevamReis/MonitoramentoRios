@@ -127,7 +127,7 @@
                             chartLevelData.push([hora, round(dado.nivelRio, 2), round(dado.nivelRio_RAW, 2)]);
                             temNivel = true;
                         }
-                        if (dado.tensaoBateria || dado.tensaoBateria == 0) {
+                        if (dado.tensaoBateria && dado.tensaoBateria > 0) { // Quando não tem, fica em 0v
                             chartBatData.push([hora, round(dado.tensaoBateria, 2), round(dado.percentBateria, 0)]);
                             temBat = true;
                         }
