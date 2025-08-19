@@ -195,6 +195,8 @@ public class TBWeather
 
     public decimal Lat {  get; set; }
     public decimal Lon {  get; set; }
+    [Index("ixTBWeather_RegionCode")]
+    public string RegionCode { get; set; } = string.Empty;
 }
 
 

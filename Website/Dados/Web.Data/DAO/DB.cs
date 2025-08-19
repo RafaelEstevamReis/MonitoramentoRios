@@ -83,6 +83,15 @@ public class DB
 
             }
         }
+        var migWeather = result.FirstOrDefault(o => o.TableName == nameof(DBModels.TBWeather));
+        if (migWeather != null && migWeather.ColumnsAdded.Length > 0)
+        {
+            // 20250819 - Adiciona RegionCode
+            if (migWeather.ColumnsAdded.Any(c => c == "RegionCode")) // Criou a últimos envios
+            {
+                cnn.Execute($"UPDATE {nameof(DBModels.TBWeather)} SET {nameof(DBModels.TBWeather.RegionCode)} = 'RSRL' ");
+            }
+        }
     }
     public DBModels.TBEstacoes? ObterDadosCompletosEstacao(string estacao)
     {
@@ -484,13 +493,14 @@ public class DB
         using var cnn = db.GetConnection();
         cnn.BulkInsert(data, OnConflict.Ignore);
     }
-    public IEnumerable<DBModels.TBWeather> ObterWeatherProximasHoras(int hour = 12)
+    public IEnumerable<DBModels.TBWeather> ObterWeatherProximasHoras(string regiao, int hour = 12)
     {
         using var cnn = db.GetConnection();
-        var d = cnn.Query<DBModels.TBWeather>("SELECT * FROM TBWeather WHERE ForecastUTC BETWEEN @inicio AND @fim ORDER BY ColetaUTC DESC, ForecastUTC ASC LIMIT 0,100", new
+        var d = cnn.Query<DBModels.TBWeather>("SELECT * FROM TBWeather WHERE RegionCode=@regiao AND ForecastUTC BETWEEN @inicio AND @fim ORDER BY ColetaUTC DESC, ForecastUTC ASC LIMIT 0,100", new
         {
             inicio = DateTime.UtcNow.AddHours(-1),
             fim = DateTime.UtcNow.AddHours(hour),
+            regiao
         });
 
         // Garante que não tem duplicata e está ordenado
@@ -502,10 +512,13 @@ public class DB
                 .Take(hour)
                 ;
     }
-    public IEnumerable<DBModels.TBWeather> ObterWeatherEstendido()
+    public IEnumerable<DBModels.TBWeather> ObterWeatherEstendido(string regiao)
     {
         using var cnn = db.GetConnection();
-        var d = cnn.Query<DBModels.TBWeather>("SELECT * FROM TBWeather WHERE ColetaUTC IN (SELECT MAX(ColetaUTC) FROM TBWeather) ORDER BY ForecastUTC ASC LIMIT 0,96");
+        var d = cnn.Query<DBModels.TBWeather>("SELECT * FROM TBWeather WHERE RegionCode=@regiao AND  ColetaUTC IN (SELECT MAX(ColetaUTC) FROM TBWeather) ORDER BY ForecastUTC ASC LIMIT 0,96", new
+        {
+            regiao
+        });
         return d;
     }
 

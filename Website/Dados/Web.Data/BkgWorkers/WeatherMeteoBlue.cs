@@ -17,6 +17,9 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
     const int HOURS_SECO = 13;
     const int HOURS_CHUVA = 5;
 
+    static readonly (string, (decimal, decimal))[] Localizacoes = [
+        new ("RSRL", ( -29.64M, -50.57M)),
+    ];
 
     private readonly ILogger logger;
     private readonly DB db;
@@ -63,57 +66,61 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
 
     private async void executaVerificacaoAsync(object? state)
     {
-        // Chega última
-        if (temRecente(out TimeSpan recenteAge, out bool recenteTemChuva))
+        foreach (var local in Localizacoes)
         {
-            logger.Information("[WeatherMeteoBlue] Tem recente, SKIP | Hours: {h:N1} | Chuva: {bChuva}", recenteAge.TotalHours, recenteTemChuva);
-            return;
-        }
-        logger.Information("[WeatherMeteoBlue] Atualiza Dados | Hours: {h:N1} | Chuva: {bChuva}", recenteAge.TotalHours, recenteTemChuva);
-
-        try
-        {
-            var url = montaUrl();
-            var r = await clientInfo.GetAsync<DadosModel>(url);
-            r.EnsureSuccessStatusCode();
-
-            var d1h = r.Data.data_1h;
-            var lst = new List<DAO.DBModels.TBWeather>();
-            for (int i = 0; i < d1h.time.Length; i++)
+            // Chega última
+            if (temRecente(local.Item1, out TimeSpan recenteAge, out bool recenteTemChuva))
             {
-                lst.Add(new DAO.DBModels.TBWeather
-                {
-                    Id = 0,
-                    ColetaUTC = pegaData(r.Data.metadata.modelrun_updatetime_utc, 0), // 0: Já é UTC
-                    Lat = r.Data.metadata.latitude,
-                    Lon = r.Data.metadata.longitude,
-
-                    ForecastUTC = pegaData(d1h.time[i], +3), // É Local, ajustar
-                    LuzDia = d1h.isdaylight[i] == 1,
-                    UvIndex = d1h.uvindex[i],
-                    Temperatura = d1h.temperature[i],
-                    SensacaoTermica = d1h.felttemperature[i],
-                    Umidade = d1h.relativehumidity[i],
-                    Precipitacao = d1h.precipitation[i],
-                    PrecipitacaoProb = d1h.precipitation_probability[i],
-                    VentoVelocidade = d1h.windspeed[i],
-                    VentoDirecao = d1h.winddirection[i],
-                    Pressao = d1h.sealevelpressure[i],
-                    PictoCode = d1h.pictocode[i],
-                });
+                logger.Information("[WeatherMeteoBlue] Tem recente, SKIP | Hours: {h:N1} | Chuva: {bChuva}", recenteAge.TotalHours, recenteTemChuva);
+                return;
             }
+            logger.Information("[WeatherMeteoBlue] Atualiza Dados | Hours: {h:N1} | Chuva: {bChuva}", recenteAge.TotalHours, recenteTemChuva);
 
-            db.RegistraWeather(lst);
-            logger.Information("[WeatherMeteoBlue] Registrados {qtd} horários", lst.Count);
-        }
-        catch (Exception ex)
-        {
-            logger.Error(ex, "[WeatherMeteoBlue] Error {msg}", ex.Message);
+            try
+            {
+                var url = montaUrl(local.Item2.Item1, local.Item2.Item2);
+                var r = await clientInfo.GetAsync<DadosModel>(url);
+                r.EnsureSuccessStatusCode();
+
+                var d1h = r.Data.data_1h;
+                var lst = new List<DAO.DBModels.TBWeather>();
+                for (int i = 0; i < d1h.time.Length; i++)
+                {
+                    lst.Add(new DAO.DBModels.TBWeather
+                    {
+                        Id = 0,
+                        ColetaUTC = pegaData(r.Data.metadata.modelrun_updatetime_utc, 0), // 0: Já é UTC
+                        Lat = r.Data.metadata.latitude,
+                        Lon = r.Data.metadata.longitude,
+
+                        ForecastUTC = pegaData(d1h.time[i], +3), // É Local, ajustar
+                        LuzDia = d1h.isdaylight[i] == 1,
+                        UvIndex = d1h.uvindex[i],
+                        Temperatura = d1h.temperature[i],
+                        SensacaoTermica = d1h.felttemperature[i],
+                        Umidade = d1h.relativehumidity[i],
+                        Precipitacao = d1h.precipitation[i],
+                        PrecipitacaoProb = d1h.precipitation_probability[i],
+                        VentoVelocidade = d1h.windspeed[i],
+                        VentoDirecao = d1h.winddirection[i],
+                        Pressao = d1h.sealevelpressure[i],
+                        PictoCode = d1h.pictocode[i],
+                        RegionCode = local.Item1
+                    });
+                }
+
+                db.RegistraWeather(lst);
+                logger.Information("[WeatherMeteoBlue] Registrados {qtd} horários", lst.Count);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "[WeatherMeteoBlue] Error {msg}", ex.Message);
+            }
         }
     }
-    private bool temRecente(out TimeSpan age, out bool temChuva)
+    private bool temRecente(string regiao, out TimeSpan age, out bool temChuva)
     {
-        var lista = db.ObterWeatherProximasHoras(hour: 6).ToArray();
+        var lista = db.ObterWeatherProximasHoras(regiao, hour: 6).ToArray();
         if (lista.Length == 0)
         {
             age = TimeSpan.FromDays(7);
@@ -143,7 +150,7 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
                          ;
         return dt;
     }
-    private string montaUrl()
+    private string montaUrl(decimal lat, decimal lon)
     {
         if (API_KEY == "DEBUG")
         {
@@ -151,10 +158,7 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
             // DEMO KEY
             return "/packages/basic-1h_agro-1h?lat=47.56&lon=7.57&apikey=DEMOKEY&sig=e85c990f1d5d476b29eddd989ca56859";
         }
-
-        decimal lat = -29.64M;
-        decimal lon = -50.57M;
-
+        
         string sLat = lat.ToString(CultureInfo.InvariantCulture);
         string sLon = lon.ToString(CultureInfo.InvariantCulture);
 

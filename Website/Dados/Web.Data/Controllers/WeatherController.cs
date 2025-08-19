@@ -30,7 +30,7 @@ public class WeatherController : ControllerBase
 
         if (hora != currHourCache || wcache.Length == 0)
         {
-            wcache = db.ObterWeatherProximasHoras().ToArray();
+            wcache = db.ObterWeatherProximasHoras("RSRL").ToArray();
             currHourCache = hora;
         }
 
@@ -40,7 +40,7 @@ public class WeatherController : ControllerBase
     [HttpGet("ext")]
     public IActionResult ObterExtendido()
     {
-        return Ok(db.ObterWeatherEstendido());
+        return Ok(db.ObterWeatherEstendido("RSRL"));
     }
 
 }
