@@ -30,7 +30,12 @@ function montaTabelaEstacoes(lst) {
                 }
                 let bat = (dado.percentBateria || dado.percentBateria == 0) ? `<i class="bi ${iconeBateria(dado.percentBateria)}"></i>` : '';
                 let wifiSigPerc = wifiSignalToPercent(dado.forcaSinal);
-                let sig = dado.source == 3 ? loraIcon : `<i class="${iconeWifi(wifiSigPerc)}"></i>`;
+
+                //let sig = dado.source == 3 ? loraIcon : `<i class="${iconeWifi(wifiSigPerc)}"></i>`;
+                let sig = `<i class="${iconeWifi(wifiSigPerc)}"></i>`;
+                if (dado.source == 3) sig = loraIcon;
+                if (dado.source == 5) sig = `<i class="bi bi-globe"></i>`;
+                if (dado.source == 9) sig = `<i class="bi bi-broadcast-pin"></i>`;
 
                 let temp = dado.temperaturaAr ? `<i class="bi-thermometer"></i> ${formatValue(dado.temperaturaAr, 1)}ºC` : ''
                 let humd = dado.umidadeAr ? `<i class="bi-droplet"></i> ${formatValue(dado.umidadeAr, 0)}%` : ''
@@ -48,7 +53,7 @@ function montaTabelaEstacoes(lst) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                                         <td style='text-align: left; width: 90px'>${dado.nomeEstacao || dado.estacao}</td>
-                                        <td style='text-align: left;'><span title="WiFi: ${wifiSigPerc}">${sig}</span> <span title="Bateria: ${(dado.percentBateria ?? 0).toFixed(0)}%">${bat}</span></td>
+                                        <td style='text-align: left;'><span title="Bateria: ${(dado.percentBateria ?? 0).toFixed(0)}%">${bat}</span> <span title="WiFi: ${wifiSigPerc}">${sig}</span></td>
                                         <td><span>${humd}</span> <span>${temp}</span> <span>${prss}</span></td>
                                         <td><span>${nivel}</span> <span id='${idCh}'>${chuva}</span></td>
                                         <td><a class="btn" href="live.html?estacao=${dado.estacao}">Ver Estação</a></td>
