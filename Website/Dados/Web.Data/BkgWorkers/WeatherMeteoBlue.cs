@@ -68,13 +68,14 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
     {
         foreach (var local in Localizacoes)
         {
+            string regiao = local.Item1;
             // Chega última
-            if (temRecente(local.Item1, out TimeSpan recenteAge, out bool recenteTemChuva))
+            if (temRecente(regiao, out TimeSpan recenteAge, out bool recenteTemChuva))
             {
-                logger.Information("[WeatherMeteoBlue] Tem recente, SKIP | Hours: {h:N1} | Chuva: {bChuva}", recenteAge.TotalHours, recenteTemChuva);
+                logger.Information("[WeatherMeteoBlue] {regiao} Tem recente, SKIP | Hours: {h:N1} | Chuva: {bChuva}", regiao, recenteAge.TotalHours, recenteTemChuva);
                 return;
             }
-            logger.Information("[WeatherMeteoBlue] Atualiza Dados | Hours: {h:N1} | Chuva: {bChuva}", recenteAge.TotalHours, recenteTemChuva);
+            logger.Information("[WeatherMeteoBlue] {regiao} Atualiza Dados | Hours: {h:N1} | Chuva: {bChuva}", regiao, recenteAge.TotalHours, recenteTemChuva);
 
             try
             {
@@ -105,16 +106,16 @@ public class WeatherMeteoBlue : IHostedService, IDisposable
                         VentoDirecao = d1h.winddirection[i],
                         Pressao = d1h.sealevelpressure[i],
                         PictoCode = d1h.pictocode[i],
-                        RegionCode = local.Item1
+                        RegionCode = regiao
                     });
                 }
 
                 db.RegistraWeather(lst);
-                logger.Information("[WeatherMeteoBlue] Registrados {qtd} horários", lst.Count);
+                logger.Information("[WeatherMeteoBlue] {region} Registrados {qtd} horários", regiao, lst.Count);
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "[WeatherMeteoBlue] Error {msg}", ex.Message);
+                logger.Error(ex, "[WeatherMeteoBlue] {region} Error {msg}", regiao, ex.Message);
             }
         }
     }
