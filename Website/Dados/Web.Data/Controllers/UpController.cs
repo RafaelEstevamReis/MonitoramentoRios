@@ -28,7 +28,7 @@ public class UpController : ControllerBase
                         .ToArray();
 
         calibracoes = tCal.Select(o => (CalibracaoDigital.ICalibracaoDigital)(Activator.CreateInstance(o) ?? throw new InvalidOperationException()))
-                          .Where(o => o.ValidadeFimUTC < DateTime.UtcNow) // Já venceu
+                          .Where(o => o.ValidadeFimUTC > DateTime.UtcNow) // Já venceu?
                           .ToArray();
 
         Log.Logger.Information("Calibrações Carregadas: {qtd} {lista}",
