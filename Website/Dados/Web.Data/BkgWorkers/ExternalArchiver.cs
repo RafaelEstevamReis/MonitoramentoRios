@@ -188,6 +188,11 @@ public class ExternalArchiver : IHostedService, IDisposable
         var html = await r.Content.ReadAsStringAsync();
         var blScript = html.Split("<script ");
         var graficos = blScript.Where(h => h.Contains("Grafico(")).ToArray();
+        if(graficos.Length < 2)
+        {
+            logger.Information("[ExternalArchiver] Dados externos [NO DATA] CDM/{estacao}", e.Estacao);
+            return;
+        }
 
         var js = graficos[0];
         var ixGrafico = js.IndexOf("{");
