@@ -22,12 +22,12 @@ public class CD20250814_WL : ICalibracaoDigital
         }
         if (d.NivelRio_RAW < 1.5M)
         {
-            d.NivelRio = null; // Falso positivo
+            d.NivelRio = null; // Falso positivo 
             return true;
         }
 
         // Pegou no chão
-        if (d.NivelRio_RAW > 2.5M && d.NivelRio_RAW < 2.9M)
+        if (d.NivelRio_RAW > 2.0M && d.NivelRio_RAW < 2.9M)
         {
             d.NivelRio = null; // chão
             return true;
