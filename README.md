@@ -56,7 +56,9 @@ Adicionalmente, se você é órgão governamental ou à serviço do serviço pú
 
 ### Licença Restrita
 
-#### Termos de Uso
+~~~
+Termos de Uso da Licença Restrita
+
 Esta licença estabelece os termos sob os quais os dados coletados e processados  podem ser acessados. Ao acessar ou utilizar estes dados, você concorda com os seguintes termos:
 
 1. Proibição de Uso:
@@ -90,3 +92,4 @@ Qualquer violação dos termos desta licença pode resultar em medidas legais, i
 8. Acordo
 
 Ao acessar ou utilizar os dados fornecidos por este repositório, você reconhece que leu, entendeu e concorda em cumprir todos os termos desta licença. Se você não concorda com estes termos, não deve acessar ou utilizar os dados.
+~~~
