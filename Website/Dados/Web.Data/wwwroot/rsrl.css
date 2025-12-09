@@ -6,6 +6,14 @@
     background-color: darkslategray;
 }
 
+.aviso-manutencao {
+    text-align: center;
+    min-height: 22px;
+    padding: 12px;
+    background-color: burlywood;
+    color: black;
+}
+
 #screen {
     height: 100%;
 }
@@ -161,5 +169,4 @@ a, a:visited {
         gap: 10px;
         justify-content: center;
     }
-
 }
