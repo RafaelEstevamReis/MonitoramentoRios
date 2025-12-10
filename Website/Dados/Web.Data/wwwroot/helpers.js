@@ -14,7 +14,7 @@ function round(value, decimals) {
 }
 function formatValueUnit(value, decimals, unit) {
     if (value == null) return '-'; // Verifica null ou undefined
-    return (decimals === 0 ? Math.round(value) : value.toFixed(decimals)) +""+ unit;
+    return (decimals === 0 ? Math.round(value) : value.toFixed(decimals)) + "" + unit;
 }
 function timeSince(date) {
     const now = new Date();
@@ -81,7 +81,7 @@ function getDateTimeForTimezoneHour(currentString, tz) {
 
     // Extrair componentes da data e hora em UTC (já ajustado)
     const year = adjustedTime.getUTCFullYear();
-    const month = String(adjustedTime.getUTCMonth()+1).padStart(2, '0');
+    const month = String(adjustedTime.getUTCMonth() + 1).padStart(2, '0');
     const day = String(adjustedTime.getUTCDate()).padStart(2, '0');
     const hours = String(adjustedTime.getUTCHours()).padStart(2, '0');
 
@@ -91,6 +91,11 @@ function getDateTimeForTimezoneHour(currentString, tz) {
     const formattedDateTime = `${day}/${month} ${hours}h`;
 
     return formattedDateTime;
+}
+
+function adicionaZ(strDataHora) {
+    if (!strDataHora.endsWith('Z')) strDataHora = strDataHora + 'Z';
+    return strDataHora;
 }
 
 function wifiSignalToPercent(signal) {

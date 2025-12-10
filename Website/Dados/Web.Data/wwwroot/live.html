@@ -58,7 +58,7 @@
                 .then(response => response.json())
                 .then(data => {
                     const dado = data[0]; // Mais recente
-                    const dtD0 = new Date(dado.dataHoraDadosUTC+"Z");
+                    const dtD0 = new Date(adicionaZ(dado.dataHoraDadosUTC));
                     // Header
                     setValue('nomeEstacao', dado.nomeEstacao);
                     setValue('dtDados', dtD0.toLocaleString("pt-BR"));
@@ -149,7 +149,8 @@
                     const sortedData = data.slice().sort((a, b) => {
                         if (!a?.dataHoraDadosUTC) return 1; // Coloca `a` no final se `a` for null ou dataHoraDadosUTC estiver ausente
                         if (!b?.dataHoraDadosUTC) return -1; // Coloca `b` no final se `b` for null ou dataHoraDadosUTC estiver ausente
-                        return new Date(b.dataHoraDadosUTC) - new Date(a.dataHoraDadosUTC);
+
+                        return new Date(adicionaZ(b.dataHoraDadosUTC)) - new Date(adicionaZ(a.dataHoraDadosUTC));
                     });
 
                     tableBody.innerHTML = "";
