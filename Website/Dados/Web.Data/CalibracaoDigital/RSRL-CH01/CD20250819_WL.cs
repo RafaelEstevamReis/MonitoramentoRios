@@ -1,8 +1,8 @@
-﻿using System;
+﻿namespace Web.Data.CalibracaoDigital.RSRL_CH01;
+
+using System;
 using System.Text.Json.Nodes;
 using Web.Data.Controllers;
-
-namespace Web.Data.CalibracaoDigital.RSRL_CH01;
 
 public class CD20250819_WL : ICalibracaoDigital
 {

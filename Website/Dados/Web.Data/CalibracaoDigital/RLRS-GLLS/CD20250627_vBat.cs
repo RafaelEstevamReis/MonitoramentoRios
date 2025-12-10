@@ -1,8 +1,8 @@
-﻿using System;
+﻿namespace Web.Data.CalibracaoDigital.RLRS_GLLS;
+
+using System;
 using System.Text.Json.Nodes;
 using Web.Data.Controllers;
-
-namespace Web.Data.CalibracaoDigital.RLRS_GLLS;
 
 public class CD20250627_vBat : ICalibracaoDigital
 {
