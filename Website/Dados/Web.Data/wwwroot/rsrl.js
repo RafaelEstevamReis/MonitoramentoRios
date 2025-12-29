@@ -1,6 +1,101 @@
 ﻿const loraIcon = "<img src='lora.svg' style='height:24px;margin-left:4px;vertical-align: middle;'>";
 const noSigSvg = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M790-56 414-434q-47 11-87.5 33T254-346l-84-86q32-32 69-56t79-42l-90-90q-41 21-76.5 46.5T84-516L0-602q32-32 66.5-57.5T140-708l-84-84 56-56 736 736-58 56Zm-310-64q-42 0-71-29.5T380-220q0-42 29-71t71-29q42 0 71 29t29 71q0 41-29 70.5T480-120Zm236-238-29-29-29-29-144-144q81 8 151.5 41T790-432l-74 74Zm160-158q-77-77-178.5-120.5T480-680q-21 0-40.5 1.5T400-674L298-776q44-12 89.5-18t92.5-6q142 0 265 53t215 145l-84 86Z"/></svg>';
 
+
+function atualizaMapa(lst) {
+    fetch('/estacoes/ultimos')
+        .then(response => response.json())
+        .then(data => {
+            // exibe
+            data.forEach(dado => {
+                //if (dado.nomeEstacao.startsWith('EX')) return; // Algumas externas são carregadas
+                                
+                let text = `-`;
+                if (dado.nivelRio === null && dado.temperaturaAr === null) {
+                    text = `?/?`;
+                } else if (dado.precipitacao10min || dado.precipitacao10min == 0) {
+                    text = `${formatValue(dado.temperaturaAr, 1)}ºC<br>${formatValue(dado.precipitacao10min, 1)}mm`;
+                } else if (dado.nivelRio === null || dado.nivelRio === undefined) {
+                    text = `${formatValue(dado.temperaturaAr, 1)}ºC`;
+                } else {
+                    text = `${formatValue(dado.temperaturaAr, 1)}ºC<br>${formatValue(dado.nivelRio, 1)}m`;
+                }
+                atualizaEstacao(lst, text, dado.estacao);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar dados das estações:', error);
+        });
+}
+function exibeDadosEstacaoTabelaChuva(idSpan, idEstacao) {
+    // Resumo 24h
+    fetch('/estacoes/agregado?hour=24&estacao=' + idEstacao)
+        .then(response => response.json())
+        .then(dado => {
+            setValue(`spn_${idSpan}_PC`, `${formatValue(dado.precipitacaoTotal_Hora, 0) || '-'}mm/24h`);
+        })
+        .catch (error => {
+        console.error('Erro ao carregar dados das estações:', error);
+        });
+    // Chama a geral para preencher dados atuais
+    exibeDadosEstacaoTabelaRio(idSpan, idEstacao); 
+}
+function exibeDadosEstacaoTabelaRio(idSpan, idEstacao) {
+    // Chama a geral para preencher dados atuais
+    let url = '/estacoes/dados?limit=10&estacao=' + idEstacao;
+    fetch(url)
+        .then(response => response.json())
+        .then(rows => {
+            dado = rows[0];
+            if (isOlderThan(dado.dataHoraDadosUTC, 2)) return;
+
+            if (dado.source == 3 && !dado.percentBateria && dado.tensaoBateria) { // LORA
+                if (dado.tensaoBateria < 3.2) dado.percentBateria = 0;
+                else if (dado.tensaoBateria < 3.4) dado.percentBateria = 10;
+                else if (dado.tensaoBateria < 3.6) dado.percentBateria = 40;
+                else if (dado.tensaoBateria < 3.7) dado.percentBateria = 60;
+                else if (dado.tensaoBateria < 4) dado.percentBateria = 80;
+                else dado.percentBateria = 90;
+            }
+
+            let bat = (dado.percentBateria || dado.percentBateria == 0) ? `<i class="bi ${iconeBateria(dado.percentBateria)}"></i>` : '';
+            let wifiSigPerc = wifiSignalToPercent(dado.forcaSinal);
+
+            //let sig = dado.source == 3 ? loraIcon : `<i class="${iconeWifi(wifiSigPerc)}"></i>`;
+            let sig = `<i class="${iconeWifi(wifiSigPerc)}"></i>`;
+            if (dado.source == 3) sig = loraIcon;
+            if (dado.source == 5) sig = `<i class="bi bi-globe"></i>`;
+            if (dado.source == 9) sig = `<i class="bi bi-broadcast-pin"></i>`;
+
+            let temp = dado.temperaturaAr ? `<i class="bi-thermometer"></i> ${formatValue(dado.temperaturaAr, 0)}ºC` : ''
+            let humd = dado.umidadeAr ? `<i class="bi-droplet"></i> ${formatValue(dado.umidadeAr, 0)}%` : ''
+            let prss = dado.pressaoAr ? `<i class="bi-box-arrow-in-down"></i> ${formatValue(dado.pressaoAr, 0)} hPa` : ''
+            if (dado.temperaturaAr && dado.pressaoAr) humd = '';
+
+            let nivel = dado.nivelRio || dado.nivelRio == 0 ? `<i class="bi-water"></i> ${formatValueUnit(dado.nivelRio, 1, 'm')}` : '';
+
+            setValue(`spn_${idSpan}_SigBat`, `${bat} ${sig}`);
+            setValue(`spn_${idSpan}_Air`, `${temp} ${humd} ${prss}`);
+            setValue(`spn_${idSpan}_Temp`, `${temp}`);
+            setValue(`spn_${idSpan}_WL`, `${nivel}`);
+
+        })
+        .catch (error => {
+        console.error('Erro ao carregar dados das estações:', error);
+    });
+}
+function setValue(id, value) {
+    const element = document.getElementById(id);
+    if (element === null || element === undefined) return;
+
+    if (value || value == 0) {
+        element.innerHTML = value;
+    } else {
+        element.innerHTML = '-';
+    }   
+}
+
+
 function montaTabelaEstacoes(lst) {
     fetch('/estacoes/ultimos')
         .then(response => response.json())
@@ -402,6 +497,73 @@ function carregaPrevisao() {
             document.querySelector('#previsaoTempo').innerHTML = '<p style="text-align: center; color: red; font-size: 1.2em;">Erro ao carregar previsão do tempo.</p>';
         });
 }
+function carregaPrevisaoAgrupado() {
+    fetch('/weather/blocks')
+        .then(response => response.json())
+        .then(data => {
+            // Criar cards visuais
+            const cardsContainer = document.querySelector('#previsaoCards');
+            cardsContainer.innerHTML = ''; // Limpar container
+
+            if (data.length > 0) {
+                const dataHora = new Date(data[0].coletaUTC + 'Z').toLocaleString('pt-BR');
+                const spanDH = document.querySelector('#dataHoraColetaPrevisao');
+                spanDH.textContent = `Coleta dos Dados: ${dataHora}`;
+            }
+
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.style.cssText = `
+                        background-color: whitesmoke;
+                        border: 2px solid white;
+                        border-radius: 10px;
+                        padding: 7px;
+                        width: 85px;
+                        min-height: 100px;
+                        text-align: center;
+                        box-shadow: 4px 2px 5px rgba(0,0,0,0.9);
+                        font-size: 1.1em;
+                    `;
+                let dataHora = item.horarioLocal;
+
+                let iconRain = 'bi-cloud-slash';
+                if (item.precipitacao > 0.1) iconRain = 'bi-cloud';
+                if (item.precipitacao > 0.5) iconRain = 'bi-cloud-drizzle';
+                if (item.precipitacao > 4) iconRain = 'bi-cloud-rain';
+                if (item.precipitacao > 9) iconRain = 'bi-cloud-rain-heavy';
+
+                let tagProb = item.precipitacao > 0.5 ? `<small style="color: #2980b9;">(${item.precipitacaoProb.toFixed(0)}%)</small>` : ''
+                // Na Beaufort Wind Scale
+                //  "Brisa leve" é de 4 a 7km/h (Wind felt on face; leaves rustle; ordinary vanes moved by wind)
+                //  "Brisa gentil" é de 8 a 12km/h (Leaves and small twigs in constant motion; wind extends light flag.)
+                //  "Brisa moderada" é de 13 a 18km/h (Raises dust and loose paper; small branches are moved.)
+                //  ...
+                //  "Quase vendaval" é de 32 a 38km/h (Whole trees in motion; inconvenience felt when walking against the wind.)
+                //  "Vendaval" é de 39 a 46km/h (Breaks twigs off trees; generally impedes progress.)
+                //  Vou exibir a partir da faixa superior da leve, em 6
+                let corVento = "teal";
+                if (item.ventoVelocidade > 30) corVento = "red";
+                let tagVento = item.ventoVelocidade > 6 ? `<div style="margin: 5px 0;"> <span style="color: ${corVento};"><i class="bi bi-wind"></i> ${item.ventoVelocidade.toFixed(0)} km/h</span> </div>` : ''
+
+                let strTemp = item.temperatura < 10 ? item.temperatura.toFixed(1) : item.temperatura.toFixed(0);
+                card.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 10px; color: black;">${dataHora}</div>
+                        <div style="font-size: 1.5em; color: #d9534f;">${strTemp}°C</div>
+
+                        ${tagVento}
+                        <div style="margin: 5px 0;">
+                            <span style="color: navy;"><i class="bi ${iconRain}"></i> ${item.precipitacao.toFixed(1)} mm</span>
+                            <!-- ${tagProb} -->
+                        </div>
+                    `;
+                cardsContainer.appendChild(card);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar previsão:', error);
+            document.querySelector('#previsaoTempo').innerHTML = '<p style="text-align: center; color: red; font-size: 1.2em;">Erro ao carregar previsão do tempo.</p>';
+        });
+}
 function carregaPrevisaoEstendida() {
     // Limpa card
     const cardsContainer = document.querySelector('#previsaoCards');
@@ -411,7 +573,6 @@ function carregaPrevisaoEstendida() {
         window.location = "/tempo.html"
     }, 5000); // Wait
 };
-
 
 function adicionaEstacao(lst, lat, lng, label, id) {
     let e = addCircleLabel(lat, lng, label, `/live.html?estacao=${id}`);
