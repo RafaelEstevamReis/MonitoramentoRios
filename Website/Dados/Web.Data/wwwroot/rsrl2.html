@@ -1,0 +1,247 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link rel="preload" href="rsrl.css?r=2" as="style" /> <!-- REVISION ID -->
+    <link rel="preload" href="rsrl.js?r=5" as="script" /> <!-- REVISION ID -->
+    <link rel="preload" href="helpers.js?r=1" as="script" /> <!-- REVISION ID -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="600">
+    <title>Sistema de Monitoramento dos Rios</title>
+    <script>
+        //window.history.replaceState(null, "", "/#RSRL"); // Remove URL
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="rsrl.css?r=2" /> <!-- REVISION ID -->
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script type="text/javascript" src="chart.js"></script>
+    <script type="text/javascript" src="rsrl.js?r=5"></script> <!-- REVISION ID -->
+    <script type="text/javascript" src="helpers.js?r=1"></script> <!-- REVISION ID -->
+
+    <style>
+        .tbHeaderRow{
+            text-align: left;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="ribbon">₿ETA</div>
+    <div id="screen">
+        <div id="top">
+            <div id="topTable">
+                <h1>Sistema de Monitoramento de Rios</h1>
+
+                <table id="ultimasLeituras">
+                    <thead>
+                        <tr>
+                            <th>Ponto de Leitura - Distância</th>
+                            <!--<th></th>-->
+                            <th>Ar</th>
+                            <th>Água | Alerta</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="tbHeaderRow">Chuva Acumulada</td>
+                        </tr>
+                        <tr>
+                            <td>Rio Branco - 3km</td>
+                            <!--<td><span id="spn_RSRLRB02_SigBat">-</span></td>-->
+                            <td><span id="spn_RSRLRB02_Air">-</span></td>
+                            <td><span id="spn_RSRLRB02_PC">-</span> | 120mm</td>
+                            <td><a class="btn" href="live.html?estacao=5BA69743261D364A">Ver Estação</a></td>
+                        </tr>
+                        <tr>
+                            <td>Morro Grande - 8km</td>
+                            <!--<td><span id="spn_EXRLMG01_SigBat">-</span></td>-->
+                            <td><span id="spn_EXRLMG01_Air">-</span></td>
+                            <td><span id="spn_EXRLMG01_PC">-</span></td>
+                            <td><a class="btn" href="live.html?estacao=CEF2144E84EF82A0">Ver Estação</a></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" class="tbHeaderRow">Nível dos Rios</td>
+                        </tr>
+                        <tr>
+                            <td>Junção dos Rios - 0km</td>
+                            <!--<td><span id="spn_RSRLCE02_SigBat">-</span></td>-->
+                            <td><span id="spn_RSRLCE02_Air">-</span></td>
+                            <td><span id="spn_RSRLCE02_WL">-</span></td>
+                            <td><a class="btn" href="live.html?estacao=AAA7CCD686C44D8E">Ver Estação</a></td>
+                        </tr>
+                        <tr>
+                            <td>Rio Rolante - 5km</td>
+                            <!--<td><span id="spn_RSRLAR01_SigBat">-</span></td>-->
+                            <td><span id="spn_RSRLAR01_Air">-</span></td>
+                            <td><span id="spn_RSRLAR01_WL">-</span></td>
+                            <td><a class="btn" href="live.html?estacao=CF98FCFA7E9EE7C1">Ver Estação</a></td>
+                        </tr>
+                        <tr>
+                            <td>Arroio da Areia - 8km</td>
+                            <!--<td><span id="spn_RSRLGLLS_SigBat">-</span></td>-->
+                            <td><span id="spn_RSRLGLLS_Air">-</span></td>
+                            <td><span id="spn_RSRLGLLS_WL">-</span></td>
+                            <td><a class="btn" href="live.html?estacao=9A6EE7B45495BB7F">Ver Estação</a></td>
+                        </tr>
+                        <tr>
+                            <td>Arroio da Areia - 12km</td>
+                            <!--<td><span id="spn_RSRLBE01_SigBat">-</span></td>-->
+                            <td><span id="spn_RSRLBE01_Air">-</span></td>
+                            <td><span id="spn_RSRLBE01_WL">-</span></td>
+                            <td><a class="btn" href="live.html?estacao=04109F675953A131">Ver Estação</a></td>
+                        </tr>
+                        <tr>
+                            <td>Rio Rolante - 20km</td>
+                            <!--<td><span id="spn_RSRLCH01_SigBat">-</span></td>-->
+                            <td><span id="spn_RSRLCH01_Air">-</span></td>
+                            <td><span id="spn_RSRLCH01_WL">-</span></td>
+                            <td><a class="btn" href="live.html?estacao=48B1162D47EC0FE6">Ver Estação</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="map"></div>
+        </div>
+        <hr style="margin-top: 0px;" />
+        <div id="bottom">
+
+            <h2> Previsão do Tempo para as Próximas Horas </h2>
+            <div id="previsaoTempo">
+                <div id="previsaoCards"></div>
+                <div style="text-align: center; margin-top:10px"> <small id="dataHoraColetaPrevisao"></small> <button onclick="carregaPrevisaoEstendida()">Carregar mais</button> </div>
+            </div>
+
+            <hr />
+
+            <div id="dvTodas">
+
+                <div class="cdvChart">
+                    <h3>
+                        <span onclick="abrirEstacao('5BA69743261D364A')">
+                            <i class="bi-cloud-rain"></i> Chuva no Rio Branco - Rio Branco, Rolante-RS
+                        </span>
+                    </h3>
+                    <canvas id="chtRB02"></canvas>
+                </div>
+
+                <div class="cdvChart">
+                    <h3>
+                        <span onclick="abrirEstacao('CF98FCFA7E9EE7C1')">
+                            <i class="bi-water"></i> Nível da água no Rio Rolante - Alto Rolante, Rolante-RS
+                        </span>
+                    </h3>
+                    <canvas id="chtAR01"></canvas>
+                </div>
+
+                <div class="cdvChart">
+                    <h3>
+                        <span onclick="abrirEstacao('9A6EE7B45495BB7F')">
+                            <i class="bi-water"></i> Nível da água no Arroio da Areia - Alto Areia, Rolante-RS
+                        </span>
+                    </h3>
+                    <canvas id="chtGLLS"></canvas>
+                </div>
+
+                <div class="cdvChart">
+                    <h3>
+                        <span onclick="abrirEstacao('04109F675953A131')">
+                            <i class="bi-water"></i> Nível da água no Arroio Boa Esperança - Boa Esperança, Rolante-RS
+                        </span>
+                    </h3>
+                    <canvas id="chtBE01"></canvas>
+                </div>
+
+                <!--<div class="cdvChart">
+        <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-water"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
+        <canvas id="chtCH01"></canvas>
+    </div>-->
+
+            </div>
+
+            <hr />
+
+            <div id="divSobre">
+                <h2> Sobre o Sistema </h2>
+                <p>O sistema de monitoramento dos rios é uma iniciativa do <strong>Projeto ₿itcoin é Aqui de Rolante-RS</strong></p>
+                <p>
+                    As estações de monitoramento são financiadas exclusivamente por recursos privados captados em Bitcoin.
+                    <br />
+                    Realizadas com apoio de moradores locais que contribuem com locais para instalação e conhecimento sobre os rios e padrões de chuvas da região.
+                </p>
+                <p>A previsão para as próximas horas é um serviço pago com a MeteoBlue e as representações são cedidas sob os termos da MeteoBlue.</p>
+                <p>
+                    O sistema é de código aberto e está disponível em:
+                    <a href="https://github.com/RafaelEstevamReis/MonitoramentoRios" target="_blank">github.com/MonitoramentoRios</a>.
+                    <br />
+                    Implemente também na sua comunidade. Oferecemos consultoria, nos contate pelas redes sociais.
+                </p> <p>
+                    Siga-nos nas redes sociais:
+                    <a href="https://x.com/bitcoineaqui" target="_blank" class="social-icon">
+                        <i class="bi bi-twitter-x"></i>
+                    </a>
+                    <a href="https://instagram.com/bitcoinrolante" target="_blank" class="social-icon">
+                        <i class="bi bi-instagram"></i>
+                    </a>.
+                </p> <p>
+                    Apoie o projeto com doações:
+                    <a href="https://coinos.io/enchenterolante" style="vertical-align: middle" target="_blank">
+                        <img src='coinos.svg' style='height:24px;margin-left:4px;vertical-align: middle;'>
+                    </a>
+                </p>
+            </div>
+            <br><br><br>
+        </div>
+
+        <hr style="margin-bottom: 1px;" />
+        <div style="text-align: center; padding-bottom: 10px;"> <small id="versaoSistema">Versão do Sistema: 1.0+{{GIT_HASH}}[B]</small> </div>
+    </div>
+
+    <script>
+        /* Inicializa Gráfico */
+        let lstEstacoesMapa = [];
+        var map = L.map('map', {
+            maxZoom: 13,
+            minZoom: 11,
+        }).setView([-29.61, -50.52], 12); // Posição inicial [latitude, longitude] e zoom
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        // Adiciona estações do Mapa
+        // > Todas as coordenadas devem ter apenas 2.5 casas decimais (terceira casa múltiplo de 5)
+        adicionaEstacao(lstEstacoesMapa, -29.565, -50.535, noSigSvg, "04109F675953A131"); // RSRL-BE01
+        adicionaEstacao(lstEstacoesMapa, -29.590, -50.565, noSigSvg, "9A6EE7B45495BB7F"); // RSRL-GLLS
+        adicionaEstacao(lstEstacoesMapa, -29.635, -50.545, noSigSvg, "BB45660B199C5677"); // RSRL-RB01
+        adicionaEstacao(lstEstacoesMapa, -29.565, -50.420, noSigSvg, "48B1162D47EC0FE6"); // RSRZ-CH01
+        adicionaEstacao(lstEstacoesMapa, -29.650, -50.545, noSigSvg, "5BA69743261D364A"); // RSFP-RB02
+        adicionaEstacao(lstEstacoesMapa, -29.660, -50.580, noSigSvg, "AAA7CCD686C44D8E"); // RSRL-CE02
+        adicionaEstacao(lstEstacoesMapa, -29.640, -50.530, noSigSvg, "CF98FCFA7E9EE7C1"); // RSRL-AR01
+        adicionaEstacao(lstEstacoesMapa, -29.640, -50.560, noSigSvg, "2CAED8D9CB62CEB5"); // RSRL-BV01
+
+        /* Dados */
+        carregaPrevisao(false);
+        atualizaMapa(lstEstacoesMapa); // Atualiza Bolha no mapa
+
+        exibeDadosEstacaoTabelaChuva('RSRLRB02', '5BA69743261D364A');
+        exibeDadosEstacaoTabelaChuva('EXRLMG01', 'CEF2144E84EF82A0');
+
+        exibeDadosEstacaoTabelaRio('RSRLCE02', 'AAA7CCD686C44D8E');
+        exibeDadosEstacaoTabelaRio('RSRLAR01', 'CF98FCFA7E9EE7C1');
+        exibeDadosEstacaoTabelaRio('RSRLGLLS', '9A6EE7B45495BB7F');
+        exibeDadosEstacaoTabelaRio('RSRLBE01', '04109F675953A131');
+        exibeDadosEstacaoTabelaRio('RSRLCH01', '48B1162D47EC0FE6');
+
+        /* Gráficos */
+        carregaHistoricoGrafico('04109F675953A131', 'chtBE01', 0.09, 0.5);
+        carregaHistoricoGrafico('9A6EE7B45495BB7F', 'chtGLLS', 0.15, 2.0);
+        carregaHistoricoGrafico('48B1162D47EC0FE6', 'chtCH01', null, 1.5);
+        carregaHistoricoGrafico('CF98FCFA7E9EE7C1', 'chtAR01', null, null);
+        carregaHistoricoGrafico('5BA69743261D364A', 'chtRB02', null, 120.0);
+
+    </script>
+    </body>
+</html>
