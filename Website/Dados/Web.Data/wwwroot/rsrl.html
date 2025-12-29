@@ -136,9 +136,9 @@
 
     <script>
         /* Inicializa Gráfico */
-        let lst = [];
+        let lstEstacoesMapa = [];
         var map = L.map('map', {
-            maxZoom: 15,
+            maxZoom: 13,
             minZoom: 11,
         }).setView([-29.61, -50.52], 12); // Posição inicial [latitude, longitude] e zoom
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -146,18 +146,18 @@
         }).addTo(map);
         // Adiciona estações do Mapa
         // > Todas as coordenadas devem ter apenas 2.5 casas decimais (terceira casa múltiplo de 5)
-        adicionaEstacao(lst, -29.565, -50.535, noSigSvg, "04109F675953A131"); // RSRL-BE01
-        adicionaEstacao(lst, -29.590, -50.565, noSigSvg, "9A6EE7B45495BB7F"); // RSRL-GLLS
-        adicionaEstacao(lst, -29.635, -50.545, noSigSvg, "BB45660B199C5677"); // RSRL-RB01
-        adicionaEstacao(lst, -29.565, -50.420, noSigSvg, "48B1162D47EC0FE6"); // RSRZ-CH01
-        adicionaEstacao(lst, -29.650, -50.545, noSigSvg, "5BA69743261D364A"); // RSFP-RB02
-        adicionaEstacao(lst, -29.660, -50.580, noSigSvg, "AAA7CCD686C44D8E"); // RSRL-CE02
-        adicionaEstacao(lst, -29.640, -50.530, noSigSvg, "CF98FCFA7E9EE7C1"); // RSRL-AR01
-        adicionaEstacao(lst, -29.640, -50.560, noSigSvg, "2CAED8D9CB62CEB5"); // RSRL-BV01
+        adicionaEstacao(lstEstacoesMapa, -29.565, -50.535, noSigSvg, "04109F675953A131"); // RSRL-BE01
+        adicionaEstacao(lstEstacoesMapa, -29.590, -50.565, noSigSvg, "9A6EE7B45495BB7F"); // RSRL-GLLS
+        adicionaEstacao(lstEstacoesMapa, -29.635, -50.545, noSigSvg, "BB45660B199C5677"); // RSRL-RB01
+        adicionaEstacao(lstEstacoesMapa, -29.565, -50.420, noSigSvg, "48B1162D47EC0FE6"); // RSRZ-CH01
+        adicionaEstacao(lstEstacoesMapa, -29.650, -50.545, noSigSvg, "5BA69743261D364A"); // RSFP-RB02
+        adicionaEstacao(lstEstacoesMapa, -29.660, -50.580, noSigSvg, "AAA7CCD686C44D8E"); // RSRL-CE02
+        adicionaEstacao(lstEstacoesMapa, -29.640, -50.530, noSigSvg, "CF98FCFA7E9EE7C1"); // RSRL-AR01
+        adicionaEstacao(lstEstacoesMapa, -29.640, -50.560, noSigSvg, "2CAED8D9CB62CEB5"); // RSRL-BV01
 
         /* Dados */
         carregaPrevisao(false);
-        montaTabelaEstacoes(lst); // Atualiza Bolha no mapa
+        montaTabelaEstacoes(lstEstacoesMapa); // Atualiza Bolha no mapa
         /* Gráficos */
         carregaHistoricoGrafico('04109F675953A131', 'chtBE01', 0.09, 0.5);
         carregaHistoricoGrafico('9A6EE7B45495BB7F', 'chtGLLS', 0.15, 2.0);
