@@ -49,10 +49,11 @@
                 <table style="padding-top: 5px;" id="ultimasLeituras">
                     <thead>
                         <tr>
-                            <th>Ponto de Leitura - Distância do centro</th>
+                            <th>Ponto de Leitura - Distância</th>
                             <!--<th></th>-->
                             <th>Ar</th>
-                            <th>Água | Alerta</th>
+                            <th>Água</th>
+                            <th>Alerta</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -64,14 +65,16 @@
                             <td>Rio Branco - 3km</td>
                             <!--<td><span id="spn_RSRLRB02_SigBat">-</span></td>-->
                             <td><span id="spn_RSRLRB02_Temp">-</span></td>
-                            <td><span id="spn_RSRLRB02_PC">-</span> | 120mm</td>
+                            <td><span id="spn_RSRLRB02_PC">-</span></td>
+                            <td>120mm</td>
                             <td><a class="btn" href="live.html?estacao=5BA69743261D364A">Ver Estação</a></td>
                         </tr>
                         <tr>
                             <td>Morro Grande - 8km</td>
                             <!--<td><span id="spn_EXRLMG01_SigBat">-</span></td>-->
                             <td><span id="spn_EXRLMG01_Temp">-</span></td>
-                            <td><span id="spn_EXRLMG01_PC">-</span> | 120mm</td>
+                            <td><span id="spn_EXRLMG01_PC">-</span></td>
+                            <td>120mm</td>
                             <td><a class="btn" href="live.html?estacao=CEF2144E84EF82A0">Ver Estação</a></td>
                         </tr>
                         <tr>
@@ -82,6 +85,7 @@
                             <!--<td><span id="spn_RSRLCE02_SigBat">-</span></td>-->
                             <td><span id="spn_RSRLCE02_Temp">-</span></td>
                             <td><span id="spn_RSRLCE02_WL">-</span></td>
+                            <td></td>
                             <td><a class="btn" href="live.html?estacao=AAA7CCD686C44D8E">Ver Estação</a></td>
                         </tr>
                         <tr>
@@ -89,20 +93,23 @@
                             <!--<td><span id="spn_RSRLAR01_SigBat">-</span></td>-->
                             <td><span id="spn_RSRLAR01_Temp">-</span></td>
                             <td><span id="spn_RSRLAR01_WL">-</span></td>
+                            <td></td>
                             <td><a class="btn" href="live.html?estacao=CF98FCFA7E9EE7C1">Ver Estação</a></td>
                         </tr>
                         <tr>
                             <td>Arroio da Areia - 8km</td>
                             <!--<td><span id="spn_RSRLGLLS_SigBat">-</span></td>-->
                             <td><span id="spn_RSRLGLLS_Temp">-</span></td>
-                            <td><span id="spn_RSRLGLLS_WL">-</span> | 2.0m</td>
+                            <td><span id="spn_RSRLGLLS_WL">-</span></td>
+                            <td>2.0m</td>
                             <td><a class="btn" href="live.html?estacao=9A6EE7B45495BB7F">Ver Estação</a></td>
                         </tr>
                         <tr>
                             <td>Arroio da Areia - 12km</td>
                             <!--<td><span id="spn_RSRLBE01_SigBat">-</span></td>-->
                             <td><span id="spn_RSRLBE01_Temp">-</span></td>
-                            <td><span id="spn_RSRLBE01_WL">-</span> | 0.5m</td>
+                            <td><span id="spn_RSRLBE01_WL">-</span></td>
+                            <td>0.5m</td>
                             <td><a class="btn" href="live.html?estacao=04109F675953A131">Ver Estação</a></td>
                         </tr>
                         <tr>
@@ -110,6 +117,7 @@
                             <!--<td><span id="spn_RSRLCH01_SigBat">-</span></td>-->
                             <td><span id="spn_RSRLCH01_Temp">-</span></td>
                             <td><span id="spn_RSRLCH01_WL">-</span></td>
+                            <td></td>
                             <td><a class="btn" href="live.html?estacao=48B1162D47EC0FE6">Ver Estação</a></td>
                         </tr>
                     </tbody>
@@ -232,7 +240,7 @@
         adicionaEstacao(lstEstacoesMapa, -29.585, -50.530, noSigSvg, "CEF2144E84EF82A0"); // EXRL-MG01
 
         /* Dados */
-        carregaPrevisao(false);
+        carregaPrevisaoAgrupado();
         atualizaMapa(lstEstacoesMapa); // Atualiza Bolha no mapa
 
         exibeDadosEstacaoTabelaChuva('RSRLRB02', '5BA69743261D364A');

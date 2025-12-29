@@ -497,6 +497,73 @@ function carregaPrevisao() {
             document.querySelector('#previsaoTempo').innerHTML = '<p style="text-align: center; color: red; font-size: 1.2em;">Erro ao carregar previsão do tempo.</p>';
         });
 }
+function carregaPrevisaoAgrupado() {
+    fetch('/weather/blocks')
+        .then(response => response.json())
+        .then(data => {
+            // Criar cards visuais
+            const cardsContainer = document.querySelector('#previsaoCards');
+            cardsContainer.innerHTML = ''; // Limpar container
+
+            if (data.length > 0) {
+                const dataHora = new Date(data[0].coletaUTC + 'Z').toLocaleString('pt-BR');
+                const spanDH = document.querySelector('#dataHoraColetaPrevisao');
+                spanDH.textContent = `Coleta dos Dados: ${dataHora}`;
+            }
+
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.style.cssText = `
+                        background-color: whitesmoke;
+                        border: 2px solid white;
+                        border-radius: 10px;
+                        padding: 7px;
+                        width: 85px;
+                        min-height: 100px;
+                        text-align: center;
+                        box-shadow: 4px 2px 5px rgba(0,0,0,0.9);
+                        font-size: 1.1em;
+                    `;
+                let dataHora = item.horarioLocal;
+
+                let iconRain = 'bi-cloud-slash';
+                if (item.precipitacao > 0.1) iconRain = 'bi-cloud';
+                if (item.precipitacao > 0.5) iconRain = 'bi-cloud-drizzle';
+                if (item.precipitacao > 4) iconRain = 'bi-cloud-rain';
+                if (item.precipitacao > 9) iconRain = 'bi-cloud-rain-heavy';
+
+                let tagProb = item.precipitacao > 0.5 ? `<small style="color: #2980b9;">(${item.precipitacaoProb.toFixed(0)}%)</small>` : ''
+                // Na Beaufort Wind Scale
+                //  "Brisa leve" é de 4 a 7km/h (Wind felt on face; leaves rustle; ordinary vanes moved by wind)
+                //  "Brisa gentil" é de 8 a 12km/h (Leaves and small twigs in constant motion; wind extends light flag.)
+                //  "Brisa moderada" é de 13 a 18km/h (Raises dust and loose paper; small branches are moved.)
+                //  ...
+                //  "Quase vendaval" é de 32 a 38km/h (Whole trees in motion; inconvenience felt when walking against the wind.)
+                //  "Vendaval" é de 39 a 46km/h (Breaks twigs off trees; generally impedes progress.)
+                //  Vou exibir a partir da faixa superior da leve, em 6
+                let corVento = "teal";
+                if (item.ventoVelocidade > 30) corVento = "red";
+                let tagVento = item.ventoVelocidade > 6 ? `<div style="margin: 5px 0;"> <span style="color: ${corVento};"><i class="bi bi-wind"></i> ${item.ventoVelocidade.toFixed(0)} km/h</span> </div>` : ''
+
+                let strTemp = item.temperatura < 10 ? item.temperatura.toFixed(1) : item.temperatura.toFixed(0);
+                card.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 10px; color: black;">${dataHora}</div>
+                        <div style="font-size: 1.5em; color: #d9534f;">${strTemp}°C</div>
+
+                        ${tagVento}
+                        <div style="margin: 5px 0;">
+                            <span style="color: navy;"><i class="bi ${iconRain}"></i> ${item.precipitacao.toFixed(1)} mm</span>
+                            <!-- ${tagProb} -->
+                        </div>
+                    `;
+                cardsContainer.appendChild(card);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar previsão:', error);
+            document.querySelector('#previsaoTempo').innerHTML = '<p style="text-align: center; color: red; font-size: 1.2em;">Erro ao carregar previsão do tempo.</p>';
+        });
+}
 function carregaPrevisaoEstendida() {
     // Limpa card
     const cardsContainer = document.querySelector('#previsaoCards');
