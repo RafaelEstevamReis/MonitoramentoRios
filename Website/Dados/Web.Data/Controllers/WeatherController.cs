@@ -50,8 +50,8 @@ public class WeatherController : ControllerBase
         int tz = -3;
         var utcHour = utc.Date.AddHours(hora);
         var group = wcache.Where(o => o.ForecastUTC >= utcHour)
-                          .Chunk(3)
-                          .Take(4)
+                          .Chunk(4) // Blocos de 4 horas
+                          .Take(3) // 3 cards
                           .Select(g =>
                           {
                               return new WeatherAgrupado

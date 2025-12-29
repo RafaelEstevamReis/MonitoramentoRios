@@ -32,7 +32,7 @@ function exibeDadosEstacaoTabelaChuva(idSpan, idEstacao) {
     fetch('/estacoes/agregado?hour=24&estacao=' + idEstacao)
         .then(response => response.json())
         .then(dado => {
-            setValue(`spn_${idSpan}_PC`, `${formatValue(dado.precipitacaoTotal_Hora, 0) || '-'}mm/24h`);
+            setValue(`spn_${idSpan}_PC`, `${formatValue(dado.precipitacaoTotal_Hora, 0) || '-'}mm`);
         })
         .catch (error => {
         console.error('Erro ao carregar dados das estações:', error);

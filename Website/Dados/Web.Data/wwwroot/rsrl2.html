@@ -10,7 +10,7 @@
     <meta http-equiv="refresh" content="600">
     <title>Sistema de Monitoramento dos Rios</title>
     <script>
-        //window.history.replaceState(null, "", "/#RSRL"); // Remove URL
+        window.history.replaceState(null, "", "/#RSRL"); // Remove URL
     </script>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -34,7 +34,7 @@
 
     <div id="screen">
         <div>
-            <h1>Sistema de Monitoramento de Rios</h1>
+            <h1>Sistema de Monitoramento de Rios de Rolante</h1>
             <h2>
                 Desenvolvido pelo Bitcoin É Aqui
                 <br>
@@ -46,75 +46,84 @@
 
         <div id="top">
             <div id="topTable">
-                <table style="padding-top: 5px;" id="ultimasLeituras">
+                <table style="padding-top: 5px; min-width: 410px" id="ultimasLeituras">
                     <thead>
-                        <tr>
-                            <th>Ponto de Leitura - Distância</th>
-                            <!--<th></th>-->
-                            <th>Ar</th>
-                            <th>Água</th>
-                            <th>Alerta</th>
+                        <!--<tr>
+                            <th>Ponto de Leitura</th>
+                            <th>Distância</th>
                             <th></th>
-                        </tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>-->
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="5" class="tbHeaderRow">Chuva Acumulada</td>
+                            <td class="tbHeaderRow">Chuva Acumulada</td>
+                            <td class="tbHeaderRow">Distância</td>
+                            <td class="tbHeaderRow"></td>
+                            <td class="tbHeaderRow" style="text-align: center">Chuva 24h</td>
+                            <td class="tbHeaderRow" style="text-align: center">Alerta</td>
                         </tr>
                         <tr>
-                            <td>Rio Branco - 3km</td>
-                            <!--<td><span id="spn_RSRLRB02_SigBat">-</span></td>-->
+                            <td>Rio Branco</td>
+                            <td>3km</td>
                             <td><span id="spn_RSRLRB02_Temp">-</span></td>
                             <td><span id="spn_RSRLRB02_PC">-</span></td>
                             <td>120mm</td>
                             <td><a class="btn" href="live.html?estacao=5BA69743261D364A">Ver Estação</a></td>
                         </tr>
                         <tr>
-                            <td>Morro Grande - 8km</td>
-                            <!--<td><span id="spn_EXRLMG01_SigBat">-</span></td>-->
+                            <td>Morro Grande</td>
+                            <td>8km</td>
                             <td><span id="spn_EXRLMG01_Temp">-</span></td>
                             <td><span id="spn_EXRLMG01_PC">-</span></td>
                             <td>120mm</td>
                             <td><a class="btn" href="live.html?estacao=CEF2144E84EF82A0">Ver Estação</a></td>
                         </tr>
                         <tr>
-                            <td colspan="5" class="tbHeaderRow">Nível dos Rios</td>
+                            <td class="tbHeaderRow">Nível dos Rios</td>
+                            <td></td>
+                            <td></td>
+                            <td class="tbHeaderRow" style="text-align: center">Nível</td>
+                            <td class="tbHeaderRow" style="text-align: center">Alerta</td>
+
                         </tr>
                         <tr>
-                            <td>Junção dos Rios - 0km</td>
-                            <!--<td><span id="spn_RSRLCE02_SigBat">-</span></td>-->
+                            <td>Junção dos Rios</td>
+                            <td>0km</td>
                             <td><span id="spn_RSRLCE02_Temp">-</span></td>
                             <td><span id="spn_RSRLCE02_WL">-</span></td>
                             <td></td>
                             <td><a class="btn" href="live.html?estacao=AAA7CCD686C44D8E">Ver Estação</a></td>
                         </tr>
                         <tr>
-                            <td>Rio Rolante - 5km</td>
-                            <!--<td><span id="spn_RSRLAR01_SigBat">-</span></td>-->
+                            <td>Rio Rolante</td>
+                            <td>5km</td>
                             <td><span id="spn_RSRLAR01_Temp">-</span></td>
                             <td><span id="spn_RSRLAR01_WL">-</span></td>
                             <td></td>
                             <td><a class="btn" href="live.html?estacao=CF98FCFA7E9EE7C1">Ver Estação</a></td>
                         </tr>
                         <tr>
-                            <td>Arroio da Areia - 8km</td>
-                            <!--<td><span id="spn_RSRLGLLS_SigBat">-</span></td>-->
+                            <td>Arroio da Areia</td>
+                            <td>8km</td>
                             <td><span id="spn_RSRLGLLS_Temp">-</span></td>
                             <td><span id="spn_RSRLGLLS_WL">-</span></td>
                             <td>2.0m</td>
                             <td><a class="btn" href="live.html?estacao=9A6EE7B45495BB7F">Ver Estação</a></td>
                         </tr>
                         <tr>
-                            <td>Arroio da Areia - 12km</td>
-                            <!--<td><span id="spn_RSRLBE01_SigBat">-</span></td>-->
+                            <td>Arroio da Areia</td>
+                            <td>12km</td>
                             <td><span id="spn_RSRLBE01_Temp">-</span></td>
                             <td><span id="spn_RSRLBE01_WL">-</span></td>
                             <td>0.5m</td>
                             <td><a class="btn" href="live.html?estacao=04109F675953A131">Ver Estação</a></td>
                         </tr>
                         <tr>
-                            <td>Rio Rolante - 20km</td>
-                            <!--<td><span id="spn_RSRLCH01_SigBat">-</span></td>-->
+                            <td>Rio Rolante</td>
+                            <td>20km</td>
                             <td><span id="spn_RSRLCH01_Temp">-</span></td>
                             <td><span id="spn_RSRLCH01_WL">-</span></td>
                             <td></td>
