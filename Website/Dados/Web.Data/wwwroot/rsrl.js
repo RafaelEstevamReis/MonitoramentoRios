@@ -8,7 +8,7 @@ function atualizaMapa(lst) {
         .then(data => {
             // exibe
             data.forEach(dado => {
-                if (dado.nomeEstacao.startsWith('EX')) return;
+                //if (dado.nomeEstacao.startsWith('EX')) return; // Algumas externas são carregadas
                                 
                 let text = `-`;
                 if (dado.nivelRio === null && dado.temperaturaAr === null) {
@@ -32,7 +32,7 @@ function exibeDadosEstacaoTabelaChuva(idSpan, idEstacao) {
     fetch('/estacoes/agregado?hour=24&estacao=' + idEstacao)
         .then(response => response.json())
         .then(dado => {
-            setValue(`spn_${idSpan}_PC`, `${formatValue(dado.precipitacaoTotal_Hora, 0) || '-'}mm/h`);
+            setValue(`spn_${idSpan}_PC`, `${formatValue(dado.precipitacaoTotal_Hora, 0) || '-'}mm/24h`);
         })
         .catch (error => {
         console.error('Erro ao carregar dados das estações:', error);
@@ -47,6 +47,8 @@ function exibeDadosEstacaoTabelaRio(idSpan, idEstacao) {
         .then(response => response.json())
         .then(rows => {
             dado = rows[0];
+            if (isOlderThan(dado.dataHoraDadosUTC, 2)) return;
+
             if (dado.source == 3 && !dado.percentBateria && dado.tensaoBateria) { // LORA
                 if (dado.tensaoBateria < 3.2) dado.percentBateria = 0;
                 else if (dado.tensaoBateria < 3.4) dado.percentBateria = 10;
@@ -55,6 +57,7 @@ function exibeDadosEstacaoTabelaRio(idSpan, idEstacao) {
                 else if (dado.tensaoBateria < 4) dado.percentBateria = 80;
                 else dado.percentBateria = 90;
             }
+
             let bat = (dado.percentBateria || dado.percentBateria == 0) ? `<i class="bi ${iconeBateria(dado.percentBateria)}"></i>` : '';
             let wifiSigPerc = wifiSignalToPercent(dado.forcaSinal);
 
@@ -73,6 +76,7 @@ function exibeDadosEstacaoTabelaRio(idSpan, idEstacao) {
 
             setValue(`spn_${idSpan}_SigBat`, `${bat} ${sig}`);
             setValue(`spn_${idSpan}_Air`, `${temp} ${humd} ${prss}`);
+            setValue(`spn_${idSpan}_Temp`, `${temp}`);
             setValue(`spn_${idSpan}_WL`, `${nivel}`);
 
         })

@@ -39,6 +39,20 @@ function timeSince(date) {
     return 'agora';
 }
 
+function isOlderThan(timeString, hours) {
+    if (!timeString.endsWith('Z')) timeString = timeString + 'Z'; // Fix missing TZ, all times are GMT
+    const targetDate = new Date(timeString);
+
+    // Verifica se a data é válida
+    if (isNaN(targetDate.getTime())) {
+        throw new Error('Invalid date string provided');
+    }
+
+    const now = new Date();
+    const limit = new Date(now.getTime() - hours * 60 * 60 * 1000);
+    return targetDate < limit;
+}
+
 function generateHourlyLabels(start, end) {
     const labels = [];
     let current = start;

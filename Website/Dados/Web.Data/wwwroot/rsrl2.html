@@ -23,7 +23,7 @@
     <script type="text/javascript" src="helpers.js?r=1"></script> <!-- REVISION ID -->
 
     <style>
-        .tbHeaderRow{
+        .tbHeaderRow {
             text-align: left;
             font-weight: bold;
         }
@@ -31,15 +31,25 @@
 </head>
 <body>
     <div class="ribbon">₿ETA</div>
+
     <div id="screen">
+        <div>
+            <h1>Sistema de Monitoramento de Rios</h1>
+            <h2>
+                Desenvolvido pelo Bitcoin É Aqui
+                <br>
+                Mantido pela ACISA
+            </h2>
+        </div>
+
+        <hr style=" margin-bottom: 0px;" />
+
         <div id="top">
             <div id="topTable">
-                <h1>Sistema de Monitoramento de Rios</h1>
-
-                <table id="ultimasLeituras">
+                <table style="padding-top: 5px;" id="ultimasLeituras">
                     <thead>
                         <tr>
-                            <th>Ponto de Leitura - Distância</th>
+                            <th>Ponto de Leitura - Distância do centro</th>
                             <!--<th></th>-->
                             <th>Ar</th>
                             <th>Água | Alerta</th>
@@ -53,15 +63,15 @@
                         <tr>
                             <td>Rio Branco - 3km</td>
                             <!--<td><span id="spn_RSRLRB02_SigBat">-</span></td>-->
-                            <td><span id="spn_RSRLRB02_Air">-</span></td>
+                            <td><span id="spn_RSRLRB02_Temp">-</span></td>
                             <td><span id="spn_RSRLRB02_PC">-</span> | 120mm</td>
                             <td><a class="btn" href="live.html?estacao=5BA69743261D364A">Ver Estação</a></td>
                         </tr>
                         <tr>
                             <td>Morro Grande - 8km</td>
                             <!--<td><span id="spn_EXRLMG01_SigBat">-</span></td>-->
-                            <td><span id="spn_EXRLMG01_Air">-</span></td>
-                            <td><span id="spn_EXRLMG01_PC">-</span></td>
+                            <td><span id="spn_EXRLMG01_Temp">-</span></td>
+                            <td><span id="spn_EXRLMG01_PC">-</span> | 120mm</td>
                             <td><a class="btn" href="live.html?estacao=CEF2144E84EF82A0">Ver Estação</a></td>
                         </tr>
                         <tr>
@@ -70,35 +80,35 @@
                         <tr>
                             <td>Junção dos Rios - 0km</td>
                             <!--<td><span id="spn_RSRLCE02_SigBat">-</span></td>-->
-                            <td><span id="spn_RSRLCE02_Air">-</span></td>
+                            <td><span id="spn_RSRLCE02_Temp">-</span></td>
                             <td><span id="spn_RSRLCE02_WL">-</span></td>
                             <td><a class="btn" href="live.html?estacao=AAA7CCD686C44D8E">Ver Estação</a></td>
                         </tr>
                         <tr>
                             <td>Rio Rolante - 5km</td>
                             <!--<td><span id="spn_RSRLAR01_SigBat">-</span></td>-->
-                            <td><span id="spn_RSRLAR01_Air">-</span></td>
+                            <td><span id="spn_RSRLAR01_Temp">-</span></td>
                             <td><span id="spn_RSRLAR01_WL">-</span></td>
                             <td><a class="btn" href="live.html?estacao=CF98FCFA7E9EE7C1">Ver Estação</a></td>
                         </tr>
                         <tr>
                             <td>Arroio da Areia - 8km</td>
                             <!--<td><span id="spn_RSRLGLLS_SigBat">-</span></td>-->
-                            <td><span id="spn_RSRLGLLS_Air">-</span></td>
-                            <td><span id="spn_RSRLGLLS_WL">-</span></td>
+                            <td><span id="spn_RSRLGLLS_Temp">-</span></td>
+                            <td><span id="spn_RSRLGLLS_WL">-</span> | 2.0m</td>
                             <td><a class="btn" href="live.html?estacao=9A6EE7B45495BB7F">Ver Estação</a></td>
                         </tr>
                         <tr>
                             <td>Arroio da Areia - 12km</td>
                             <!--<td><span id="spn_RSRLBE01_SigBat">-</span></td>-->
-                            <td><span id="spn_RSRLBE01_Air">-</span></td>
-                            <td><span id="spn_RSRLBE01_WL">-</span></td>
+                            <td><span id="spn_RSRLBE01_Temp">-</span></td>
+                            <td><span id="spn_RSRLBE01_WL">-</span> | 0.5m</td>
                             <td><a class="btn" href="live.html?estacao=04109F675953A131">Ver Estação</a></td>
                         </tr>
                         <tr>
                             <td>Rio Rolante - 20km</td>
                             <!--<td><span id="spn_RSRLCH01_SigBat">-</span></td>-->
-                            <td><span id="spn_RSRLCH01_Air">-</span></td>
+                            <td><span id="spn_RSRLCH01_Temp">-</span></td>
                             <td><span id="spn_RSRLCH01_WL">-</span></td>
                             <td><a class="btn" href="live.html?estacao=48B1162D47EC0FE6">Ver Estação</a></td>
                         </tr>
@@ -155,23 +165,21 @@
                     </h3>
                     <canvas id="chtBE01"></canvas>
                 </div>
-
-                <!--<div class="cdvChart">
-        <h3><span onclick="abrirEstacao('48B1162D47EC0FE6')"><i class="bi-water"></i> Chuvisqueiro - Chuvisqueiro, Riozinho-RS</span></h3>
-        <canvas id="chtCH01"></canvas>
-    </div>-->
-
             </div>
 
             <hr />
 
             <div id="divSobre">
                 <h2> Sobre o Sistema </h2>
-                <p>O sistema de monitoramento dos rios é uma iniciativa do <strong>Projeto ₿itcoin é Aqui de Rolante-RS</strong></p>
                 <p>
-                    As estações de monitoramento são financiadas exclusivamente por recursos privados captados em Bitcoin.
+                    O sistema de monitoramento dos rios é uma iniciativa do <strong>Projeto ₿itcoin é Aqui de Rolante-RS</strong>
                     <br />
-                    Realizadas com apoio de moradores locais que contribuem com locais para instalação e conhecimento sobre os rios e padrões de chuvas da região.
+                    Em Novembro de 2025 o sistema foi doado para a ACISA, <a href="https://acisarolante.com/2025/09/11/acisa-e-projeto-bitcoin-e-aqui-lancam-central-de-monitoramento-dos-rios-em-rolante/" target="_blank">Leia mais</a>
+                </p>
+                <p>
+                    As estações de monitoramento foram financiadas exclusivamente por recursos privados captados em Bitcoin.
+                    <br />
+                    Realizadas com apoio de moradores locais que contribuiram com locais para instalação e com o conhecimento sobre os rios e padrões de chuvas da região.
                 </p>
                 <p>A previsão para as próximas horas é um serviço pago com a MeteoBlue e as representações são cedidas sob os termos da MeteoBlue.</p>
                 <p>
@@ -180,7 +188,7 @@
                     <br />
                     Implemente também na sua comunidade. Oferecemos consultoria, nos contate pelas redes sociais.
                 </p> <p>
-                    Siga-nos nas redes sociais:
+                    Siga o Projeto nas redes sociais:
                     <a href="https://x.com/bitcoineaqui" target="_blank" class="social-icon">
                         <i class="bi bi-twitter-x"></i>
                     </a>
@@ -188,8 +196,8 @@
                         <i class="bi bi-instagram"></i>
                     </a>.
                 </p> <p>
-                    Apoie o projeto com doações:
-                    <a href="https://coinos.io/enchenterolante" style="vertical-align: middle" target="_blank">
+                    Apoie o Projeto com doações:
+                    <a href="https://coinos.io/bitcoineaqui" style="vertical-align: middle" target="_blank">
                         <img src='coinos.svg' style='height:24px;margin-left:4px;vertical-align: middle;'>
                     </a>
                 </p>
@@ -221,6 +229,7 @@
         adicionaEstacao(lstEstacoesMapa, -29.660, -50.580, noSigSvg, "AAA7CCD686C44D8E"); // RSRL-CE02
         adicionaEstacao(lstEstacoesMapa, -29.640, -50.530, noSigSvg, "CF98FCFA7E9EE7C1"); // RSRL-AR01
         adicionaEstacao(lstEstacoesMapa, -29.640, -50.560, noSigSvg, "2CAED8D9CB62CEB5"); // RSRL-BV01
+        adicionaEstacao(lstEstacoesMapa, -29.585, -50.530, noSigSvg, "CEF2144E84EF82A0"); // EXRL-MG01
 
         /* Dados */
         carregaPrevisao(false);
@@ -243,5 +252,5 @@
         carregaHistoricoGrafico('5BA69743261D364A', 'chtRB02', null, 120.0);
 
     </script>
-    </body>
+</body>
 </html>
