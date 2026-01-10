@@ -532,7 +532,6 @@ function carregaPrevisaoAgrupado() {
                 if (item.precipitacao > 4) iconRain = 'bi-cloud-rain';
                 if (item.precipitacao > 9) iconRain = 'bi-cloud-rain-heavy';
 
-                let tagProb = item.precipitacao > 0.5 ? `<small style="color: #2980b9;">(${item.precipitacaoProb.toFixed(0)}%)</small>` : ''
                 // Na Beaufort Wind Scale
                 //  "Brisa leve" é de 4 a 7km/h (Wind felt on face; leaves rustle; ordinary vanes moved by wind)
                 //  "Brisa gentil" é de 8 a 12km/h (Leaves and small twigs in constant motion; wind extends light flag.)
@@ -553,7 +552,6 @@ function carregaPrevisaoAgrupado() {
                         ${tagVento}
                         <div style="margin: 5px 0;">
                             <span style="color: navy;"><i class="bi ${iconRain}"></i> ${item.precipitacao.toFixed(1)} mm</span>
-                            <!-- ${tagProb} -->
                         </div>
                     `;
                 cardsContainer.appendChild(card);
