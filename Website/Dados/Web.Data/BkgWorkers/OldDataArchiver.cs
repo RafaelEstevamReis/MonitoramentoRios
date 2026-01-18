@@ -13,7 +13,7 @@ public class OldDataArchiver : IHostedService, IDisposable
 {
     private readonly ILogger logger;
     private readonly DB db;
-    private Timer _timer;
+    private Timer? _timer;
     public OldDataArchiver(DB db, ILogger logger)
     {
         this.db = db;
@@ -37,7 +37,7 @@ public class OldDataArchiver : IHostedService, IDisposable
         return Task.CompletedTask;
     }
 
-    private void executaVerificacaoAsync(object state)
+    private void executaVerificacaoAsync(object? state)
     {
         try
         {
