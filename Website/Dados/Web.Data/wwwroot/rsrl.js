@@ -250,7 +250,9 @@ function carregaHistoricoGrafico(idEstacao, canvasId, nivelNormal, nivelAlerta) 
                 const label = getDateTimeForTimezone(current, -3);
                 dataMap.set(label, dado);
             });
-            let modoNivel = idEstacao != "5BA69743261D364A";
+
+            let modoNivel = idEstacao != "5BA69743261D364A" && idEstacao != "CEF2144E84EF82A0";
+
             let maiorAcumulado = 0;
             let maiorNivel = 0;
 
