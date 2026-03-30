@@ -80,7 +80,12 @@
                 return;
             }
 
-            const hexChunkSize = Math.ceil(totalHexLength / numChunks);
+            let hexChunkSize = Math.ceil(totalHexLength / numChunks);
+            if (hexChunkSize % 2 === 1) {
+                hexChunkSize += 1;
+            }
+
+            console.log(`CHUNKS: totalHexLength: ${totalHexLength}, numChunks: ${numChunks}, hexChunkSize: ${hexChunkSize}`);
 
             // Dividir o HEX em chunks
             const chunks = [];
@@ -100,6 +105,9 @@
                     // Formato BTXxy, onde x é a parte atual (index+1) e y é o total (numChunks)
                     chunkDiv.textContent = `BTX${index + 1}${numChunks}${base64}`;
                     outputDiv.appendChild(chunkDiv);
+
+                    console.log(`CHUNK: ${index + 1}/${numChunks} Len: ${chunk.length} Data: ${chunk}`);
+
                 } catch (e) {
                     outputDiv.innerHTML += `<p style="color: red;">Erro ao processar chunk ${index + 1}: ${e.message}</p>`;
                 }

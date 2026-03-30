@@ -104,7 +104,7 @@ app.UseCors("AllowGetMethod");
 
 app.UseResponseCompression();
 app.UseDefaultFiles();
-if (!Web.Data.Controllers.HomeController.VERSION.IsAZ)
+//if (!Web.Data.Controllers.HomeController.VERSION.IsAZ)
 {
     app.UseStaticFiles();
 }
