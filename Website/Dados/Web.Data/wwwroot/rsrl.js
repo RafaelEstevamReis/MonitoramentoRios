@@ -8,8 +8,6 @@ function atualizaMapa(lst) {
         .then(data => {
             // exibe
             data.forEach(dado => {
-                //if (dado.nomeEstacao.startsWith('EX')) return; // Algumas externas são carregadas
-                                
                 let text = `-`;
                 if (dado.nivelRio === null && dado.temperaturaAr === null) {
                     text = `?/?`;
@@ -42,10 +40,14 @@ function exibeDadosEstacaoTabelaChuva(idSpan, idEstacao) {
 }
 function exibeDadosEstacaoTabelaRio(idSpan, idEstacao) {
     // Chama a geral para preencher dados atuais
-    let url = '/estacoes/dados?limit=10&estacao=' + idEstacao;
+    let url = '/estacoes/dados?limit=2&estacao=' + idEstacao;
     fetch(url)
         .then(response => response.json())
         .then(rows => {
+            if (rows.length == 0) {
+                console.log('Estação não tem dados: ' + idEstacao);
+                return;
+            }
             dado = rows[0];
             if (isOlderThan(dado.dataHoraDadosUTC, 2)) return;
 
@@ -61,7 +63,6 @@ function exibeDadosEstacaoTabelaRio(idSpan, idEstacao) {
             let bat = (dado.percentBateria || dado.percentBateria == 0) ? `<i class="bi ${iconeBateria(dado.percentBateria)}"></i>` : '';
             let wifiSigPerc = wifiSignalToPercent(dado.forcaSinal);
 
-            //let sig = dado.source == 3 ? loraIcon : `<i class="${iconeWifi(wifiSigPerc)}"></i>`;
             let sig = `<i class="${iconeWifi(wifiSigPerc)}"></i>`;
             if (dado.source == 3) sig = loraIcon;
             if (dado.source == 5) sig = `<i class="bi bi-globe"></i>`;
@@ -81,7 +82,7 @@ function exibeDadosEstacaoTabelaRio(idSpan, idEstacao) {
 
         })
         .catch (error => {
-        console.error('Erro ao carregar dados das estações:', error);
+            console.error('Erro ao carregar dados da estação: ' + idEstacao, error);
     });
 }
 function setValue(id, value) {
@@ -94,7 +95,6 @@ function setValue(id, value) {
         element.innerHTML = '-';
     }   
 }
-
 
 function montaTabelaEstacoes(lst) {
     fetch('/estacoes/ultimos')
