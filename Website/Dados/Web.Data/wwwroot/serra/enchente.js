@@ -170,13 +170,6 @@ const ESCALA_REGUA=[[0,1],[0.85,4],[1.0,6],[1.35,7]];
    falha ("veredito piscando") que o proprio motor ja documentou noutro
    limiar (ver comentario sobre o limiar 72<->80mm mais acima no arquivo). */
 const ESCALA_NOWCAST=[[0,0],[10,2]];
-/* Previsao: mesmos cortes de mm que computeRisk ja usa (15/40/80mm no pico
-   do dia; 10mm em 24h; 60/100mm em 72h) — tres testes independentes, o
-   pior vence, igual a logica OR que ja existia. Teto em 9: previsao nunca
-   vira confirmacao. */
-const ESCALA_PREV_DIA=[[0,1],[15,4],[40,6],[80,9]];
-const ESCALA_PREV_24=[[0,1],[10,4]];
-const ESCALA_PREV_72=[[0,1],[60,6],[100,9]];
 /* indice "agora": o maior entre chuva+solo e o reforco da regua (quando
    fresca, confiavel, e nao em recuo confirmado — reaproveita `rio.arrefeceu`,
    que ja vem dentro do proprio `rio`). Chuva caindo agora soma a rampa de
@@ -198,15 +191,20 @@ function indiceAgora(agoraRatio, rio, eta){
   if(rio.nivel>=3) idx=Math.max(idx,9);
   return Math.round(Math.min(10, Math.max(1, idx)));
 }
-/* indice "futuro": o pior entre as tres janelas de previsao ja usadas
-   hoje, cada uma na sua propria escala com o mesmo teto (9). */
-function indiceFuturo(){
+/* indice "futuro": a MESMA escala da chuva medida (fracao do limiar de
+   enchente, ajustada pelo solo), com teto 9 — previsao nunca vira
+   confirmacao. `picoRatio` e o pico da razao critica nas 48 h de previsao
+   (futuro.pico.ratio, ja calculado em projetaChuva com o solo evoluindo
+   hora a hora). Antes usava mm crus do pico do dia (15/40/80 mm), mas mm
+   crus nao veem a concentracao da chuva nem a saturacao do solo: 27 mm
+   espalhados num dia com solo seco davam 5/10, o mesmo que 77 mm medidos
+   numa hora com solo encharcado. A fracao do limiar ve a duracao que
+   estoura primeiro (3/6/12/24 h) e o solo que cai enquanto chove — e fica
+   comparavel com o indice "agora", no mesmo eixo. Teto 9: previsao nunca
+   vira confirmacao. */
+function indiceFuturo(picoRatio){
   if(!APP.FC) return 1;
-  const pd=APP.FC.peakDay;
-  const porDia=escalaRisco(ESCALA_PREV_DIA, pd?pd.mm:0);
-  const porNext72=escalaRisco(ESCALA_PREV_72, APP.FC.next72||0);
-  const porNext24=escalaRisco(ESCALA_PREV_24, APP.FC.next24||0);
-  return Math.round(Math.max(porDia, porNext72, porNext24));
+  return Math.round(Math.min(9, Math.max(1, escalaRisco(ESCALA_CHUVA, picoRatio))));
 }
 
 function soilIndex(obs){ let a=0; for(let i=0;i<obs.length;i++) a=a*SOIL_K+(obs[i]||0); return a; }
@@ -360,7 +358,7 @@ function cityFlood(){
   const chuva = agora.ratio>=1?3 : agora.ratio>=0.75?2 : agora.ratio>=0.5?1 : 0;
   const mag=magnitude(agora, rio, futuro.pico);
   const idxAgora=indiceAgora(agora.ratio, rio, futuro.eta);
-  const idxFuturo=indiceFuturo();
+  const idxFuturo=indiceFuturo(futuro.pico.ratio);
   return {ok:true, level:Math.max(rio.nivel,chuva),
           rio:rio.nivel, chuva, arrefeceu:rio.arrefeceu,
           indiceAgora:idxAgora, indiceFuturo:idxFuturo, indice:Math.max(idxAgora,idxFuturo),

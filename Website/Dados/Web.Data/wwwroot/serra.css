@@ -297,8 +297,10 @@ section{ margin-top: 18px; }
 /* Estado vazio do bloco de contexto: ocupa a grade inteira. */
 .ctx-vazio{ grid-column: 1 / -1; font-size: 0.85rem; color: var(--muted); }
 
-/* ===== Rede + contexto (linha superior) ===== */
-.top-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0 2px; }
+/* ===== Rede + contexto (agora no fim da pagina, depois das secoes
+   principais de risco/chuva/rios — sao infraestrutura de apoio, nao o
+   que importa primeiro) ===== */
+.top-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0 0; }
 .top-row .netcard{ margin:0; }
 .ctx-sub{ font-size:0.78rem; color:var(--muted); margin: 2px 2px 8px; }
 @media (max-width:620px){ .top-row{ grid-template-columns: 1fr; } }
@@ -555,11 +557,14 @@ body.storm .nc-st b, body.storm .nc-tag b{ color: var(--ink); }
   transform-origin: 100% 0%;
 }
 .test-ribbon .tr-close{
-  position: absolute; top:6px; right:7px; width:20px; height:20px; line-height:18px;
-  border:none; border-radius:50%; background: oklch(1 0 0 / 0.16); color: inherit;
-  font-size:1rem; cursor:pointer; padding:0; -webkit-appearance:none;
+  position: absolute; top:6px; right:7px; width:24px; height:24px;
+  display:flex; align-items:center; justify-content:center;
+  border: 1.5px solid oklch(1 0 0 / 0.7); border-radius:50%; background: var(--alert); color: oklch(0.99 0.006 30);
+  cursor:pointer; padding:0; -webkit-appearance:none;
+  box-shadow: 0 1px 5px oklch(0 0 0 / 0.32);
 }
-.test-ribbon .tr-close:hover{ background: oklch(1 0 0 / 0.28); }
+.test-ribbon .tr-close svg{ display:block; }
+.test-ribbon .tr-close:hover{ background: oklch(0.50 0.155 38); }
 .test-ribbon .tr-tag{
   display:inline-block; font-size:0.79rem; font-weight:700; text-transform:uppercase;
   letter-spacing:0.06em; background: oklch(1 0 0 / 0.18); border-radius:999px;
@@ -573,5 +578,6 @@ body.storm .nc-st b, body.storm .nc-tag b{ color: var(--ink); }
   .test-ribbon .tr-tag{ font-size:0.67rem; padding:1px 7px; margin-bottom:5px; }
   .test-ribbon .tr-txt{ font-size:0.74rem; margin-bottom:5px; }
   .test-ribbon .tr-cta{ font-size:0.67rem; }
-  .test-ribbon .tr-close{ width:18px; height:18px; line-height:16px; font-size:0.9rem; top:4px; right:4px; }
+  .test-ribbon .tr-close{ width:22px; height:22px; top:4px; right:4px; }
+  .test-ribbon .tr-close svg{ width:13px; height:13px; }
 }

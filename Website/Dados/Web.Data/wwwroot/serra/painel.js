@@ -202,7 +202,7 @@ export function renderForecast(){
   const mx=Math.max(10,Math.max.apply(null,APP.FC.days.map(d=>d.mm)));
   $("#fc-days").innerHTML=APP.FC.days.map((d,i)=>{ const dt=new Date(d.date+"T12:00"); const h=Math.round((d.mm/mx)*52); const cls=d.mm>=80?"heavy":d.mm>=20?"wet":""; const today=diaCurto(d.date)==="hoje";
     return '<div class="fc-d '+cls+(today?' today':'')+'"><div class="dow">'+DOW[dt.getDay()]+'</div><div class="dnum">'+String(dt.getDate()).padStart(2,"0")+'/'+String(dt.getMonth()+1).padStart(2,"0")+'</div><div class="fc-bar"><div class="b" style="--h:'+Math.max(2,h)+'px"></div></div><div class="mm">'+fmt(d.mm,d.mm>=10?0:1)+'</div><div class="pb">'+fmt(d.prob,0)+'%</div></div>'; }).join("");
-  $("#fc-note").innerHTML="Barras = mm/dia; % = probabilidade. Fonte: Open-Meteo (modelo ECMWF/Best-Match) para Rolante.";
+  $("#fc-note").innerHTML="Barras = mm/dia; % = probabilidade de chuva para Rolante.";
 }
 function dropSvg(){ return '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2 C 12.5 6,16 8.5,16 12 a6 6 0 1 1 -12 0 C 4 8.5,7.5 6,10 2 Z" fill="var(--teal)" opacity="0.9"/><path d="M10 2 C 12.5 6,16 8.5,16 12 a6 6 0 1 1 -12 0 C 4 8.5,7.5 6,10 2 Z" fill="none" stroke="var(--teal-deep)" stroke-width="1"/></svg>'; }
 

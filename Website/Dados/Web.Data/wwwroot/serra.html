@@ -14,7 +14,7 @@
 <canvas id="storm" aria-hidden="true"></canvas>
 
 <aside class="test-ribbon" id="testRibbon" role="note" aria-label="Aviso sobre a versão em testes">
-  <button class="tr-close" id="testRibbonClose" type="button" aria-label="Fechar aviso">×</button>
+  <button class="tr-close" id="testRibbonClose" type="button" aria-label="Fechar aviso"><svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M4 4 L16 16 M16 4 L4 16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
   <span class="tr-tag">Em testes</span>
   <p class="tr-txt">2 de 4 estações de nível dos rios em funcionamento.</p>
   <p class="tr-cta">Uma estação custa cerca de R$ 2.000. Empresário, ajude a bancar a
@@ -54,15 +54,6 @@
     </div>
   </header>
 
-  <div class="top-row">
-    <div class="netcard" id="net-card" role="status"><div class="nc-top"><div class="nc-ttl">Rede de estações</div></div>Verificando a rede…</div>
-    <div class="netcard" id="ctx-card" role="status">
-      <div class="nc-top"><div class="nc-ttl">Contexto atmosférico</div></div>
-      <div class="ctx-sub" id="ctx-h">Ar na estação de referência</div>
-      <div class="ctx-grid" id="ctx-grid"></div>
-    </div>
-  </div>
-
   <main>
     <!-- RISCO -->
     <section class="panel risk reveal d1" aria-labelledby="risk-h">
@@ -79,7 +70,7 @@
     <section class="panel series reveal d2" aria-labelledby="fc-h" id="fc-sec">
       <div class="sec-head">
         <div><div class="eyebrow">Chuva</div><h2 id="fc-h">Chuva: previsão e histórico</h2></div>
-        <span class="hint">Open-Meteo + rede de estações · Rolante</span>
+        <span class="hint">Previsão + rede de estações · Rolante</span>
       </div>
       <div class="chart-block">
         <div class="chart-title"><h3>Previsão por dia</h3><span class="u">próximos 7 dias</span></div>
@@ -123,8 +114,17 @@
     </section>
   </main>
 
+  <div class="top-row">
+    <div class="netcard" id="net-card" role="status"><div class="nc-top"><div class="nc-ttl">Rede de estações</div></div>Verificando a rede…</div>
+    <div class="netcard" id="ctx-card" role="status">
+      <div class="nc-top"><div class="nc-ttl">Contexto atmosférico</div></div>
+      <div class="ctx-sub" id="ctx-h">Ar na estação de referência</div>
+      <div class="ctx-grid" id="ctx-grid"></div>
+    </div>
+  </div>
+
   <p class="disclaimer">
-    Leituras das estações da rede e previsão do Open-Meteo, publicadas como medidas, sem
+    Leituras das estações da rede e previsão, publicadas como medidas, sem
     garantia de disponibilidade ou exatidão. Não é aviso oficial: alertas e orientações de
     segurança são da Defesa Civil e do Corpo de Bombeiros.
     <br>* Escala de risco de 1 a 10 construída a partir de poucos eventos reais medidos
