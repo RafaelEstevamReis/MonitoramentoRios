@@ -6,7 +6,7 @@
 import { APP } from "./estado.js";
 import { HMAX, CH } from "./config.js";
 import { $, fmt, clamp, smoothPath, diaCurto, sunTimesFor, horaDe } from "./util.js";
-import { codeTail, kmTxt } from "./config.js";
+import { codeTail, kmTxt, VENTO_LIMIAR } from "./config.js";
 import { rainPulse, rainNowOf } from "./dados.js";
 import { pulseTxt, rainWord } from "./rotulos.js";
 import { tipShow, tipHide } from "./tooltip.js";
@@ -18,16 +18,31 @@ import { svgText } from "./svg.js";
    e devolve marcacao; nenhum le estado global. */
 const CAIXA_CHUVA={Wv:360,Hv:172,L:30,R:12,T:24,B:26};
 
-/* Faixa clara = dia. O fundo do grafico e noite; a faixa marca so o intervalo
-   real entre nascer e por do sol de cada dia (calculado pra Rolante, ver
-   sunTimesFor) — assim da pra ver de longe se o pico cai de dia ou de
-   madrugada, sem precisar ler a hora em cada barra. */
+/* O gráfico começa pelo fundo da noite; as faixas amarelas mostram o dia
+   real entre nascer e pôr do sol em Rolante. Sol e lua ficam no começo de
+   cada período visível, para situar o horário sem competir com a chuva. */
+function iconeSol(x,y){
+  return '<g fill="none" stroke="var(--day-deep)" stroke-width="1.2" stroke-linecap="round"><circle cx="'+x+'" cy="'+y+'" r="2.2"/><path d="M '+x+' '+(y-5)+' v1.4 M '+x+' '+(y+3.6)+' v1.4 M '+(x-5)+' '+y+' h1.4 M '+(x+3.6)+' '+y+' h1.4 M '+(x-3.5)+' '+(y-3.5)+' l1 1 M '+(x+2.5)+' '+(y+2.5)+' l1 1 M '+(x-3.5)+' '+(y+3.5)+' l1 -1 M '+(x+2.5)+' '+(y-2.5)+' l1 -1"/></g>';
+}
+function iconeLua(x,y){
+  return '<path d="M '+(x+2.8)+' '+(y-5)+' A 5 5 0 1 0 '+(x+2.8)+' '+(y+5)+' A 3.6 3.6 0 0 1 '+(x+2.8)+' '+(y-5)+'" fill="none" stroke="var(--night-deep)" stroke-width="1.2" stroke-linecap="round"/>';
+}
+/* Vento forte: mesmo tracado do icone "wind" (Feather), reescalado. Centraliza
+   em (x,y) porque o path original tem o desenho deslocado do (0,0) do viewBox. */
+function iconeVento(x,y){
+  const s=0.34;
+  return '<g transform="translate('+x.toFixed(1)+','+y.toFixed(1)+') scale('+s+') translate(-11,-12)" fill="none" stroke="var(--alert)" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></g>';
+}
 function faixasDeDia(C, tt, n, timeToX){
-  const out=[], ini=new Date(tt[0]), fim=new Date(tt[n-1]);
+  const y=C.T, h=C.Hv-C.B-C.T, limiteE=C.L+5, limiteD=C.Wv-C.R-5;
+  const out=['<rect x="'+C.L+'" y="'+y+'" width="'+(C.Wv-C.L-C.R)+'" height="'+h+'" fill="var(--night)" opacity="0.22"/>'];
+  const ini=new Date(tt[0]), fim=new Date(tt[n-1]);
   for(let dt=new Date(ini.getFullYear(),ini.getMonth(),ini.getDate()); dt<=fim; dt.setDate(dt.getDate()+1)){
-    const sol=sunTimesFor(dt);
-    const x0=timeToX(sol.sunrise.getTime()), x1=timeToX(sol.sunset.getTime());
-    if(x1>x0) out.push('<rect x="'+x0.toFixed(1)+'" y="'+C.T+'" width="'+(x1-x0).toFixed(1)+'" height="'+(C.Hv-C.B-C.T)+'" fill="var(--warn)" opacity="0.09"/>');
+    const sol=sunTimesFor(dt), x0=timeToX(sol.sunrise.getTime()), x1=timeToX(sol.sunset.getTime());
+    if(x1<=x0) continue;
+    out.push('<rect x="'+x0.toFixed(1)+'" y="'+y+'" width="'+(x1-x0).toFixed(1)+'" height="'+h+'" fill="var(--day)" opacity="0.24"/>');
+    if(x0>=limiteE&&x0<=limiteD) out.push(iconeSol(x0+6,y+8));
+    if(x1>=limiteE&&x1<=limiteD) out.push(iconeLua(x1+6,y+8));
   }
   return out;
 }
@@ -49,6 +64,13 @@ function barrasDeChuva(C, pr, tt, n, xs, ys, bw){
     const passou=new Date(tt[i]).getTime()<agora-3600000;
     out.push('<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(0.6,h).toFixed(1)+'" rx="1" fill="'+cor+'"'+(passou?' opacity="0.38"':'')+'/>');
   }
+  return out;
+}
+/* So desenha o icone na hora que passa do limiar — as demais ficam sem
+   marcacao nenhuma, e nao um icone "fraco" ou apagado. */
+function marcasDeVento(C, ve, n, xs){
+  const y=C.T+12, out=[];
+  for(let i=0;i<n;i++) if((ve[i]||0)>=VENTO_LIMIAR) out.push(iconeVento(xs(i),y));
   return out;
 }
 function eixoDeHoras(C, tt, n, xs){
@@ -98,7 +120,7 @@ export function chartRain(){
     svg.innerHTML=svgText("previsão indisponível",{x:180,y:90,ancora:"meio",tam:11});
     return;
   }
-  const pr=APP.FC.hourly.p, tt=APP.FC.hourly.t, n=pr.length;
+  const pr=APP.FC.hourly.p, tt=APP.FC.hourly.t, ve=APP.FC.hourly.v||[], n=pr.length;
   const yMax=Math.max(2,Math.ceil(Math.max.apply(null,pr)*1.15));
   const xs=i=>C.L+i*(C.Wv-C.L-C.R)/(n-1);
   const ys=v=>(C.Hv-C.B)-v/yMax*(C.Hv-C.B-C.T);
@@ -112,9 +134,10 @@ export function chartRain(){
     eixoDeHoras(C,tt,n,xs),
     rotulosDeDia(C,tt,n,xs),
     marcaAgora(C,tt,n,xs),
+    marcasDeVento(C,ve,n,xs),
     camadaDeHover(C)
   ).join("");
-  hookRainHover(svg,{Wv:C.Wv,L:C.L,R:C.R,n:n,bw:bw,xs:xs,pr:pr,tt:tt});
+  hookRainHover(svg,{Wv:C.Wv,L:C.L,R:C.R,n:n,bw:bw,xs:xs,pr:pr,tt:tt,ve:ve});
 }
 
 function hookRainHover(svg,C){
@@ -124,11 +147,12 @@ function hookRainHover(svg,C){
     const r=svg.getBoundingClientRect(); if(!r.width) return;
     const vx=(ev.clientX-r.left)*C.Wv/r.width;
     const i=Math.round(clamp((vx-C.L)/((C.Wv-C.L-C.R)/(C.n-1)),0,C.n-1));
-    const x=C.xs(i), mm=C.pr[i]||0, d=new Date(C.tt[i]);
+    const x=C.xs(i), mm=C.pr[i]||0, vento=(C.ve&&C.ve[i])||0, d=new Date(C.tt[i]);
     band.setAttribute("x",(x-C.bw/2-0.8).toFixed(1)); band.setAttribute("width",(C.bw+1.6).toFixed(1));
     line.setAttribute("x1",x.toFixed(1)); line.setAttribute("x2",x.toFixed(1));
     band.setAttribute("visibility","visible"); line.setAttribute("visibility","visible");
-    tipShow('<b>'+diaCurto(C.tt[i])+' · '+String(d.getHours()).padStart(2,"0")+'h</b><br><span class="kv">'+fmt(mm,1)+' mm/h · '+rainWord(mm)+'</span>',ev);
+    const ventoTx=vento>=VENTO_LIMIAR?' · vento forte ~'+fmt(vento,0)+' km/h':'';
+    tipShow('<b>'+diaCurto(C.tt[i])+' · '+String(d.getHours()).padStart(2,"0")+'h</b><br><span class="kv">'+fmt(mm,1)+' mm/h · '+rainWord(mm)+ventoTx+'</span>',ev);
   }
   function off(){ band.setAttribute("visibility","hidden"); line.setAttribute("visibility","hidden"); tipHide(); }
   hit.addEventListener("mousemove",at);

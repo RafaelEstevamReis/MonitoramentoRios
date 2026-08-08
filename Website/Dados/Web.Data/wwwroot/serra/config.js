@@ -17,6 +17,10 @@ const isDev = (location.hostname === "localhost" || location.hostname === "127.0
 export const API    = apiOverride ?? (isDev ? "https://rios.bitcoineaqui.com.br" : "");
 export const API_FC = apiOverride ?? "";
 export const HMAX=96, CH=36;                 // buckets carregados / mostrados no grafico
+/* Vento forte, pedido explicito do dono do painel: acima disso vira simbolo
+   no grafico horario e frase na manchete; abaixo fica oculto, sem poluir a
+   leitura normal de chuva com um dado que quase nunca importa. */
+export const VENTO_LIMIAR=40;
 
 /* Registro: coords reais (map.html), limiares reais (rsrl2.html), bacia confirmada pelo usuario.
    bacia: "areia" | "rolante". cotaAlerta so existe onde ha regua de nivel aferida. */

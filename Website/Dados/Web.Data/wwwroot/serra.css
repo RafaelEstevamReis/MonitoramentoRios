@@ -19,6 +19,11 @@
   --moss-deep: oklch(0.520 0.098 134);
   --granite:   oklch(0.560 0.014 235);
   --granite-2: oklch(0.700 0.012 235);
+  --night:     oklch(0.420 0.062 246);
+  --night-deep:oklch(0.320 0.045 245);
+  --day:       oklch(0.760 0.145 82);
+  --day-deep:  oklch(0.560 0.132 68);
+
   --terra:     oklch(0.610 0.120 55);
   --terra-deep:oklch(0.510 0.115 50);
   --teal:      oklch(0.615 0.088 208);
@@ -276,8 +281,8 @@ section{ margin-top: 18px; }
 .cl .ln-fraca{ background: var(--teal); }
 .cl .ln-moderada{ background: var(--terra-deep); }
 .cl .ln-forte{ background: var(--alert); }
-.cl .ln-dia{ background: var(--warn); opacity: 0.5; }
-.cl.nota{ color: var(--muted); }
+.cl .ln-noite{ background: var(--night); opacity: 0.65; }
+.cl .ln-dia{ background: var(--day); opacity: 0.65; }
 .cl .sw{ width:13px; height:13px; border-radius:3px; flex:0 0 auto; border:1px solid oklch(0.30 0.03 150 / 0.12); }
 .cl .sw-0{ background: var(--hm-0); }
 .cl .sw-2{ background: var(--hm-2); }

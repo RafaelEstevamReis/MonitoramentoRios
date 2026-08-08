@@ -4,7 +4,7 @@
    ======================================================================== */
 
 import { APP } from "./estado.js";
-import { HMAX, CH, REG, REGBY, rioNome, rioArt } from "./config.js";
+import { HMAX, CH, REG, REGBY, rioNome, rioArt, VENTO_LIMIAR } from "./config.js";
 import { $, fmt, clamp, DOW, diaCurto, horaCurta, quandoTxt, fillGaps, smoothPath } from "./util.js";
 import { statusRel, chuvaStatus, rainCls, trendTxt, cotaTxt, pulseTxt } from "./rotulos.js";
 import { rainPulse } from "./dados.js";
@@ -76,9 +76,15 @@ function manchete(R){
     return "Chovendo agora"+quanto+".";
   }
   const pico=APP.FC&&APP.FC.peakDay;
+  const vento=APP.FC&&APP.FC.windDay;
+  /* So entra na frase quando passa do limiar (mesmo do grafico horario) —
+     abaixo disso o vento nao muda em nada a leitura do dia. */
+  const fraseVento = (vento&&vento.windMax>=VENTO_LIMIAR)
+    ? " Vento forte previsto: ~"+fmt(vento.windMax,0)+" km/h em "+diaCurto(vento.date)+"."
+    : "";
   if(pico&&pico.mm>=15)
-    return "Sem chuva agora. Previsão aponta ~"+fmt(pico.mm,0)+" mm em "+diaCurto(pico.date)+" (prob. "+fmt(pico.prob,0)+"%).";
-  return "Sem chuva agora. Sem chuva relevante prevista.";
+    return "Sem chuva agora. Previsão aponta ~"+fmt(pico.mm,0)+" mm em "+diaCurto(pico.date)+" (prob. "+fmt(pico.prob,0)+"%)."+fraseVento;
+  return "Sem chuva agora. Sem chuva relevante prevista."+fraseVento;
 }
 /* A linha de apoio ficou com UMA informacao: onde choveu mais forte. Todo o
    resto (rio em relacao ao limite, solo, chuva medida, limite vigente) esta nos
