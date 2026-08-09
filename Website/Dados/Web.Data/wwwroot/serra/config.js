@@ -17,14 +17,6 @@ const isDev = (location.hostname === "localhost" || location.hostname === "127.0
 export const API    = apiOverride ?? (isDev ? "https://rios.bitcoineaqui.com.br" : "");
 export const API_FC = apiOverride ?? "";
 export const HMAX=96, CH=36;                 // buckets carregados / mostrados no grafico
-/* Limiar de RAJADA (nao vento sustentado). Calibrado contra o vendaval real
-   de 06-07/08/2026 em Rolante (alerta vermelho do INMET, rajadas de
-   60-100 km/h): vento sustentado nao distinguiu o dia do vendaval de um dia
-   comum (22-23 km/h nos dois), mas rajada sim — 6-16 h acima de 40 km/h no
-   vendaval, contra 0 h na maioria dos outros dias de uma janela de 3
-   semanas. Acima disso vira simbolo no grafico horario e frase na manchete;
-   abaixo fica oculto, sem poluir a leitura normal de chuva com um dado que
-   quase nunca importa. */
 export const VENTO_LIMIAR=40;
 
 /* Registro: coords reais (map.html), limiares reais (rsrl2.html), bacia confirmada pelo usuario.

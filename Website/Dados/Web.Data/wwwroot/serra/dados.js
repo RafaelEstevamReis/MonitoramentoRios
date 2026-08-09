@@ -318,7 +318,8 @@ function agregaPorDia(horas, mm, rows, inicio){
     const e=porDia.get(dia);
     e.mm += mm[k]||0;
     e.prob = Math.max(e.prob, rows[k].precipitacaoProb||0);
-    e.windMax = Math.max(e.windMax, rows[k].ventoRajada||0);
+    e.windMax = Math.max(e.windMax, rows[k].ventoVelocidade||0);
+
   }
   return Array.from(porDia,([date,v])=>({date, mm:v.mm, prob:v.prob, windMax:v.windMax})).slice(0,7);
 }
@@ -348,14 +349,10 @@ export async function loadForecast(){
     if(!rows || !rows.length){ APP.FC=null; return; }
     const horas=rows.map(r=>r.forecastUTC.endsWith("Z")?r.forecastUTC:r.forecastUTC+"Z");
     const mm=rows.map(r=>r.precipitacao||0);
-    /* Rajada (ventoRajada), nao vento sustentado (ventoVelocidade). Validado
-       contra o vendaval real de 06-07/08/2026 (alerta vermelho do INMET,
-       rajadas de 60-100 km/h): o vento sustentado mal se mexeu (max 22-23
-       km/h, igual a dia calmo), mas a rajada disparou (54-58 km/h, 6-16 h
-       acima de 40 km/h — contra 0 h em quase todos os outros dias de uma
-       janela de 3 semanas). Sustentado nao serve pra alertar vento forte
-       localizado de serra; rajada sim. */
-    const vento=rows.map(r=>r.ventoRajada||0);
+    /* item.ventoVelocidade ja vem do /weather/ext (mesmo endpoint que
+       tempo.html/rsrl.js ja usam) — so precisa entrar na janela horaria. */
+    const vento=rows.map(r=>r.ventoVelocidade||0);
+
     const agora=Date.now();
     const inicio=primeiraLinhaValida(horas, agora);
     const dias=agregaPorDia(horas, mm, rows, inicio);

@@ -151,7 +151,8 @@ function hookRainHover(svg,C){
     band.setAttribute("x",(x-C.bw/2-0.8).toFixed(1)); band.setAttribute("width",(C.bw+1.6).toFixed(1));
     line.setAttribute("x1",x.toFixed(1)); line.setAttribute("x2",x.toFixed(1));
     band.setAttribute("visibility","visible"); line.setAttribute("visibility","visible");
-    const ventoTx=vento>=VENTO_LIMIAR?' · rajada forte ~'+fmt(vento,0)+' km/h':'';
+    const ventoTx=vento>=VENTO_LIMIAR?' · vento forte ~'+fmt(vento,0)+' km/h':'';
+
     tipShow('<b>'+diaCurto(C.tt[i])+' · '+String(d.getHours()).padStart(2,"0")+'h</b><br><span class="kv">'+fmt(mm,1)+' mm/h · '+rainWord(mm)+ventoTx+'</span>',ev);
   }
   function off(){ band.setAttribute("visibility","hidden"); line.setAttribute("visibility","hidden"); tipHide(); }
