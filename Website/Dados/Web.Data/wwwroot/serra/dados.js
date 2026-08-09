@@ -318,8 +318,7 @@ function agregaPorDia(horas, mm, rows, inicio){
     const e=porDia.get(dia);
     e.mm += mm[k]||0;
     e.prob = Math.max(e.prob, rows[k].precipitacaoProb||0);
-    e.windMax = Math.max(e.windMax, rows[k].ventoVelocidade||0);
-
+    e.windMax = Math.max(e.windMax, rows[k].ventoRajada||0);
   }
   return Array.from(porDia,([date,v])=>({date, mm:v.mm, prob:v.prob, windMax:v.windMax})).slice(0,7);
 }
@@ -349,10 +348,8 @@ export async function loadForecast(){
     if(!rows || !rows.length){ APP.FC=null; return; }
     const horas=rows.map(r=>r.forecastUTC.endsWith("Z")?r.forecastUTC:r.forecastUTC+"Z");
     const mm=rows.map(r=>r.precipitacao||0);
-    /* item.ventoVelocidade ja vem do /weather/ext (mesmo endpoint que
-       tempo.html/rsrl.js ja usam) — so precisa entrar na janela horaria. */
-    const vento=rows.map(r=>r.ventoVelocidade||0);
-
+    // ventoRajada (rajada), nao ventoVelocidade (sustentado) — sustentado nao distingue vendaval de dia comum.
+    const vento=rows.map(r=>r.ventoRajada||0);
     const agora=Date.now();
     const inicio=primeiraLinhaValida(horas, agora);
     const dias=agregaPorDia(horas, mm, rows, inicio);
