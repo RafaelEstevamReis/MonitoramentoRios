@@ -17,6 +17,7 @@ const isDev = (location.hostname === "localhost" || location.hostname === "127.0
 export const API    = apiOverride ?? (isDev ? "https://rios.bitcoineaqui.com.br" : "");
 export const API_FC = apiOverride ?? "";
 export const HMAX=96, CH=36;                 // buckets carregados / mostrados no grafico
+// Limiar de RAJADA (nao vento sustentado) — vento sustentado nao distingue vendaval de dia comum.
 export const VENTO_LIMIAR=40;
 
 /* Registro: coords reais (map.html), limiares reais (rsrl2.html), bacia confirmada pelo usuario.
