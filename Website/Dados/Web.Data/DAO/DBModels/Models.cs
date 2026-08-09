@@ -188,6 +188,12 @@ public class TBWeather
     public decimal Umidade { get; set; }
     public decimal Pressao { get; set; }
     public decimal VentoVelocidade { get; set; }
+    /* Rajada (wind_gusts_10m), ja vinha na chamada ao Open-Meteo mas nao era
+       guardada. Validado contra o vendaval de 06-07/08/2026 (alerta vermelho
+       do INMET): vento SUSTENTADO mal se mexeu (max 22-23 km/h, igual a dias
+       calmos), mas a RAJADA disparou (54-58 km/h, 6-16 h acima de 40 km/h,
+       contra 0 h na maioria dos dias calmos da mesma janela de 3 semanas). */
+    public decimal VentoRajada { get; set; }
     public int VentoDirecao { get; set; }
     public decimal PrecipitacaoProb { get; set; }
     public decimal Precipitacao { get; set; }

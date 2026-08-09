@@ -319,6 +319,7 @@ function agregaPorDia(horas, mm, rows, inicio){
     e.mm += mm[k]||0;
     e.prob = Math.max(e.prob, rows[k].precipitacaoProb||0);
     e.windMax = Math.max(e.windMax, rows[k].ventoVelocidade||0);
+
   }
   return Array.from(porDia,([date,v])=>({date, mm:v.mm, prob:v.prob, windMax:v.windMax})).slice(0,7);
 }
@@ -351,6 +352,7 @@ export async function loadForecast(){
     /* item.ventoVelocidade ja vem do /weather/ext (mesmo endpoint que
        tempo.html/rsrl.js ja usam) — so precisa entrar na janela horaria. */
     const vento=rows.map(r=>r.ventoVelocidade||0);
+
     const agora=Date.now();
     const inicio=primeiraLinhaValida(horas, agora);
     const dias=agregaPorDia(horas, mm, rows, inicio);

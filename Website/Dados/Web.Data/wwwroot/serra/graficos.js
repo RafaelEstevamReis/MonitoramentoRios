@@ -152,6 +152,7 @@ function hookRainHover(svg,C){
     line.setAttribute("x1",x.toFixed(1)); line.setAttribute("x2",x.toFixed(1));
     band.setAttribute("visibility","visible"); line.setAttribute("visibility","visible");
     const ventoTx=vento>=VENTO_LIMIAR?' · vento forte ~'+fmt(vento,0)+' km/h':'';
+
     tipShow('<b>'+diaCurto(C.tt[i])+' · '+String(d.getHours()).padStart(2,"0")+'h</b><br><span class="kv">'+fmt(mm,1)+' mm/h · '+rainWord(mm)+ventoTx+'</span>',ev);
   }
   function off(){ band.setAttribute("visibility","hidden"); line.setAttribute("visibility","hidden"); tipHide(); }
@@ -230,11 +231,44 @@ function eixoDoMapa(M, off, cw, yb){
   out.push(svgText("agora",{x:M.Wv-M.padR, y:yb+11, ancora:"fim", tam:8.5, peso:600, cor:"var(--ink-2)"}));
   return out;
 }
+/* Linha de hora que acompanha o mouse/dedo, igual ao grafico "Chuva prevista
+   por hora" — sem ela so dava pra saber a hora nas 4 marcas fixas do eixo. */
+function camadaDeHoverMapa(M, yFim){
+  return [
+    '<rect class="hover-band" x="0" y="'+M.y0+'" width="0" height="'+(yFim-M.y0).toFixed(1)+'" rx="1" visibility="hidden"/>',
+    '<line class="hover-line" x1="0" y1="'+M.y0+'" x2="0" y2="'+yFim.toFixed(1)+'" visibility="hidden"/>',
+    '<rect class="chart-hit" x="'+M.padL+'" y="'+M.y0+'" width="'+(M.Wv-M.padL-M.padR).toFixed(1)+'" height="'+(yFim-M.y0).toFixed(1)+'" fill="transparent"/>'
+  ];
+}
+function hookRainMapHover(svg, ctx){
+  const band=svg.querySelector(".hover-band"), line=svg.querySelector(".hover-line"), hit=svg.querySelector(".chart-hit");
+  if(!hit) return;
+  function at(ev){
+    const r=svg.getBoundingClientRect(); if(!r.width) return;
+    const vx=(ev.clientX-r.left)*ctx.Wv/r.width;
+    const i=clamp(Math.floor((vx-ctx.padL)/ctx.cw),0,ctx.CH-1);
+    const x=ctx.padL+i*ctx.cw;
+    band.setAttribute("x",(x+0.4).toFixed(1)); band.setAttribute("width",(ctx.cw-0.8).toFixed(1));
+    line.setAttribute("x1",(x+ctx.cw/2).toFixed(1)); line.setAttribute("x2",(x+ctx.cw/2).toFixed(1));
+    band.setAttribute("visibility","visible"); line.setAttribute("visibility","visible");
+    const c=ctx.cov[i];
+    const tx = c&&c.t ? (c.n+' de '+c.t+' estações com chuva'+(c.mx?' · máx '+fmt(c.mx,1)+' mm/h':'')) : 'sem dado nessa hora';
+    tipShow('<b>'+APP.labels[ctx.off+i]+'</b><br><span class="kv">'+tx+'</span>',ev);
+  }
+  function sai(){ band.setAttribute("visibility","hidden"); line.setAttribute("visibility","hidden"); tipHide(); }
+  hit.addEventListener("mousemove",at);
+  hit.addEventListener("mouseleave",sai);
+  hit.addEventListener("touchstart",function(e){ if(e.touches[0]) at(e.touches[0]); },{passive:true});
+  hit.addEventListener("touchmove",function(e){ if(e.touches[0]) at(e.touches[0]); },{passive:true});
+  hit.addEventListener("touchend",sai);
+  hit.addEventListener("touchcancel",sai);
+}
 function legendaDoMapa(){
   const faixas=[["sw-0","sem chuva"],["sw-2","fraca"],["sw-3","moderada"],["sw-4","forte"],["sw-5","muito forte"]];
   return faixas.map(([cls,txt])=>'<span class="cl"><span class="sw '+cls+'"></span>'+txt+'</span>').join("")+
     '<span class="cl nota">cada linha é uma estação, da cabeceira para a cidade · cinza = sem dado</span>'+
-    '<span class="cl nota">faixa de cima: altura = quantas estações estavam com chuva naquela hora</span>';
+    '<span class="cl nota">faixa de cima: altura = quantas estações estavam com chuva naquela hora</span>'+
+    '<span class="cl nota">passe o mouse (ou o dedo) sobre o mapa para ver a hora de cada coluna</span>';
 }
 export function chartRainMap(){
   const svg=$("#chart-rainmap"), leg=$("#rainmap-legend"), read=$("#rainmap-read"); if(!svg) return;
@@ -259,10 +293,12 @@ export function chartRainMap(){
   svg.innerHTML=[].concat(
     faixaAbrangencia(M,cov,off,sts.length,cw),
     linhas.marcacao,
-    eixoDoMapa(M,off,cw,linhas.yFim)
+    eixoDoMapa(M,off,cw,linhas.yFim),
+    camadaDeHoverMapa(M,linhas.yFim)
   ).join("");
   if(read) read.innerHTML=rainSpreadTxt(cov,sts.length);
   if(leg) leg.innerHTML=legendaDoMapa();
+  hookRainMapHover(svg,{Wv:M.Wv,padL:M.padL,padR:M.padR,cw:cw,CH:CH,off:off,cov:cov});
 }
 /* Le a faixa de abrangencia em palavras: e a resposta para "chove em toda a
    regiao ou so num ponto?", que o grafico de maximo nao conseguia dar. */

@@ -442,6 +442,7 @@ body.ready .chart-line{ stroke-dashoffset: 0; }
 .fc-d .mm{ font-size:0.8rem; font-weight:700; color:var(--pine-deep); }
 .fc-d .pb{ font-size:0.64rem; color:var(--muted); }
 .fc-d.today{ outline:2px solid oklch(0.52 0.098 134 / 0.4); outline-offset:-1px; }
+.fc-d .fc-wind{ position:absolute; top:5px; right:6px; line-height:0; cursor:help; }
 .fc-note{ font-size:0.74rem; color:var(--muted); margin: 10px 2px 0; }
 
 /* ===== Bacias ===== */

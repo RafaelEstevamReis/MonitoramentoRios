@@ -88,6 +88,7 @@ public class WeatherOpenMeteo(DB db, ILogger logger, OpenMeteoService openMeteoS
                         Precipitacao = d1h.precipitation[i],
                         PrecipitacaoProb = d1h.precipitation_probability[i],
                         VentoVelocidade = d1h.wind_speed_10m[i],
+                        VentoRajada = d1h.wind_gusts_10m[i],
                         VentoDirecao = (int)d1h.wind_direction_10m[i],
                         Pressao = d1h.surface_pressure[i],
                         PictoCode = -1,
