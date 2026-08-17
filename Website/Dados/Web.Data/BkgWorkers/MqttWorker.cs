@@ -18,17 +18,23 @@ public class MqttWorker : IHostedService, IDisposable
     private readonly ILogger logger;
     private readonly CancellationTokenSource tokenSrc;
     private readonly CancellationToken token;
+    private readonly Meshtastic? meshtastic;
     private readonly MqttClientOptions mqttClientOptions;
     private readonly DB db;
 
-    public MqttWorker(ILogger logger, DB db, string? host, string? user, string? pass)
+    public MqttWorker(ILogger logger, DB db, string? host, string? user, string? pass, string? psk)
     {
         this.db = db;
         this.logger = logger;
         tokenSrc = new CancellationTokenSource();
         token = tokenSrc.Token;
+        meshtastic = Meshtastic.Create(psk);
+        if (psk != null && meshtastic == null)
+        {
+            logger.Warning("[LoRaMQTT] PSK do canal 0 invalida | topicos /e/ ignorados");
+        }
 
-        if(host == null)
+        if (host == null)
         {
             logger.Warning("[LoRaMQTT] NO-HOST | Unable to configure service");
             return;
@@ -41,7 +47,7 @@ public class MqttWorker : IHostedService, IDisposable
     }
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        if(mqttClientOptions == null)
+        if (mqttClientOptions == null)
         {
             logger.Warning("[LoRaMQTT] Disabled");
             return;
@@ -117,10 +123,10 @@ public class MqttWorker : IHostedService, IDisposable
         {
             topic = args.ApplicationMessage.Topic;
             payload = args.ApplicationMessage.Payload.ToArray();
-            msg = Encoding.UTF8.GetString(payload);
+            if (topic.Contains("/json/")) msg = Encoding.UTF8.GetString(payload);
 
             // Fire-and-Forget
-            processMessage(args, topic, args.ApplicationMessage.Payload.ToArray(), msg);
+            processMessage(args, topic, payload, msg);
         }
         catch (Exception ex)
         {
@@ -131,19 +137,40 @@ public class MqttWorker : IHostedService, IDisposable
     }
     private async void processMessage(MqttApplicationMessageReceivedEventArgs args, string topic, byte[] payload, string msg)
     {
-        if (!topic.Contains("/json/")) return; // ignorar binários
+        if (topic.Contains("/e/"))
+        {
+            if (meshtastic == null)
+            {
+                return;
+            }
 
-        var jsonEvent = Newtonsoft.Json.JsonConvert.DeserializeObject<JsonEvent>(msg);
-        if (jsonEvent.type != "text") return;
+            // Gateway publicando ServiceEnvelope cifrado em vez de JSON.
+            var pacote = meshtastic.ReadEnvelope(payload);
+            if (pacote == null) return;                         // outro canal, PKI ou nao-envelope
+            if (pacote.PortNum != Meshtastic.PortText) return; // nodeinfo/position/telemetry
 
-        // O payload será:
-        // a. um objeto JObject
-        // b. um número quando o conteúdo da mensagem for um número
-        if (jsonEvent.payload is not JObject jPayload) return; // Não é dado de estação
+            var evento = new JsonEvent
+            {
+                from = pacote.From,
+                timestamp = pacote.RxTime != 0 ? pacote.RxTime : DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            };
+            await processaMensagemTexto(args, topic, evento, pacote.Text);
+        }
 
-        // converte para eventText
-        var jsonEventPayloadText = jPayload.ToObject<JsonEventPayloadText>();
-        await processaMensagemTexto(args, topic, jsonEvent, jsonEventPayloadText?.text ?? "");
+        if (topic.Contains("/json/"))
+        {
+            var jsonEvent = Newtonsoft.Json.JsonConvert.DeserializeObject<JsonEvent>(msg);
+            if (jsonEvent.type != "text") return;
+
+            // O payload será:
+            // a. um objeto JObject
+            // b. um número quando o conteúdo da mensagem for um número
+            if (jsonEvent.payload is not JObject jPayload) return; // Não é dado de estação
+
+            // converte para eventText
+            var jsonEventPayloadText = jPayload.ToObject<JsonEventPayloadText>();
+            await processaMensagemTexto(args, topic, jsonEvent, jsonEventPayloadText?.text ?? "");
+        }
     }
 
     private async Task processaMensagemTexto(MqttApplicationMessageReceivedEventArgs args, string topic, JsonEvent jsonEvent, string text)

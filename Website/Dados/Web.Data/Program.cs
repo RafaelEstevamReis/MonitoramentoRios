@@ -55,7 +55,8 @@ builder.Services.AddHostedService(i =>
     var host = builder.Configuration["mqtt_server"];
     var user = builder.Configuration["mqtt_user"];
     var pass = builder.Configuration["mqtt_pass"];
-    return new Web.Data.BkgWorkers.MqttWorker(i.GetService<ILogger>(), i.GetService<Web.Data.DAO.DB>(), host, user, pass);
+    var psk = builder.Configuration["mqtt_ch0_psk"];
+    return new Web.Data.BkgWorkers.MqttWorker(i.GetService<ILogger>(), i.GetService<Web.Data.DAO.DB>(), host, user, pass, psk);
 });
 builder.Services.AddHostedService(i =>
 {
